@@ -217,9 +217,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   /* Global Background */
-  background-image: url(--nn-background-image);
   background-color: var(--nn-body-background-color);
-  background-image: var(--nn-body-background-image);
+  background-image: var(--nn-background-image);
   background-position: center;
   background-size: cover;
 
