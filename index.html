@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- About Your Site                                                   -->
+    <!-- ----------------------------------------------------------------- -->
+    <link rel="shortcut icon" type="image/png" href="assets/narwhal.png" />
+    <title>Naras Nature</title>
+    <meta property="title" content="Naras Nature" />
+    <meta property="type" content="website" />
+    <meta property="url" content="https://narasnature.netlify.app" />
+    <meta property="image" content="assets/meta.png" />
+    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+
+    <!-- No AI scraping directives -->
+    <meta name="robots" content="noai">
+    <meta name="robots" content="noimageai">
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Styles                                                            -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- Bootstrap CSS -->
+    <!-- Using Bootstrap 4.5 because its closest to Toyhou.se's current version -->
+    <!-- https://getbootstrap.com/docs/4.5/getting-started/introduction/ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Optional Styles                                                   -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="styles/narasnature.css">
+
+</head>
+
+<body>
+
+
+    <!-- --------------------------------------------------------------------
+    <-- Header
+    <-------------------------------------------------------------------- -->
+    
+    <div class="load-html" id="header" data-source="includes/header.html"></div>
+
+
+    <!-- Spinner for loading-->
+    <div class="spinner-border m-auto" id="loading"></div>
+
+
+    <!-- --------------------------------------------------------------------
+    <-- Terms
+    <-- I've provided a boiler plate, edit these how you see fit!
+    <-------------------------------------------------------------------- -->
+    <div class="softload py-md-5 my-4 py-4" id="main-container">
+        <div class="row no-gutters m-n2">
+
+            <!-- Main Content
+            --------------------------------------------------------------------- -->
+            <div class="col-12 p-2">
+                <div class="card p-md-5 p-4 h-100">
+
+                    <!-- Hero Image & Title
+                    ------------------------------------------------------------- -->
+                    <div class="hero-title mb-4" style="background-image: url();">
+                        <div class="m-auto">Wander in Nature...</div>
+                    </div>
+
+
+                    <!-- Description
+                    ------------------------------------------------------------- -->
+                    <div class="px-4 text-muted">
+                        <p>NARAS NATURE is a freeform private ARPG species about magical creatures that 
+                            sport long fur and magical vessels atop their heads. Naras are the main focus
+                            of this group, resembling fluffy carnivora with unicorn-like attributes.</p>
+
+                        <p>We are a low-energy species group that focuses on personal character and 
+                            community growth through art and designs.</p>
+                        
+                        <p>The group is currently in development and operates on an invite-only basis.</p>
+                    </div>
+
+
+                    <!-- Links
+                    ------------------------------------------------------------- -->
+                    <hr class="my-4">
+                    <div class="row no-gutters m-n1 mb-n2">
+
+                        <div class="col-lg-4 p-1 text-center">
+                            <p style="font-size:150%"><i class="fa-solid fa-earth-oceania"></i> Naras Nature</p>
+                            <h6 class="px-3">
+                                <a class="btn btn-primary d-block mb-1" href="encyclopedia.html">Encyclopedia</a>
+                                <a class="btn btn-primary d-block mb-1" href="lore.html">Lore</a>
+                                <a class="btn btn-primary d-block mb-1" href="masterlist.html">Designs</a>
+                            </h6>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 p-1 text-center">
+                            <p style="font-size:150%"><i class="fa-solid fa-people-roof"></i> Town Hall</p>
+                            <h6 class="px-3">
+                                <a class="btn btn-primary d-block mb-1" href="#">Newcomer Guide</a>
+                                <a class="btn btn-primary d-block mb-1" href="#">Summoning</a>
+                            <a class="btn btn-primary d-block mb-1" href="pursuits.html">Pursuits</a>
+                            </h6>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 p-1 text-center">
+                            <p style="font-size:150%"><i class="fa-solid fa-scroll"></i> Librarium</p>
+                            <h6 class="px-3">
+                                <a class="btn btn-primary d-block mb-1" href="#">Help Desk</a>
+                                <a class="btn btn-primary d-block mb-1" href="faq.html">FAQ</a>
+                                <a class="btn btn-primary d-block mb-1" href="terms.html">TOS</a>
+                            </h6>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Social Media Links
+                    ------------------------------------------------------------- -->
+                    <hr class="mt-4">
+                    <h6 class="text-center mb-md-n4">
+
+                        <a class="mx-3" href="https://toyhou.se/~lore/57896.narasnature"><i class="fa-solid fa-house fa-fw mr-1"></i> Toyhou.se</a>
+                        <a class="mx-3" href="https://discord.gg/J6XNr5ndZK"><i class="fab fa-discord fa-fw mr-1"></i> Discord</a>
+                        <a class="mx-3" href="#"><i class="fab fa-twitter fa-fw mr-1"></i> Twitter </a>
+                        <a class="mx-3" href="#"><i class="fab fa-tumblr fa-fw mr-1"></i> Tumblr</a>
+                        <a class="mx-3" href="#"><i class="fas fa-cloud fa-fw mr-1"></i> BSky</a>
+
+                    </h6>
+                </div>
+            </div>
+
+            <!-- Designs
+            --------------------------------------------------------------------- -->
+            <div class="col-md-12 p-2" id="design-gallery">
+                <div class="card p-md-5 p-4 h-100">
+
+                    <h4 class="mb-0">Newest Naras</h4>
+                    <hr class="mb-4">
+                    <div class="list row no-gutters gallery-row m-n1"></div>
+
+                    <div class="d-none">
+                        <div class="col-md-3 col-6 gallery-item p-1" id="design-item">
+                            <a class="card p-2 bg-faded d-block text-center cardlink" href="">
+                                <img class="image img-fluid gallery-img" src=""><br>
+                                <h6 class="btn btn-primary d-block mt-2 design"></h6>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- pursuits
+            --------------------------------------------------------------------- -->
+            <div class="col-md-6 p-2" id="quest-gallery">
+                <div class="card p-md-5 p-4 h-100">
+
+                    <h4 class="mb-0">Pursuits</h4>
+                    <hr class="mb-4">
+                    <div class="list row no-gutters gallery-row m-n1"></div>
+
+                    <div class="d-none">
+                        <div class="col-12 gallery-item p-1" id="quest-item">
+                            <div class="card bg-faded p-3">
+                                <h5 class="m-0">
+                                    <a class="cardlink title" href=""></a>
+                                </h5>
+                                <hr class="my-2">
+                                <div class="row no-gutters small my-n2">
+                                    <div class="col-md-6 p-2 d-flex justify-content-between">
+                                        <b>Starts</b> <span class="startdate"></span>
+                                    </div>
+                                    <div class="col-md-6 p-2 d-flex justify-content-between">
+                                        <b>Ends</b> <span class="enddate"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Staff
+            --------------------------------------------------------------------- -->
+            <div class="col-md-6 p-2" id="staff-gallery">
+                <div class="card p-md-5 p-4 h-100">
+
+                    <h4 class="mb-0">Celestials</h4>
+                    <hr class="mb-4">
+                    <div class="list row no-gutters gallery-row m-n1"></div>
+
+                    <div class="d-none">
+                        <div class="col-md-6 gallery-item p-1" id="staff-item">
+                            <div class="row no-gutters m-n1">
+                                <div class="col-4 p-1 my-auto">
+                                    <img class="img-fluid img-thumbnail image" src="">
+                                </div>
+                                <div class="col-8 p-1">
+                                    <a class="d-block mt-2 link text-truncate" href=""><h6 class="username"></h6></a>
+                                    <h6 class="badge badge-primary jobtitle"></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------------------
+    <-- Footer
+    <-------------------------------------------------------------------- -->
+    
+    <div class="load-html" id="footer" data-source="includes/footer.html"></div>
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- JS                                                                -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    <!-- List.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
+
+    <!-- narasnature Script -->
+    <script src="styles/config.js"></script>
+    <script src="styles/narasnature.js"></script>
+    <script>frontPage(options.index);</script>
+
+
+</body>
+
+</html>
