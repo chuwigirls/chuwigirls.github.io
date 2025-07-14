@@ -28,6 +28,7 @@ body {
   /* ============================================================= */
   /* Backgrounds
   ================================================================ */
+  --nn-background-image:                 url("/assets/vaporwave_grid.png");
   --nn-body-background-color:            #f0ecec;
   --nn-content-background-color:         #c7e4f5;
   --nn-faded-background-color:           #f2e9e9;
@@ -216,6 +217,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   /* Global Background */
+  background-image: url(--nn-background-image);
   background-color: var(--nn-body-background-color);
   background-image: var(--nn-body-background-image);
   background-position: center;
