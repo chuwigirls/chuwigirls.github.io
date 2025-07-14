@@ -1,0 +1,87 @@
+* , *::before , *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Wrapper takes the combined width of the columns so that
+   the two following sections naturally match that width */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* ───────────── Columns ───────────── */
+.columns {
+  display: flex;
+  gap: 2rem;
+}
+
+.column {
+  width: 200px;
+  padding: 1rem;
+
+  background: #f4f6fa;
+  border: 2px solid #000;
+  border-top-left-radius: 60px;
+  border-top-right-radius: 60px;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.column img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.column h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.column button {
+  padding: 0.5rem 0.75rem;
+  background: #3498db;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.25s ease-in-out;
+}
+
+.column button:hover {
+  background: #2980b9;
+}
+
+/* ───────────── Full‑width sections ───────────── */
+.wide-section {
+  border: 2px solid #000;
+  padding: 1rem;
+}
+
+.wide-section p,
+.wide-section h3 {
+  text-align: center;
+}
+
+.recent-naras {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
