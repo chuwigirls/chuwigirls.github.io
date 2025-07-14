@@ -28,7 +28,7 @@ body {
   /* ============================================================= */
   /* Backgrounds
   ================================================================ */
-  --nn-background-image:                 url("/assets/vaporwave_grid.png");
+  --nn-background-image:                 url("../assets/vaporwave_grid.png");
   --nn-body-background-color:            #f0ecec;
   --nn-content-background-color:         #c7e4f5;
   --nn-faded-background-color:           #f2e9e9;
