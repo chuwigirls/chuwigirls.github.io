@@ -15,60 +15,75 @@
             <ul class="navbar-nav ml-auto">
 
                 
-                <a class="nav-link" href="#"><i class="fa-solid fa-bullhorn"></i></a> 
+                <a class="nav-link" href="#">News</a> 
                 
 
                 <li class="nav-item dropdown">
-                    <!-- Explore -->
-                    <a class="nav-link" href="#" data-toggle="dropdown"><i class="fa-solid fa-earth-oceania"></i> <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a> 
+                    <a class="nav-link" href="#" data-toggle="dropdown">Explore <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a> 
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="/encyclopedia.html">Encyclopedia</a>
-                        <a class="dropdown-item" href="/lore.html">The Nature's Lore</a>
-                        <a class="dropdown-item" href="/glossary.html">Glossary</a>
+                        <a class="dropdown-item" href="/encyclopedia.html"><i class="fa-solid fa-book-bookmark"></i> Encyclopedia</a>
+                        <a class="dropdown-item" href="/lore.html"><i class="fa-solid fa-layer-group"></i> Naras Nature Lore</a>
+                        <a class="dropdown-item" href="../catalog/nursery.html"><i class="fa-solid fa-seedling"></i> Adopt a Narling</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="https://toyhou.se/~lore/57896.narasnature">Toyhou.se World</a>
-                        <a class="dropdown-item" href="https://discord.gg/J6XNr5ndZK" target="_blank">Discord Server</a>
+                        <a class="dropdown-item" href="/bazaar.html"><i class="fa-solid fa-gem"></i> Bazaar </a>
+                        <a class="dropdown-item" href="/commerce.html"><i class="fa-solid fa-rotate"></i> Commerce</a>
                     </div>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <!-- Recreation -->
-                    <a class="nav-link" href="#" data-toggle="dropdown"><i class="fa-solid fa-gamepad"></i> <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
+                    <a class="nav-link" href="#" data-toggle="dropdown">Recreation <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="/pursuits.html">Pursuits</a>
-                        <a class="dropdown-item" href="/magic.html">Magic Tower</a>
+                        <a class="dropdown-item" href="/pursuits.html"><i class="fa-solid fa-paintbrush"></i> Pursuits</a>
+                        <a class="dropdown-item" href="/callings.html"><i class="fa-solid fa-certificate"></i> Callings</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/activities.html">Activities</a>
-                        <a class="dropdown-item" href="/classes.html">Classes</a>
+                        <a class="dropdown-item" href="/magic.html"><i class="fa-solid fa-wand-magic-sparkles"></i> Magic</a>
+                        <a class="dropdown-item" href="/magicomp.html"><i class="fa-solid fa-explosion"></i> Magicomp</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/games.html"><i class="fa-solid fa-gamepad"></i> Games</a>
                     </div>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <!-- Catalogue -->
-                    <a class="nav-link" href="#" data-toggle="dropdown"><i class="fa-solid fa-scroll"></i> <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
+                    <a class="nav-link" href="#" data-toggle="dropdown">Catalogue <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="/masterlist.html">Masterlist</a>
-                        <a class="dropdown-item" href="/features.html">Features</a>
+                        <a class="dropdown-item" href="/masterlist.html"><i class="fa-solid fa-list-ul"></i> Masterlist</a>
+                        <a class="dropdown-item" href="/features.html"><i class="fa-solid fa-cube"></i> Features</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/artifacts.html">Artifacts</a>
-                        <a class="dropdown-item" href="/companions.html">Companions</a>
+                        <a class="dropdown-item" href="/artifacts.html"><i class="fa-solid fa-award"></i> Artifacts</a>
+                        <a class="dropdown-item" href="/companions.html"><i class="fa-solid fa-paw"></i> Companions</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/inventories.html">Inventories</a>
+                        <a class="dropdown-item" href="/civilians.html"><i class="fa-solid fa-shield-cat"></i> Civilians</a>
                     </div>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <!-- Help -->
-                    <a class="nav-link" href="#" data-toggle="dropdown"><i class="fa-solid fa-question"></i> <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
+                    <a class="nav-link" href="#" data-toggle="dropdown">Help <i class="fas fa-chevron-down nav-link-icon fa-fw"></i></a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="/staff.html">Staff</a>
-                        <a class="dropdown-item" href="/faq.html">FAQ & Guides</a>
+                        <a class="dropdown-item" href="../help/staff.html"><i class="fa-solid fa-crown"></i> Staff</a>
+                        <a class="dropdown-item" href="../help/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+                        <a class="dropdown-item" href="../help/guides.html"><i class="fa-solid fa-feather"></i> Guides</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="">Help Desk</a>
-                        <a class="dropdown-item" href="/terms.html">TOS</a>
+                        <!--- <a class="dropdown-item" href="">Help Desk</a> --->
+                        <a class="dropdown-item" href="../help/terms.html"><i class="fa-solid fa-circle-info"></i> TOS</a>
                     </div>
                 </li>
 
+                <!-- User Dropdown -->
+                <li class="nav-item dropdown d-none" id="userDropdown">
+                  <a class="nav-link" href="#" id="userBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    User
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userBtn">
+                    <a class="dropdown-item" href="/user.html"><i class="fa-solid fa-user"></i> Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                  </div>
+                </li>
+                
+                <!-- Login Button -->
+                <li class="nav-item">
+                  <a id="loginBtn" class="nav-link" href="/login.html">Login</a>
+                </li>
             </ul>
         </div>
 
