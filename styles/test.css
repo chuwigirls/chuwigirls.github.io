@@ -1,4 +1,4 @@
-* , *::before , *::after {
+*,*::before,*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
   display: flex;
   flex-direction: column;   /* header → main → footer */
   min-height: 100vh;        /* footer sticks to bottom on short pages */
-  background-image: url(https://64.media.tumblr.com/46a2f8ba6dd62ddecb3ca380c48eb4f4/tumblr_owqez0cs851ua86fuo1_400.gifv);
+  background-image: url("https://64.media.tumblr.com/46a2f8ba6dd62ddecb3ca380c48eb4f4/tumblr_owqez0cs851ua86fuo1_400.gifv");
   background-size: cover;
   background-position: top;
   background-attachment: fixed;
@@ -32,10 +32,12 @@ header, footer {
 .columns {
   display: flex;
   gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .column {
-  width: 200px;
+  width: clamp(180px, 45%, 220px);
   padding: 1rem;
 
   background: #f4f6fa;
@@ -72,6 +74,11 @@ header, footer {
 
 .column button:hover {
   background: #2980b9;
+}
+
+.column button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
 }
 
 /* ───────────── Full‑width section ───────────── */
