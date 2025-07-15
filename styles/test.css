@@ -31,8 +31,11 @@ body {
   background-attachment: fixed;
 }
 
-.wrapper {                 /* make main grow to fill space */
+.wrapper {
   flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 header, footer {
@@ -75,7 +78,7 @@ button:focus-visible {
 }
 
 .column {
-  width: clamp(180px, 45%, 220px);
+  flex: 1 1 clamp(180px, 30%, 400px); /* grow and shrink allowed */
   padding: 1.3rem;
 
   background-color: var(--tan);
@@ -130,15 +133,10 @@ button:focus-visible {
 /* ───────────── Full‑width section ───────────── */
 .wide-section {
   background-color: #EFEFE7;
-  border: 1px solid #000;
+  border-radius: 10px;
   padding: 2rem;
   margin: 2rem;
-  border-radius: 10px;
-}
-
-.wide-section p,
-.wide-section h3 {
-  text-align: center;
+  text-align: left;
 }
 
 .recent-naras {
