@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
 
     <meta charset="UTF-8">
@@ -9,10 +11,10 @@
     <!-- ----------------------------------------------------------------- -->
     <link rel="shortcut icon" type="image/png" href="assets/narwhal.png" />
     <title>Naras Nature</title>
-    <meta property="title" content="Naras Nature" />
-    <meta property="type" content="website" />
-    <meta property="url" content="https://narasnature.netlify.app" />
-    <meta property="image" content="assets/meta.png" />
+    <meta property="og:title" content="Naras Nature" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://narasnature.netlify.app" />
+    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
     <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
 
     <!-- No AI scraping directives -->
@@ -43,7 +45,7 @@
   </head>
   <body>
     <!-- --------------------------------------------------------------------
-    <-- Header
+    <-- Header                                                   -->
     <-------------------------------------------------------------------- -->
     
     <div class="load-html" id="header" data-source="includes/header.html"></div>
@@ -53,7 +55,7 @@
     <div class="spinner-border m-auto" id="loading"></div>
 
     <!-- ───────────── Main Content ───────────── -->
-    <main class="wrapper">
+    <main role="main" class="wrapper">
       <!-- Columns row -->
       <div class="columns">
         <div class="column">
@@ -98,7 +100,7 @@
     </main>
 
     <!-- --------------------------------------------------------------------
-    <-- Footer
+    <-- Footer                                                   -->
     <-------------------------------------------------------------------- -->
     
     <div class="load-html" id="footer" data-source="includes/footer.html"></div>
@@ -120,6 +122,6 @@
     <!-- narasnature Script -->
     <script src="styles/config.js"></script>
     <script src="styles/narasnature.js"></script>
-    <script>frontPage(options.index);</script>
+    <!-- <script>frontPage(options.index);</script> -->
   </body>
 </html>
