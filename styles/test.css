@@ -181,20 +181,13 @@ h1 {
 
 .frontpage-intro img {
     width: 25%;
-    max-width: 100%;
     height: auto;
+    padding: 1rem;
     position: absolute;
     right: 0;
     top: 0;
     margin: -70px -20px 0 0;
     z-index: 1;
-}
-
-@media (min-width: 600px) {
-    .frontpage-intro img {
-        width: 50%;
-        margin: -50px -50px 0 0;
-    }
 }
 
 /* check borders of sections 
@@ -216,4 +209,32 @@ h1 {
   gap: 1rem;
   margin-top: 0.5rem;
   
+}
+
+/* mobile bobile */
+@media (max-width: 768px) {
+  .columns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .column {
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .frontpage-intro img {
+    position: static;
+    width: 100%;
+    margin: 0 auto 1rem auto;
+    display: block;
+  }
+
+  body {
+    font-size: 15px;
+  }
 }
