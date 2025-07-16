@@ -188,7 +188,7 @@ h1 {
     z-index: 1;
 }
 
-@media (min-devce-width: 600px) {
+@media (min-width: 600px) {
     .frontpage-intro img {
         width: 50%;
         margin: -50px -50px 0 0;
