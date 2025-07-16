@@ -4,6 +4,7 @@
 :root {
     /* colors! */
     --tan: #EFEFE7;
+    --shadow: #f7f7f0;
     --dark-blue: #4571b8;
     --bluey: #559DE7;
     --light-blue: #cde5f5;
@@ -63,11 +64,12 @@ button {
   
   /* button styling */
   background-color: var(--light-blue);
-  padding: 5px;
+  padding: 10px;
   border-radius: 9999px;
   border-style: outset;
   border-color: var(--light-blue);
   border-width: 7px;
+  transform: scale(0.95);
   
   /* button text */
   font-family: var(--header);
@@ -116,10 +118,11 @@ h1 {
   background-color: var(--tan);
   border-top-left-radius: 120px;
   border-top-right-radius: 120px;
-  border-bottom-left-radius: px;
-  border-bottom-right-radius: 15px;
+  border-bottom-left-radius:3px;
+  border-bottom-right-radius: 3px;
   text-align: center;
-  box-shadow: inset 0px 0px 10px 1px  var(--light-blue), inset -5px 5px 0px 8px  var(--dark-blue), inset -1px 1px 1px 1px  var(--tan), inset -5px 5px 0px 0px  var(--dark-blue);
+  box-shadow: inset -3px 20px 1px 20px #fff, inset -20px 40px 1px 30px var(--shadow);
+  /*  inset -6px 9px 10px 8px var(--light-blue), 2px 2px 10px 1px var(--dark-blue), 5px -5px 10px 2px var(--light-blue), 5px 5px 10px 5px var(--dark-blue) */
 
   display: flex;
   flex-direction: column;
@@ -170,7 +173,7 @@ h1 {
   border-radius: 10px;
   padding: 2rem;
   margin: 2rem 0;
-  margin-top: 15%;
+  margin-top: 8%;
   text-align: left;
   position: relative;
 }
@@ -181,14 +184,14 @@ h1 {
     position: absolute;
     right: 0;
     top: 0;
-    margin: -50px -10px 0 0;
+    margin: -70px -20px 0 0;
     z-index: 1;
 }
 
 @media (min-devce-width: 600px) {
     .frontpage-intro img {
         width: 50%;
-        margin: -40px -30px 0 0;
+        margin: -50px -50px 0 0;
     }
 }
 
@@ -210,4 +213,5 @@ h1 {
   justify-content: center;
   gap: 1rem;
   margin-top: 0.5rem;
+  
 }
