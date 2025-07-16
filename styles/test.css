@@ -33,6 +33,7 @@ body {
   flex-direction: column;   /* header → main → footer */
   min-height: 100vh;        /* footer sticks to bottom on short pages */
   background-color: var(--tan);
+  overflow-x: hidden;
   
   /* Vaporwave background image */
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
@@ -180,6 +181,7 @@ h1 {
 
 .frontpage-intro img {
     width: 25%;
+    max-width: 100%;
     height: auto;
     position: absolute;
     right: 0;
