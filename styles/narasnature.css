@@ -1,850 +1,251 @@
-body {
-
-  /* ============================================================= */
-  /*
-  /* Main Styles
-  /*
-  /* ============================================================= */
-  /* 
-  /* This only styles the elements shown on the page.
-  /* 
-  /* Some CSS knowledge is going to be needed to style these
-  /* elements further. If you're just looking for a swatch and
-  /* font swap, then you'll only need to edit the variables below.
-  /*
-  /* ============================================================= */
-  /* Primary Color
-  ================================================================ */
-  --nn-primary-color:                    #0b2b5f;
-  --nn-primary-text-color:               #1768ba;
-  --nn-primary-header-color:             #c7e4f5;
-
-  /* ============================================================= */
-  /* Secondary Color
-  ================================================================ */
-  --nn-secondary-color:                  #d998a3;
-  --nn-secondary-text-color:             #dc7786;
-
-  /* ============================================================= */
-  /* Backgrounds
-  ================================================================ */
-  --nn-background-image:                 url("../assets/vaporwave.gif");
-  --nn-body-background-color:            #f0ecec;
-  --nn-content-background-color:         #c7e4f5;
-  --nn-faded-background-color:           #f2e9e9;
-
-  /* Background Extras */
-  --nn-body-background-image:             url("https://i.pinimg.com/736x/27/d5/1f/27d51ff6827ae60b85e4cce0a8cd90df.jpg");
-  --nn-body-background-size:              auto;
-
-  /* ============================================================= */
-  /* Text
-  ================================================================ */
-  --nn-body-text-color:                  #2563a2;
-  --nn-faded-text-color:                 #04498e;
-
-  /* ============================================================= */
-  /* Borders
-  ================================================================ */
-  --nn-border-color:                     rgba(0, 0, 0, 0.125);
-  --nn-border-width:                     1px;
-  --nn-border-style:                     solid;
-  --nn-border-radius:                    1rem;
-
-  /* ============================================================= */
-  /* Navbar
-  ================================================================ */
-  --nn-navbar-background-color:          #f2c8cf;
-  --nn-navbar-background-image:          url("../assets/header.png");
-  --nn-navbar-brand-color:               var(--nn-primary-header-color);
-  --nn-navbar-brand-color-hover:         var(--nn-primary-color);
-  --nn-navbar-text-color:                var(--nn-primary-text-color);
-  --nn-navbar-link-color:                var(--nn-navbar-text-color);
-  --nn-navbar-link-color-hover:          var(--nn-primary-text-color);
-  --nn-navbar-font-family:               var(--nn-header-font-family);
-  --nn-navbar-box-shadow:                #dc7786;
-
-  /* ============================================================= */
-  /* Main Fonts
-  ================================================================ */
-  --nn-body-font-family:                 'Palatino ', serif;
-  --nn-header-font-family:               'Verdana', sans-serif;
-  --nn-navbar-font-family:                'Century Gothic', serif;
-
-
-  /* ============================================================= */
-  /*
-  /* Optional Styles
-  /* These are just for extra easy styling
-  /*
-  /* ============================================================= */
-  /* Navbar Dropdown 
-  ================================================================ */
-
-  /* Background */
-  --nn-navbar-dropdown-background-color: var(--nn-navbar-background-color);
-  --nn-navbar-dropdown-background-hover: var(--nn-primary-color);
-
-  /* Link/Text */
-  --nn-navbar-dropdown-link-color:       var(--nn-navbar-link-color);
-  --nn-navbar-dropdown-link-color-hover: var(--nn-primary-text-color);
-
-  /* Divider */
-  --nn-navbar-dropdown-divider:          rgba(255,255,255,.12);
-  --nn-navbar-dropdown-border-radius:    0 0 var(--nn-border-radius) var(--nn-border-radius);
-
-
-  /* ============================================================= */
-  /* Footer
-  ================================================================ */
-  
-  /* Background */
-  --nn-footer-background-color:          var(--nn-navbar-background-color);
-  --nn-footer-background-image:          url("../assets/footer.png");
-
-  /* Link/Text */
-  --nn-footer-text-color:                var(--nn-navbar-text-color);
-  --nn-footer-link-color:                var(--nn-navbar-link-color);
-  --nn-footer-link-color-hover:          var(--nn-navbar-link-color-hover);
-
-
-  /* ============================================================= */
-  /* Link
-  ================================================================ */
-
-  --nn-link-text-color:                  #559DE7;
-  --nn-link-text-color-hover:            var(--nn-secondary-color);
-
-
-  /* ============================================================= */
-  /* HR
-  ================================================================ */
-
-  --nn-hr-border-width:                  var(--nn-border-width);
-  --nn-hr-border-color:                  var(--nn-border-color);
-  --nn-hr-border-style:                  var(--nn-border-style);
-
-
-  /* ============================================================= */
-  /* Pagination
-  ================================================================ */
-
-  /* Background */
-  --nn-pagination-background-color:      transparent;
-  --nn-pagination-background-hover:      transparent;
-
-  /* Text */
-  --nn-pagination-text-color:            var(--nn-faded-text-color);
-  --nn-pagination-text-color-hover:      var(--nn-primary-color);
-
-  /* Border */
-  --nn-pagination-border-radius:         var(--nn-border-radius);
-  --nn-pagination-border-width:          0;
-  --nn-pagination-border-style:          var(--nn-border-style);
-  --nn-pagination-border-color:          var(--nn-border-color);
-  --nn-pagination-border-color-hover:    var(--nn-primary-color);
-
-
-  /* ============================================================= */
-  /* Cards
-  ================================================================ */
-  
-  /* Background */
-  --nn-card-background-color:            var(--nn-content-background-color);
-  --nn-card-header-background-color:     var(--nn-card-background-color);
-
-  /* Text */
-  --nn-card-header-font-family:          var(--nn-header-font-family);
-
-  /* Border */
-  --nn-card-border-width:                var(--nn-border-width);
-  --nn-card-border-style:                var(--nn-border-style);
-  --nn-card-border-color:                var(--nn-border-color);
-  --nn-card-border-radius:               var(--nn-border-radius);
-
-
-  /* ============================================================= */
-  /* Button
-  ================================================================ */
-  
-  /* Background */
-  --nn-button-background-color:          var(--nn-content-background-color);
-  --nn-button-background-color-hover:    var(--nn-faded-background-color);
-
-  /* Text */
-  --nn-button-text-color:                var(--nn-primary-text-color);
-  --nn-button-text-color-hover:          var(--nn-secondary-text-color);
-
-  /* Border */
-  --nn-button-border-width:              var(--nn-border-width);
-  --nn-button-border-style:              var(--nn-border-style);
-  --nn-button-border-color:              var(--nn-button-background-color);
-  --nn-button-border-color-hover:        var(--nn-button-background-color-hover);
-  --nn-button-border-radius:             var(--nn-border-radius);
-
-
-  /* ============================================================= */
-  /* Input
-  ================================================================ */
-
-  /* Background */
-  --n-input-background-color:           var(--nn-faded-background-color);
-
-  /* Text */
-  --nn-input-text-color:                 var(--nn-faded-text-color);
-
-  /* Border */
-  --nn-input-border-width:               var(--nn-border-width);
-  --nn-input-border-style:               var(--nn-border-style);
-  --nn-input-border-color:               var(--nn-border-color);
-  --nn-input-border-color-hover:         var(--nn-primary-color);
-  --nn-input-border-radius:              var(--nn-border-radius);
-
+/* --------------------------- */
+/* ---------Variables--------- */
+/* --------------------------- */
+:root {
+    /* Colors */
+    --tan: #EFEFE7;
+    --shadow: #f7f7f0;
+    --dark-blue: #4571b8;
+    --bluey: #559DE7;
+    --light-blue: #cde5f5;
+    --light-pink: #d998a3;
+    --dark-pink: #dc7786;
+    --lights: #FFDBBB;
+    
+    /* Fonts */
+    --body: "Verdana", serif, sans-serif;
+    --title: "Garamond", serif, serif;
+    --button: "Verdana", serif, serif;
 }
 
 
-/* ============================================================= */
-/* General Page Styles
-/* ============================================================= */
+/* --------------------------- */
+/* ---------Main body--------- */
+/* --------------------------- */
+*,*::before,*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--body);
+}
 
+/* Add to style.css (top or bottom) */
 body {
-
-  /* Global Text */
-  color: var(--nn-body-text-color);
-  font-family: var(--nn-body-font-family);
-  font-size:20px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Global Background */
-  background-color: var(--nn-body-background-color);
-  background-image: var(--nn-background-image);
-  background-position: bottom;
+  display: flex;
+  flex-direction: column;   /* header → main → footer */
+  min-height: 100vh;        /* footer sticks to bottom on short pages */
+  background-color: var(--tan);
+  overflow-x: hidden;
+  
+  /* background image */
+  background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
   background-size: cover;
+  background-position: top;
   background-attachment: fixed;
-
 }
 
-body .staff {
-  font-family: var(--nn-header-font-family);
+.wrapper {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
-
-/* ============================================================= */
-/* Plain Links
-/* ============================================================= */
-
-a,
-a:visited {
-  color: var(--nn-link-text-color);
-  transition: color .2s ease-in-out;
-}
-
-a:hover,
-a:focus,
-a:active {
-  color: var(--nn-link-text-color-hover);
-  text-decoration: none;
-}
-
-/* ============================================================= */
-/* Navbar
-/* ============================================================= */
-.navbar {
-  background-image: url("/assets/header.png"); /* adjust if needed */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: left bottom;
-  background-color: transparent;
-  min-height: 200px;
-  z-index: 2000;
-  position: relative;
-}
-
-.navbar .navbar-brand {
-  /* background-color: var(--nn-navbar-background-color) !important; */
-  color: var(--nn-primary-color) !important;
-  font-family: var(--nn-header-font-family);
-  display: block;
-  font-size: 8vw;
-  text-shadow: -2px -2px 3px var(--nn-primary-header-color), 1px 1px 5px var(--nn-primary-text-color);
-}
-
-.navbar .navbar-brand:hover, 
-.navbar .navbar-brand:focus {
-  color: var(--nn-navbar-brand-color-hover) !important;
-}
-
-.navbar .navbar-nav .nav-link {
-  background-color: var(--nn-navbar-background-color) !important;
-  color: var(--nn-primary-color) !important;
-  padding: 8px 10px;
-  margin: 10px;
-  border-radius: 50px;
-  box-shadow: 0px 0px 30px var(--nn-navbar-box-shadow);
-}
-
-.navbar .navbar-nav .nav-link:hover, 
-.navbar .navbar-nav .nav-link:focus{
-  color: var(--nn-navbar-link-color-hover) !important;
-}
-
-.navbar .navbar-toggler {
-  float: right;
-  background-color: var(--nn-navbar-background-color) !important;
-  color: var(--nn-primary-color) !important;
-  border: none !important;
-  padding: 8px 10px;
-  margin: 10px;
-  border-radius: 50px;
-  box-shadow: 0px 0px 30px var(--nn-navbar-box-shadow);
-}
-
-.navbar .nav-link {
-    display: flex;
-    align-items: center;
-}
-
-.navbar .nav-link-icon {
-    font-size: .5rem;
-    margin-left: .25rem;
-}
-
-
-/* ============================================================= */
-/* Dropdowns
-/* This is for navbar dropdowns only
-/* ============================================================= */
-
-.navbar .dropdown-menu {
-  color: var(--nn-navbar-dropdown-link-color) !important;
-  background-color: var(--nn-navbar-dropdown-background-color) !important;
-  margin-top: 0px;
-  padding: 8px 10px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 30px var(--nn-navbar-box-shadow);
-}
-
-.dropdown:hover .dropdown-menu,
-.dropdown-menu:hover{
-  display: block !important
-}
-
-.navbar .dropdown-divider {
-  border-top: 1px solid var(--nn-navbar-dropdown-divider) !important;
-}
-
-.navbar .dropdown-item,
-.navbar .dropdown-item-text {
-  color: var(--nn-navbar-dropdown-link-color) !important;
-  transition: color .2s ease, background .2s ease;
-}
-
-.navbar .dropdown-item:hover, 
-.dropdown-item:focus,
-.dropdown-item:active {
-  color: var(--nn-navbar-dropdown-link-color-hover)!important;
-  background-color: var(--nn-navbar-dropdown-background-hover) !important;  
-}
-
-.navbar .dropdown-header {
-  color: var(--nn-navbar-dropdown-link-color-hover) !important;
-}
-
-
-/* ============================================================= */
-/* Footer
-/* ============================================================= */
-
-.footer {
-  background-image: url("/assets/footer.png"); /* adjust if needed */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center bottom;
-  background-color: transparent;
-  min-height: 160px;
-  padding-top: 100px; /* creates space above cloud image */
-  position: relative;
-}
-
-.footer img.footer-clouds {
+/* --------------------------- */
+/* ------- Header / Nav ------ */
+/* --------------------------- */
+header, footer {
   width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
-  object-position: center bottom;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.footer .footer-content {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1rem;
   text-align: center;
-  background-color: rgba(255,255,255,0.95);
-  border-radius: 1rem 1rem 0 0;
-  z-index: 1;
-  max-width: 90%;
+  padding: 1rem 0;
+  background: #f8f8f8;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
 }
 
-.footer a,ZZZZZZZ
-.footer a:visited {
-  color: var(--nn-footer-link-color) !important;
+.nav-title {
+  font-family: var(--title);
+  color: var(--dark-blue);
+  background-color: var(--tan);
 }
 
-.footer a:hover,
-.footer a:focus,
-.footer a:active {
-  color: var(--nn-footer-link-color-hover) !important;
-}
-
-
-/* ============================================================= */
-/* Pagination
-/* ============================================================= */
-
-.page-link {
-  transition: color .2s ease, background .2s ease, border .2s ease;
-  border-width: var(--nn-pagination-border-width) !important;
-  border-style: var(--nn-pagination-border-style) !important;
-}
-
-.page-link,
-.page-item.disabled .page-link {
-  color: var(--nn-pagination-text-color) !important;
-  background-color: var(--nn-pagination-background-color) !important;
-  border-color: var(--nn-pagination-border-color) !important;
-}
-
-.page-item.active .page-link,
-.page-link:hover,
-.page-link:focus,
-.page-link:active {
-  color: var(--nn-pagination-text-color-hover) !important;
-  background-color: var(--nn-pagination-background-hover) !important;
-  border-color: var(--nn-pagination-border-color-hover) !important;
-}
-
-/* Keeps users from accidentally highlighting */
-.page-link{
+button {
+  display: inline-block;
   cursor: pointer;
-  user-select: none;
+  transition-duration: 0.4s;
+  
+  /* button styling */
+  background-color: var(--light-blue);
+  padding: 10px;
+  border-radius: 9999px;
+  border-style: outset;
+  border-color: var(--light-blue);
+  border-width: 7px;
+  transform: scale(0.95);
+  
+  /* button text */
+  font-family: var(--button);
+  color: var(--dark-blue);
 }
 
-/* Fixes my jank nav/pagination hybrid */
-.nav .pagination .page-item:first-child .page-link {
-  border-radius: 0 !important;
-  border-left: 0 !important;
+button:hover {
+  background-color: var(--bluey);
+  color: white;
+  border-style: outset;
+  border-color: var(--blue);
+  border-width: 7px;
 }
 
-.nav .pagination .page-item:last-child .page-link {
-  border-radius: 0 !important
+button:focus-visible {
+  outline: 2px solid var(--dark-blue);
+  outline-offset: 2px;
 }
 
-.nav .page-item:first-child .page-link {
-  border-radius: var(--nn-pagination-border-radius) 0 0 var(--nn-pagination-border-radius) !important;
+h1 {
+    color: var(--dark-blue);
+    font-family: var(--title);
 }
 
-.nav .page-item:last-child .page-link {
-  border-radius: 0 var(--nn-pagination-border-radius) var(--nn-pagination-border-radius) 0 !important
+.title {
+    color: var(--dark-blue);
+    padding-left: 3%;
+    padding-top: 3%;
+    font-family: var(--title);
 }
 
-
-/* ============================================================= */
-/* Card
-/* ============================================================= */
-
-.card {
-  background-color: var(--nn-body-background-color) !important;
-  border-width: var(--nn-card-border-width) !important;
-  border-style: var(--nn-card-border-style) !important;
-  border-color: var(--nn-card-border-color) !important;
-  border-radius: var(--nn-border-radius) !important;
+/* ───────────── Columns ───────────── */
+.columns {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: var(--dark-blue);
 }
 
-.card-header {
-  background-color: var(--nn-card-header-background-color) !important;
-  border-bottom-color: var(--nn-card-border-color) !important;
-  border-bottom-width: var(--nn-card-border-width) !important;
-  border-bottom-style: var(--nn-card-border-style) !important;
-  font-family: var(--nn-card-header-font-family) !important;
-  border-radius: calc(var(--nn-border-radius) - 1px) calc(var(--nn-border-radius) - 1px) 0 0 !important;
-}
+.column {
+  flex: 1 1 clamp(180px, 30%, 400px); /* grow and shrink allowed */
+  padding: 1.3rem;
 
+  /* column styling */
+  background-color: var(--tan);
+  border-top-left-radius: 120px;
+  border-top-right-radius: 120px;
+  border-bottom-left-radius:3px;
+  border-bottom-right-radius: 3px;
+  text-align: center;
+  box-shadow: inset -3px 20px 1px 20px #fff, inset -20px 40px 1px 30px var(--shadow);
+  /*  inset -6px 9px 10px 8px var(--light-blue), 2px 2px 10px 1px var(--dark-blue), 5px -5px 10px 2px var(--light-blue), 5px 5px 10px 5px var(--dark-blue) */
 
-/* ============================================================= */
-/* Buttons & Badges
-/* ============================================================= */
-
-.btn.btn-primary,
-.badge.badge-primary {
-  color: var(--nn-button-text-color) !important;
-  background-color: var(--nn-button-background-color) !important;
-  border-width: var(--nn-button-border-width) !important;
-  border-style: var(--nn-button-border-style) !important;
-  border-color: var(--nn-button-border-color) !important;
-  border-radius: var(--nn-button-border-radius) !important;
-}
-
-.btn.btn-primary:hover,
-.btn.btn-primary:focus,
-.btn.btn-primary:active,
-a.badge.badge-primary:hover,
-a.badge.badge-primary:focus,
-a.badge.badge-primary:active  {
-  color: var(--nn-button-text-color-hover) !important;
-  border-color: var(--nn-button-border-color-hover) !important;
-  background-color: var(--nn-button-background-color-hover) !important;
-  box-shadow: none !important;
-}
-
-
-/* ============================================================= */
-/* Input
-/* ============================================================= */
-
-.form-control {
-  background-color: var(--nn-input-background-color) !important;
-  color: var(--nn-input-text-color) !important;
-  border-width: var(--nn-input-border-width) !important;
-  border-style: var(--nn-input-border-style) !important;
-  border-color: var(--nn-input-border-color) !important;
-  border-radius: var(--nn-input-border-radius) !important;
-}
-
-.form-control:focus,
-.form-control:active {
-  background-color: var(--nn-input-background-color) !important;
-  border-color: var(--nn-input-border-color-hover) !important;
-}
-
-
-/* ============================================================= */
-/* Scrollbar and Mobile resizing
-/* ============================================================= */
-
-@media (min-width: 992px) {
-  body::-webkit-scrollbar-track {
-    background-color: var(--nn-faded-background-color);
-    border-width: 0px !important;
-  }
-
-  body::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  body::-webkit-scrollbar-thumb {
-    background-color: var(--nn-primary-color);
-  }
-
-  body::-webkit-scrollbar-corner,
-  body::-webkit-resizer {
-    background-color: var(--nn-border-color);
-  }
-
-  @media (max-width: 768px) {
-  .site-header {
-    background-size: contain;
-    background-position: left bottom;
-    min-height: 100px;
-  }
-
-  .site-footer {
-    background-size: contain;
-    background-position: center bottom;
-    min-height: 100px;
-  }
-}
-
-
-/* ============================================================= */
-/* Misc
-/* ============================================================= */
-
-.text-primary {
-  color: var(--nn-primary-header-color) !important;
-}
-
-.bg-faded {
-  background-color: var(--nn-faded-background-color) !important;
-}
-
-.text-muted {
-  color: var(--nn-faded-text-color) !important;
-}
-
-h1, h2, h3,
-h4, h5, h6 {
-  font-family: var(--nn-navbar-font-family) !important;
-}
-
-hr {
-  border-top-color: var(--nn-hr-border-color) !important;
-  border-top-width: var(--nn-hr-border-width) !important;
-  border-top-style: var(--nn-hr-border-style) !important;
-}
-
-summary {
-  font-size: 120%;
-}
-
-img {
-  image-rendering: -webkit-optimize-contrast;
-}
-
-/* Fix any border radiuses that were messed from before */
-.rounded {border-radius: var(--nn-border-radius) !important}
-.rounded-circle {border-radius: 100%;}
-.rounded-0 {border-radius: 0 !important;}
-
-/* ============================================================= */
-/* Chee's Tweaks
-/* ============================================================= */
-
-body {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-#main-container {
-    min-height: calc(100vh - 105px);
-    padding: 1rem;
-    -ms-flex: 1 1 auto!important;
-    flex: 1 1 auto!important;
-}
-
-@media (min-width: 768px) {
-    #main-container {
-        padding: 5rem 1.5rem;
-    }
-}
-
-/* Fades container in on load so its not as jarring */
-.softload {
-  opacity: 0;
-} .softload.active {
-  opacity: 1;
-  transition: opacity 400ms linear;
-}
-
-/* Remove ugly box shadow */
-button:focus,
-.page-link:focus,
-.form-control:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Remove margin from last paragraphs */
-p:last-child {
-    margin-bottom: 0 !important;
-}
-
-/* Small container for more compact view */
-.container {
-  max-width: 950px !important;
-}
-
-/* Prevents awkward load in stutter */
-#narasnature-gallery .list .card-body {
-  min-height: calc(200px + 2.5rem);
-} 
-
-#narasnature-gallery .list .card-body .wm {
-  max-height: 200px;
-  position: absolute;
-  margin: auto;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 1;
-}
-
-#narasnature-gallery .list .card-body img {
-  max-height: 200px;
-}
-
-.gallery-img {
-    max-height: 150px;
-}
-
-.card-wm {
-  max-height: 100%;
-  max-width: 100%;
-  position: absolute;
-  margin: auto;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 1;
-}
-
-/* Combines search and its companion filter */
-#search-filter.form-control {
-  border-radius: var(--nn-border-radius) 0 0 var(--nn-border-radius) !important;
-  border-right: 0 !important;
-} 
-
-#search.filtered.form-control {
-  margin-left: -.5rem;
-  width: calc(100% + .5rem) !important;
-  border-radius: 0 var(--nn-border-radius) var(--nn-border-radius) 0 !important;
-}
-
-/* Loading Icon */
-#loading {
-  width: 5rem; 
-  height: 5rem;
-  position: absolute;
-  top: calc(50% - 2.5rem);
-  left: calc(50% - 2.5rem);
-  animation-duration: 2s;
-  opacity: .5;
-  border-color: var(--nn-body-text-color);
-  border-right-color: transparent !important;
-}
-
-
-#log-table {
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-/* ============================================================= */
-/* Custom Classes
-/* ============================================================= */
-
-/* Makes sure your text formatting is preserved from the sheet */
-/* Best for large areas like notes */
-.text-pre {
-    white-space: break-spaces;
-}
-
-.hero-title {
-    color: var(--nn-primary-color);
-    background-color: var(--nn-primary-header-color);
-    background-image: url("https://wallpapercat.com/w/full/7/7/4/1198914-2560x1440-desktop-hd-studio-ghibli-wallpaper-photo.jpg") !important;
-    background-size: cover;
-    border-radius: 20px 20px 0px 0px;
-    font-family: var(--nn-header-font-family);
-    display: flex;
-    padding: 1.5rem;
-    min-height: 250px;
-    font-weight: 800;
-    font-size: 2.5rem;
-}
-
-@media (min-width: 768px) {
-    .hero-title {
-        letter-spacing: 2px;
-        font-size: 5rem;
-    }
-}
-
-/* ============================================================= */
-/* to Top button
-/* ============================================================= */
-#top {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  z-index: 99;
-  border: none;
-  outline: none;
-  background-color: var(--nn-navbar-background-color);
-  box-shadow: 0px 0px 30px var(--nn-navbar-box-shadow);
-  color: var(--nn-body-text-color);
-  cursor: pointer; /* Add a mouse pointer on hover */
-  padding: 15px; /* Some padding */
-  border-radius: 50px; /* Rounded corners */
-}
-
-#top:hover {
-  background-color: var(--nn-navbar-box-shadow);
-}
-
-/* ============================================================= */
-/* Bank
-/* ============================================================= */
-.bank-page {
-  background-image: var(--nn-body-background-image);
-  padding: 20px;
-}
-
-.bank-page .bank-container {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
-  margin: auto;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.bank-page label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.bank-page input,
-.bank-page select {
+.column img {
   width: 100%;
-  padding: 8px;
-  margin: 5px 0 15px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
+  height: auto;
+  margin-top: 50%;
 }
 
-.bank-page .buttons {
-  display: flex;
-  justify-content: space-between;
+.column h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--title);
 }
 
-.bank-page .buttons button {
-  flex: 1;
-  margin: 5px;
-  padding: 10px;
+.column hr {
+    margin: auto;
+    width: 100px;
+    border: 1px solid var(--dark-blue);
+    border-radius: 10px;
+}
+
+/* .column button {
+  padding: 0.5rem 0.75rem;
+  background: #3498db;
+  color: #ffffff;
   border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background 0.25s ease-in-out;
 }
 
-.bank-page .buttons button:hover {
-  background: #0056b3;
+.column button:hover {
+  background: #2980b9;
 }
 
-.bank-page #statusMessage {
-  text-align: center;
-  font-weight: bold;
-  margin-top: 15px;
+.column button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+} */
+
+/* ───────────── Full‑width section ───────────── */
+.frontpage-intro {
+  background-color: var(--tan);
+  border-radius: 10px;
+  padding: 2rem;
+  margin: 2rem 0;
+  margin-top: 8%;
+  text-align: left;
+  position: relative;
 }
 
-.bank-page .spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 15px auto;
+.frontpage-intro img {
+    width: 25%;
+    height: auto;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: -70px -20px 0 0;
+    z-index: 1;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* check borders of sections 
+.columns, .wide-section {
+  outline: 1px dashed red;
+} */
+
+.newest-designs {
+  background-color: var(--tan);
+  border-radius: 10px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: left;
 }
 
-.bank-page button:disabled {
-  background-color: #aaa !important;
-  color: #666;
-  cursor: not-allowed;
+.recent-naras {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  
 }
 
+/* mobile bobile */
+@media (max-width: 768px) {
+  .columns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .column {
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .frontpage-intro img {
+    position: static;
+    width: 100%;
+    margin: 0 auto 1rem auto;
+    display: block;
+  }
+
+  body {
+    font-size: 15px;
+  }
+}
