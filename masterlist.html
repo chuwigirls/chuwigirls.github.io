@@ -48,10 +48,47 @@
     <!-- Loading spinner-->
     <div class="spinner-border m-auto" id="loading"></div>
     
+    <!-- Title -->
     <h1>Narapedia Masterlist</h1>
-    <div id="output"></div>
+
+    <!-- Masterlist Views -->
+    <div id="output">
+      <div id="masterlist-view"></div>
+      <div id="nara-detail-view" style="display: none;"></div>
+    
+
+    <!-- Templates -->
+    <template id="masterlist-card-template">
+      <div class="masterlist-card">
+        <img class="masterlist-card-img" src="" alt="">
+        <h3 class="masterlist-card-name"></h3>
+      </div>
+    </template>
+
+    <template id="nara-detail-template">
+      <div>
+        <button id="back-btn" class="btn btn-secondary mb-3">
+          <i class="fas fa-arrow-left"></i> Back to Masterlist
+        </button>
+        <div class="nara-detail-card">
+          <img class="nara-detail-img" src="" alt="">
+          <h2 class="nara-detail-name"></h2>
+          <p><strong>Owner:</strong> <span class="nara-detail-owner"></span></p>
+          <p><strong>Region:</strong> <span class="nara-detail-region"></span></p>
+          <p><strong>Designer:</strong> <span class="nara-detail-designer"></span></p>
+          <p><strong>Status:</strong> <span class="nara-detail-status"></span></p>
+          <p><strong>Rarity:</strong> <span class="nara-detail-rarity"></span></p>
+        </div>
+      </div>
+    </template>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="load-html" id="footer" data-source="../includes/footer.html"></div>
 
   <script src="../styles/config.js"></script>
   <script src="../styles/narasnature.js"></script>
+  <script src="../styles/smoothLoad.js"></script>
 </body>
 </html>
