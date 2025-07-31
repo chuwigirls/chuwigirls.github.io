@@ -19,11 +19,11 @@ async function loadPage(url, container) {
     if (!res.ok) throw new Error(`Failed to load page: ${res.status}`);
 
     const text = await res.text();
-    // Parse the fetched HTML and extract the #output content
+    // Parse the fetched HTML and extract the #smooth-load content
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, "text/html");
-    const newContent = doc.getElementById("output");
-    if (!newContent) throw new Error("No #output found in fetched page");
+    const newContent = doc.getElementById("smooth-load");
+    if (!newContent) throw new Error("No #smooth-load found in fetched page");
 
     await smoothLoad(container, async () => {
       container.innerHTML = newContent.innerHTML;
@@ -61,7 +61,7 @@ function interceptInternalLinks() {
     // Prevent default nav
     e.preventDefault();
 
-    const container = document.getElementById("output");
+    const container = document.getElementById("smooth-load");
     if (!container) {
       window.location.href = href; // fallback
       return;
@@ -80,7 +80,7 @@ function interceptInternalLinks() {
 // ==============================
 window.addEventListener("popstate", event => {
   const url = event.state && event.state.url ? event.state.url : window.location.href;
-  const container = document.getElementById("output");
+  const container = document.getElementById("smooth-load");
   if (!container) {
     window.location.href = url; // fallback
     return;
@@ -94,7 +94,7 @@ window.addEventListener("popstate", event => {
 document.addEventListener("DOMContentLoaded", () => {
   loadHeaderFooter();
 
-  const mainContent = document.getElementById("output");
+  const mainContent = document.getElementById("smooth-load");
   if (mainContent) mainContent.classList.add("fade-in");
 
   // Initialize intercept on links
@@ -113,12 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==============================
 // Called after new content is loaded via smoothLoad
 async function afterContentLoad() {
-  // If Masterlist is on this page, re-initialize it with data
-  // You may want to check if #masterlist-view exists before reloading
-
   const masterlistView = document.getElementById("masterlist-view");
   if (masterlistView) {
-    // Re-fetch data and re-render masterlist
     loadGoogleSheetsAPI(() => {
       fetchSheetData(sheetConfigs.narapedia.id, sheetConfigs.narapedia.sheetName, data => {
         Masterlist(data);
@@ -128,3 +124,21 @@ async function afterContentLoad() {
 
   // Similarly, re-run any page-specific JS needed on new content load here
 }
+
+// ==============================
+// ===== Back to Top ===========
+// ==============================
+document.addEventListener("DOMContentLoaded", function () {
+  let mybutton = document.getElementById("top");
+
+  window.onscroll = function () {
+    scrollFunction();
+  };
+
+  window.topFunction = function () {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+});
