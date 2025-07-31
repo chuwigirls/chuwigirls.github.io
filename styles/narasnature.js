@@ -39,13 +39,21 @@ function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
 // ====== Header & Footer =======
 // ==============================
 function loadHeaderFooter() {
-  document.querySelectorAll(".load-html").forEach(el => {
+  const includes = document.querySelectorAll(".includes");
+  let loadCount = 0;
+
+  includes.forEach(el => {
     const source = el.getAttribute("data-source");
     if (source) {
       fetch(source)
         .then(res => res.text())
         .then(html => {
           el.innerHTML = html;
+          loadCount++;
+          if (loadCount === includes.length) {
+            initDropdowns();
+            initHamburger();
+          }
         })
         .catch(err => {
           console.error("Failed to load:", source, err);
@@ -53,6 +61,39 @@ function loadHeaderFooter() {
     }
   });
 }
+
+function initDropdowns() {
+  const dropdownButtons = document.querySelectorAll(".dropbtn");
+
+  dropdownButtons.forEach(btn => {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const dropdown = this.nextElementSibling;
+      dropdown.classList.toggle("show");
+    });
+  });
+
+  document.addEventListener("click", function () {
+    document.querySelectorAll(".dropdown-content").forEach(menu => {
+      menu.classList.remove("show");
+    });
+  });
+}
+
+function initHamburger() {
+  const hamburger = document.getElementById("hamburgerToggle");
+  const navbarMenu = document.getElementById("navbarMenu");
+
+  if (hamburger && navbarMenu) {
+    hamburger.addEventListener("click", function () {
+      navbarMenu.classList.toggle("show");
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadHeaderFooter();
+});
 
 // ==============================
 // ========= Masterlist =========
