@@ -79,56 +79,183 @@ button:focus-visible {
 /* --------------------------- */
 /* -----------Header---------- */
 /* --------------------------- */
-.navbar-toggler {
-  padding-inline: 1.5rem;
-  margin-left: auto;
-  font-size: 1.5rem;
-
-  /* button look */
-  background-color: var(--light-blue);
-  border-radius: 9999px;
-  border-width: 0px;
-}
-
-/* overrides universal button style */
-.navbar-toggler:hover {
-  transition-duration: 0.4s;
-  background-color: var(--bluey);
-  border-radius: 9999px;
-  border-width: 0px;
-}
-
-.navbar-nav .nav-link {
-  margin: 1rem;
-  font-family: var(--semiformal);
-  text-align: center;
-  cursor: pointer;
-  transition-duration: 0.4s;
-  display: block;
-  
-  /* button look */
-  background-color: var(--light-blue);
-  border-radius: 9999px;
-}
-
-.navbar-nav .nav-link:hover {
-  transition-duration: 0.4s;
-  color: white;
-  background-color: var(--bluey);
-  border-radius: 9999px;
-  border-width: 0px;
-}
-
 .site-title {
   background-image: url("../assets/header.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 5%;
+  padding: 6%;
+  margin-bottom: -2%;
+
   /* text styling */
   text-align: left;
   font-family: var(--formal);
   color: var(--dark-blue);
   letter-spacing: 5px;
+  font-size: 5rem;
+}
+
+.site-title a {
+  color: var(--dark-blue);
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    font-family: var(--play);
+    color: var(--dark-blue);
+    border-radius: 9999px;
+    background: none;
+    gap: 1rem;
+}
+
+.navbar-toggler {
+    cursor: pointer;
+    display: none;
+    margin-left: auto;
+
+    /* text */
+    color: var(--dark-blue);
+    font-size: 1.5rem;
+
+    /* button look */
+    background-color: var(--light-blue);
+    border-radius: 9999px;
+    box-shadow: 0px 0px 10px var(--light-blue);
+}
+
+.navbar-toggler:hover {
+    cursor: pointer;
+    margin-left: auto;
+    transition-duration: 0.4s;
+
+    /* text */
+    color: var(--light-blue);
+    font-size: 1.5rem;
+
+    /* button look */
+    background-color: var(--bluey);
+    border-radius: 9999px;
+    box-shadow: 0px 0px 10px var(--bluey);
+}
+
+/* Nav links container */
+.nav-links {
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    margin: 2rem;
+}
+
+.nav-left,
+.nav-center,
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.nav-center {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Nav links */
+.nav-links a,
+.dropbtn {
+    cursor: pointer;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-radius: 9999px;
+    color: var(--dark-blue);
+    text-decoration: none;
+    margin: .8rem;
+}
+
+.nav-links a:hover,
+.dropbtn:hover {
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background-color: var(--bluey);
+    color: white;
+}
+
+/* Dropdown */
+.dropdown-content {
+    position: absolute;
+    background-color: var(--light-blue);
+    border-radius: 0px 0px 20px 20px;
+    min-width: 160px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* prevent interaction when hidden */
+    z-index: 1000;
+}
+
+.dropdown-content.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.dropdown-content a {
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background: none;
+    border: none;
+    color: var(--pink);
+    box-shadow: 0px 0px 0px var(--bluey);
+}
+
+hr.dropdown-div {
+    border-top: 1px solid var(--bluey);
+    margin: 0.1rem 0;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+    .navbar-toggler {
+        display: block;
+    }
+
+    .nav-links {
+        width: 100%;
+        flex-direction: column;
+        display: none; /* hidden by default */
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-left,
+    .nav-center,
+    .nav-right {
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .dropbtn {
+        text-align: left;
+        width: 100%;
+    }
 }
 
 /* --------------------------- */
