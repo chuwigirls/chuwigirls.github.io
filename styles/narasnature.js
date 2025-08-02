@@ -63,18 +63,19 @@ function loadHeaderFooter() {
 }
 
 function initDropdowns() {
-  const dropdownButtons = document.querySelectorAll(".dropbtn");
+  const dropdowns = document.querySelectorAll(".dropdown");
 
-  dropdownButtons.forEach(btn => {
-    btn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      const dropdown = this.nextElementSibling;
-      dropdown.classList.toggle("show");
+  dropdowns.forEach(dropdown => {
+    const button = dropdown.querySelector(".dropbtn");
+    const menu = dropdown.querySelector(".dropdown-content");
+
+    if (!button || !menu) return;
+
+    dropdown.addEventListener("mouseenter", () => {
+      menu.classList.add("show");
     });
-  });
 
-  document.addEventListener("click", function () {
-    document.querySelectorAll(".dropdown-content").forEach(menu => {
+    dropdown.addEventListener("mouseleave", () => {
       menu.classList.remove("show");
     });
   });
