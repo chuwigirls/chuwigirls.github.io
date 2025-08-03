@@ -10,9 +10,18 @@
   --light-pink: #fdd1d8;
   --pink: #dc7786;
 
-  --play: "Verdana", sans-serif;
-  --formal: "Garamond", serif;
-  --semiformal: "Georgia", serif;
+  --play: "Huninn", sans-serif;
+  --formal: "Bruno Ace", serif;
+  --semiformal: "Righteous", serif;
+}
+
+/* --------------------------- */
+/* -------Google Fonts-------- */
+/* --------------------------- */
+.huninn-regular {
+  font-family: "Huninn", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* --------------------------- */
@@ -28,12 +37,15 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--tan);
   overflow-x: hidden;
+  font-family: var(--play);
+
+  /* site bg */
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
   background-size: cover;
   background-position: top;
   background-attachment: fixed;
+  background-color: var(--tan); /* fallback color */
 }
 
 .wrapper {
@@ -48,32 +60,21 @@ h1 {
   color: var(--dark-blue);
 }
 
-/*  button {
+button {
   display: inline-block;
   cursor: pointer;
   transition-duration: 0.4s;
   background-color: var(--light-blue);
   padding: 10px;
   border-radius: 9999px;
-  border-style: outset;
-  border-color: var(--light-blue);
-  border-width: 2px;
+  border: none;
   transform: scale(0.95);
-  font-family: var(--semiformal);
+  font-family: var(--play);
   color: var(--dark-blue);
 }
 
 button:hover {
-  background-color: var(--bluey);
-  color: white;
-  border-style: outset;
-  border-color: var(--bluey);
-  border-width: 2px;
-}
-
-button:focus-visible {
-  outline: 2px solid var(--dark-blue);
-  outline-offset: 2px;
+  color: var(--pink);
 }
 
 /* --------------------------- */
@@ -99,6 +100,7 @@ button:focus-visible {
 
 .navbar {
     display: flex;
+    position: relative;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
@@ -121,46 +123,29 @@ button:focus-visible {
     /* button look */
     background-color: var(--light-blue);
     border-radius: 9999px;
-    box-shadow: 0px 0px 10px var(--light-blue);
+    right: 0;
+    position: absolute;
 }
 
-.navbar-toggler:hover {
-    cursor: pointer;
-    margin-left: auto;
-    transition-duration: 0.4s;
-
-    /* text */
-    color: var(--light-blue);
-    font-size: 1.5rem;
-
-    /* button look */
-    background-color: var(--bluey);
-    border-radius: 9999px;
-    box-shadow: 0px 0px 10px var(--bluey);
-}
-
-/* Nav links container */
 .nav-links {
-    background-color: var(--light-blue);
-    color: var(--dark-blue);
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 1rem;
     border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    margin: 2rem;
+    margin-left: 6rem;
+    margin-right: 3rem;
+    background-color: var(--light-blue);
 }
 
 .nav-left,
 .nav-center,
 .nav-right {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 1rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
 }
 
 .nav-center {
@@ -168,15 +153,24 @@ button:focus-visible {
     justify-content: center;
 }
 
+.nav-left {
+    justify-content: flex-start;
+}
+
+.nav-right {
+    justify-content: flex-end;
+}
+
 /* Nav links */
 .nav-links a,
 .dropbtn {
     cursor: pointer;
-    padding: 10px;
+    padding: 5px;
     background: none;
     border: none;
     border-radius: 9999px;
     color: var(--dark-blue);
+    font-family: var(--playful);
     text-decoration: none;
     margin: .8rem;
 }
@@ -185,8 +179,9 @@ button:focus-visible {
 .dropbtn:hover {
     transition-duration: 0.4s;
     cursor: pointer;
-    background-color: var(--bluey);
-    color: white;
+    color: var(--pink);
+    border: none;
+    background-color: transparent;
 }
 
 /* Dropdown */
@@ -212,6 +207,7 @@ button:focus-visible {
     padding: 0.75rem 1rem;
     text-decoration: none;
     display: block;
+    padding: .1rem;
 }
 
 .dropdown-content a:hover {
@@ -219,6 +215,7 @@ button:focus-visible {
     border: none;
     color: var(--pink);
     box-shadow: 0px 0px 0px var(--bluey);
+    padding: .1rem;
 }
 
 hr.dropdown-div {
@@ -228,33 +225,64 @@ hr.dropdown-div {
 
 /* Responsive styles */
 @media (max-width: 767px) {
-    .navbar-toggler {
-        display: block;
-    }
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+  }
 
-    .nav-links {
-        width: 100%;
-        flex-direction: column;
-        display: none; /* hidden by default */
-    }
+  .navbar-toggler {
+    display: inline-block !important;
+    background: var(--light-blue);
+    border: none;
+    border-radius: 20px;
+    margin: 0.5rem 1rem 0.5rem 1rem;
+    position: absolute;
+    top: .5rem;
+    left: 1rem;
+    z-index: 2100;
+  }
 
-    .nav-links.show {
-        display: flex;
-    }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: var(--light-blue);
+    border-radius: 20px;
+    z-index: 2000;
+    transition: max-height 0.3s ease;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-    .nav-left,
-    .nav-center,
-    .nav-right {
-        justify-content: center;
-        width: 100%;
-        flex-wrap: wrap;
-    }
+  .nav-links.show {
+    display: flex;
+    max-height: 1000px;
+  }
 
-    .nav-links a,
-    .dropbtn {
-        text-align: left;
-        width: 100%;
-    }
+  .nav-left,
+  .nav-center,
+  .nav-right {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+    gap: 0.5rem;
+  }
+
+  /* Remove absolute positioning for sidebar-hamburger on mobile */
+  .sidebar-hamburger {
+    position: static !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    width: auto;
+    align-self: center;
+  }
 }
 
 /* --------------------------- */
@@ -302,7 +330,90 @@ hr.dropdown-div {
   color: var(--dark-blue);
 }
 
-/* ───────────── Columns ───────────── */
+/* --------------------------- */
+/* -----------Sidebar--------- */
+/* --------------------------- */
+/* Sidebar styling */
+#mySidebar {
+  display: none;
+  width: 200px;
+  z-index: 1000;
+  background: var(--light-blue);
+  position: fixed;
+  border-radius: 0px 20px 0px 0px;
+
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+/* Main content centered */
+#main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  /* no margin-left here */
+}
+
+/* Hamburger button - fixed below header */
+#openNav {
+  z-index: 1100;
+  border-radius: 0 20px 20px 0;
+  background-color: var(--light-blue);
+  display: none; /* shown via JS on small screens */
+}
+
+/* Show sidebar on large screens */
+@media (min-width: 1300px) {
+  #mySidebar {
+    display: block !important;
+  }
+  #openNav {
+    display: none !important;
+  }
+}
+
+/* Show hamburger on small screens */
+@media (max-width: 1300px) {
+  #mySidebar {
+    display: none !important;
+  }
+  #openNav {
+    display: block !important;
+  }
+}
+
+/* Place hamburger next to News in navbar */
+.sidebar-hamburger {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0; /* Remove any margin */
+  z-index: 2000;
+  background: var(--light-blue);
+  border-radius: 9999px;
+  border: none;
+  color: var(--dark-blue);
+  display: none; /* Hide by default, show on small screens */
+  padding: 10px 16px;
+}
+
+@media (max-width: 1300px) {
+  .sidebar-hamburger {
+    display: inline-block;
+  }
+}
+
+/* Optional: Hide the original .w3-hide-large wrapper on large screens */
+@media (min-width: 1301px) {
+  .sidebar-hamburger {
+    display: none !important;
+  }
+}
+
+/* --------------------------- */
+/* -----------Frontpage--------- */
+/* --------------------------- */
 .columns {
   display: flex;
   gap: 2rem;
@@ -335,7 +446,8 @@ hr.dropdown-div {
 .column h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  font-family: var(--formal);
+  font-family: var(--semiformal);
+  letter-spacing: 5px;
 }
 
 .column hr {
@@ -345,7 +457,6 @@ hr.dropdown-div {
   border-radius: 10px;
 }
 
-/* ───────────── Full‑width section ───────────── */
 .frontpage-intro {
   background-color: var(--tan);
   border-radius: 10px;
@@ -367,6 +478,22 @@ hr.dropdown-div {
   z-index: 1;
 }
 
+.icon-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem;
+
+  /* text */
+  font-family: var(--semiformal);
+  color: var(--dark-blue);
+}
+
+.icon-row a {
+  color: var(--dark-blue);
+}
+
 .newest-designs {
   background-color: var(--tan);
   border-radius: 10px;
@@ -382,7 +509,9 @@ hr.dropdown-div {
   margin-top: 0.5rem;
 }
 
-/* ───────────── Masterlist ───────────── */
+/* --------------------------- */
+/* ----------Masterlist------- */
+/* --------------------------- */
 .masterlist-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -396,8 +525,8 @@ hr.dropdown-div {
   border: 1px solid #ccc;
   padding: 1rem;
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: var(--tan);
+  box-shadow: 0 2px 8px rgba(var(--dark-blue),0.5);
   cursor: pointer;
   text-align: center;
 
@@ -422,8 +551,8 @@ hr.dropdown-div {
   border: 1px solid #ccc;
   padding: 1rem;
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: var(--tan);
+  box-shadow: 0 2px 8px rgba(var(--dark-blue),0.5);
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
