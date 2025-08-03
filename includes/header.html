@@ -12,10 +12,13 @@
 
   <div class="nav-links" id="navbarMenu">
 
-    <div class="nav-left"> 
-      <a class="nav-link" href="/news.html">
-        News
-      </a>
+    <div class="nav-left">
+        <button id="openNav" class="sidebar-hamburger" onclick="w3_open()" aria-label="Open sidebar">
+            <i class="fa-solid fa-meteor"></i>
+        </button>
+        <a class="nav-link" href="/news.html">
+            News
+        </a>
     </div> 
 
     <div class="nav-center">
@@ -82,6 +85,7 @@
       </button>
       <div class="dropdown-content">
         <a href="user.html"><i class="fa-solid fa-user"></i> Profile</a>
+        <hr class="dropdown-div">
         <a href="#"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
       </div>
     </div>
