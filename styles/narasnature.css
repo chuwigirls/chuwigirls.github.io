@@ -10,9 +10,12 @@
   --light-pink: #fdd1d8;
   --pink: #dc7786;
 
-  --play: "Huninn", sans-serif;
+  --calm: "Huninn", sans-serif;
   --formal: "Bruno Ace", serif;
-  --semiformal: "Righteous", serif;
+  --bubbly: "DynaPuff", serif;
+  --playful: "Rubik Puddles", serif;
+  --cyber: "Righteous", serif;
+  --tropical: "Hanalei", serif;
 }
 
 /* --------------------------- */
@@ -38,7 +41,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: var(--play);
+  font-family: var(--calm);
 
   /* site bg */
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
@@ -69,7 +72,7 @@ button {
   border-radius: 9999px;
   border: none;
   transform: scale(0.95);
-  font-family: var(--play);
+  font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
@@ -104,7 +107,7 @@ button:hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    font-family: var(--play);
+    font-family: var(--calm);
     color: var(--dark-blue);
     border-radius: 9999px;
     background: none;
@@ -170,7 +173,7 @@ button:hover {
     border: none;
     border-radius: 9999px;
     color: var(--dark-blue);
-    font-family: var(--playful);
+    font-family: var(--bubbly);
     text-decoration: none;
     margin: .8rem;
 }
@@ -298,7 +301,7 @@ hr.dropdown-div {
 
   /* text */
   color: var(--dark-blue);
-  font-family: var(--semiformal);
+  font-family: var(--playful);
   
   /* button look */
   background-color: var(--light-blue);
@@ -326,7 +329,7 @@ hr.dropdown-div {
   margin-top: 5%;
 
   /* text styling */
-  font-family: var(--formal);
+  font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
@@ -444,9 +447,8 @@ hr.dropdown-div {
 }
 
 .column h2 {
-  font-size: 1.25rem;
   font-weight: 600;
-  font-family: var(--semiformal);
+  font-family: var(--playful);
   letter-spacing: 5px;
 }
 
@@ -486,7 +488,7 @@ hr.dropdown-div {
   margin: 2rem;
 
   /* text */
-  font-family: var(--semiformal);
+  font-family: var(--cyber);
   color: var(--dark-blue);
 }
 
@@ -543,7 +545,7 @@ hr.dropdown-div {
 
 .masterlist-card-name {
   margin-top: 0.5rem;
-  font-family: var(--formal);
+  font-family: var(--playful);
   color: var(--dark-blue);
 }
 
