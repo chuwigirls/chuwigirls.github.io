@@ -1,3 +1,14 @@
+/* 
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+
+    if you're looking at this page to learn about coding,
+    ask chuwigirls for help! */
+
 // ==============================
 // Load Google Visualization API
 // ==============================
@@ -52,7 +63,7 @@ function loadHeaderFooter() {
           loadCount++;
           if (loadCount === includes.length) {
             initDropdowns();
-            initHamburger();
+            initNavbarToggler();
             initSidebar();  // <-- initialize sidebar buttons & behavior here
           }
         })
@@ -66,54 +77,45 @@ function loadHeaderFooter() {
 function w3_open() {
   const sidebar = document.getElementById("mySidebar");
   const openBtn = document.getElementById("openNav");
-  if (sidebar) sidebar.style.display = "block";
-  if (openBtn) openBtn.style.display = "none";
   document.body.classList.add("sidebar-open");
 }
 
 function w3_close() {
   const sidebar = document.getElementById("mySidebar");
   const openBtn = document.getElementById("openNav");
-  if (sidebar) sidebar.style.display = "none";
-  if (openBtn) openBtn.style.display = "block";
   document.body.classList.remove("sidebar-open");
 }
 
-// On page load and resize, toggle sidebar visibility & hamburger button
+// On page load and resize, toggle sidebar visibility & navbar button
 function handleSidebarDisplay() {
   const width = window.innerWidth;
-  const sidebar = document.getElementById("mySidebar");
-  const openBtn = document.getElementById("openNav");
   
   if (width > 900) {
-    if (sidebar) sidebar.style.display = "block";
-    if (openBtn) openBtn.style.display = "none";
     document.body.classList.remove("sidebar-open");
   } else {
-    if (sidebar) sidebar.style.display = "none";
-    if (openBtn) openBtn.style.display = "block";
     document.body.classList.remove("sidebar-open");
   }
 }
 
-// Initialize sidebar button bindings and add resize listener
 function initSidebar() {
   const openBtn = document.getElementById("openNav");
   if (openBtn) openBtn.addEventListener("click", w3_open);
-  
-  // Close buttons inside sidebar
-  document.querySelectorAll("#mySidebar .w3-button").forEach(btn => {
-    if (btn.textContent.trim().startsWith("Close")) {
-      btn.addEventListener("click", w3_close);
-    }
-  });
-  
+
+  // Close button inside sidebar
+  const closeBtn = document.querySelector("#mySidebar .sidebar-close");
+  if (closeBtn) closeBtn.addEventListener("click", w3_close);
+
   // Initial display
   handleSidebarDisplay();
-  
+
   // Adjust on window resize
   window.addEventListener("resize", handleSidebarDisplay);
 }
+
+if (closeBtn) closeBtn.addEventListener("click", function() {
+  console.log("Close clicked");
+  w3_close();
+});
 
 // Call initSidebar after your includes are loaded (e.g., in loadHeaderFooter)
 
@@ -136,20 +138,22 @@ function initDropdowns() {
   });
 }
 
-function initHamburger() {
-  const hamburger = document.getElementById("hamburgerToggle");
-  const navbarMenu = document.getElementById("navbarMenu");
-
-  if (hamburger && navbarMenu) {
-    hamburger.addEventListener("click", function () {
-      navbarMenu.classList.toggle("show");
-      document.body.classList.toggle("nav-open", navbarMenu.classList.contains("show"));
+function initNavbarToggler() {
+  const toggler = document.getElementById("navbarToggle");
+  const navLinks = document.getElementById("navbarMenu");
+  if (toggler && navLinks) {
+    toggler.addEventListener("click", function () {
+      navLinks.classList.toggle("show");
+      console.log('Toggled nav-links:', navLinks.className);
     });
+  } else {
+    console.log('Navbar toggler or nav-links not found:', toggler, navLinks);
   }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   loadHeaderFooter();
+  
 });
 
 // ==============================
