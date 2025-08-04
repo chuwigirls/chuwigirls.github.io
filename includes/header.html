@@ -1,3 +1,14 @@
+<!-- 
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+
+    if you're looking at this page to learn about coding,
+    ask chuwigirls for help! -->
+
 <!-- Site title -->
 <h1 class="site-title">
   <a href="/index.html">Naras Nature <i class="fa-solid fa-wand-sparkles"></i></a>
@@ -5,17 +16,19 @@
 
 <!-- Responsive Navbar -->
 <div class="navbar">
-  <!-- Hamburger toggle (hidden on desktop) -->
-  <button class="navbar-toggler" id="hamburgerToggle">
+  <!-- Navbar menu -->
+  <button class="navbar-toggler" id="navbarToggle">
     <i class="fa-solid fa-bars"></i>
   </button>
+
+  <button id="openNav" onclick="w3_open()"  class="sidebar" aria-label="Open sidebar">
+            <i class="fa-solid fa-meteor"></i>
+        </button>
 
   <div class="nav-links" id="navbarMenu">
 
     <div class="nav-left">
-        <button id="openNav" class="sidebar-hamburger" onclick="w3_open()" aria-label="Open sidebar">
-            <i class="fa-solid fa-meteor"></i>
-        </button>
+        
         <a class="nav-link" href="/news.html">
             News
         </a>
@@ -28,11 +41,11 @@
       </button>
       <div class="dropdown-content">
         <a href="/encyclopedia.html"><i class="fa-solid fa-book-bookmark"></i> Encyclopedia</a>
-        <a href="/lore.html"><i class="fa-solid fa-layer-group"></i> Lore</a>
-        <a href="../catalog/nursery.html"><i class="fa-solid fa-seedling"></i> Adopt a Narling</a>
+        <a href="/lore.html"><i class="fa-solid fa-globe"></i> Lore</a>
         <hr class="dropdown-div">
         <a href="/bazaar.html"><i class="fa-solid fa-gem"></i> Bazaar Market</a>
         <a href="/commerce.html"><i class="fa-solid fa-rotate"></i> Commerce</a>
+        <a href="/catalog/nursery.html"><i class="fa-solid fa-seedling"></i> Nursery</a>
       </div>
     </div>
 
@@ -41,13 +54,13 @@
         Recreation <i class="fa fa-caret-down"></i>
       </button>
       <div class="dropdown-content">
+        <a href="/daily.html"><i class="fa-solid fa-cookie-bite"></i> Dailies</a>
+        <hr class="dropdown-div">
         <a href="/pursuits.html"><i class="fa-solid fa-paintbrush"></i> Pursuits</a>
         <a href="/callings.html"><i class="fa-solid fa-certificate"></i> Callings</a>
         <hr class="dropdown-div">
         <a href="/magic.html"><i class="fa-solid fa-wand-magic-sparkles"></i> Magic</a>
         <a href="/magicomp.html"><i class="fa-solid fa-explosion"></i> Magicomp</a>
-        <hr class="dropdown-div">
-        <a href="/games.html"><i class="fa-solid fa-gamepad"></i> Games</a>
       </div>
     </div>
 
@@ -60,7 +73,7 @@
         <a href="/narapedia/features.html"><i class="fa-solid fa-cube"></i> Features</a>
         <hr class="dropdown-div">
         <a href="/narapedia/artifacts.html"><i class="fa-solid fa-award"></i> Artifacts</a>
-        <a href="/narapedia/companions.html"><i class="fa-solid fa-paw"></i> Companions</a>
+        <a href="/narapedia/palcharms.html"><i class="fa-solid fa-paw"></i> Palcharms</a>
         <hr class="dropdown-div">
         <a href="/narapedia/civilians.html"><i class="fa-solid fa-shield-cat"></i> Civilians</a>
       </div>
@@ -71,11 +84,12 @@
         Help <i class="fa fa-caret-down"></i>
       </button>
       <div class="dropdown-content">
-        <a href="../help/staff.html"><i class="fa-solid fa-crown"></i> Staff</a>
-        <a href="../help/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-        <a href="../help/guides.html"><i class="fa-solid fa-feather"></i> Guides</a>
+        <a href="/help/guides.html"><i class="fa-solid fa-feather"></i> Guides</a>
+        <a href="/help/staff.html"><i class="fa-solid fa-crown"></i> Staff</a>
         <hr class="dropdown-div">
-        <a href="../help/terms.html"><i class="fa-solid fa-circle-info"></i> TOS</a>
+        <a href="/help/rules.html"><i class="fa-solid fa-circle-exclamation"></i> Rules</a>
+        <a href="/help/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+        <a href="/help/terms.html"><i class="fa-solid fa-circle-info"></i> TOS</a>
       </div>
     </div>
 
