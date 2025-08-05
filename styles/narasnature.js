@@ -47,7 +47,7 @@ function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
 }
 
 // ==============================
-// ====== Header & Footer =======
+// === Header, Footer, Sidebar ==
 // ==============================
 function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
