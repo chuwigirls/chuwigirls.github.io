@@ -25,7 +25,8 @@
   --cyber: "Righteous", serif;
   --tropical: "Hanalei", serif;
 
-  --header-height: 200px; /* fallback */
+  /* fallback */
+  --header-height: 200px;
 }
 
 /* --------------------------- */
@@ -284,15 +285,15 @@ hr.dropdown-div {
 /* --------------------------- */
 #mySidebar {
   position: fixed;
-  top: var(--header-height, 200px);
   left: 0;
   width: 200px;
-  height: calc(100vh - var(--header-height, 200px));
+  /* height of sidebar height: calc(100vh - var(--header-height, 200px)); */
   background: var(--light-blue);
   border-radius: 0 20px 20px 0;
   z-index: 900;
   transform: translateX(-100%);
   transition: transform 0.4s cubic-bezier(.77,0,.18,1);
+  text-align: center;
 }
 
 .sidebar-close {
@@ -305,6 +306,16 @@ hr.dropdown-div {
   background-color: var(--light-blue);
   color: var(--dark-blue);
   border: none;
+}
+
+#mySidebar h3 {
+  font-family: var(--bubbly);
+  color: var(--dark-blue);
+}
+
+#mySidebar h4 {
+  font-family: var(--cyber);
+  color: var(--dark-blue);
 }
 
 /* Sidebar slide open on all screens */
@@ -323,7 +334,6 @@ body.sidebar-open #mySidebar {
     display: flex;
     position: fixed;
     left: 0;
-    top: var(--header-height, 200px);
     width: 48px;
     height: 48px;
     padding: 0;
