@@ -67,6 +67,15 @@ function loadHeaderFooter() {
               initNavbarToggler();
               initSidebar();
               setHeaderHeight();
+
+              // ✅ Load Featured Nara after includes are inserted
+              loadGoogleSheetsAPI(() => {
+                loadRandomFeaturedNara(
+                  "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms", // your spreadsheet ID
+                  "Masterlist"
+                );
+              });
+
             }, 0);
           }
         })
@@ -165,6 +174,10 @@ function Masterlist(data) {
     nara["URL"] && nara["Nara"]
   );
 
+  // Check for ?design= parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDesign = urlParams.get("design");
+
   masterlistView.innerHTML = "";
   masterlistView.classList.add("masterlist-grid");
   masterlistView.style.display = "grid";
@@ -202,11 +215,94 @@ function Masterlist(data) {
     masterlistView.appendChild(card);
   });
 
-  // Use event delegation for back button to prevent multiple handlers
+  // If a Nara was requested via URL, trigger its detail view
+  if (selectedDesign) {
+    const matchingNara = visibleNaras.find(n => n.Nara === selectedDesign);
+    if (matchingNara) {
+      masterlistView.style.display = "none";
+
+      const detailCard = document.querySelector("#nara-detail-template");
+      if (!detailCard) return;
+      const detailContent = detailCard.content.cloneNode(true);
+
+      detailContent.querySelector(".nara-detail-img").src = matchingNara["URL"];
+      detailContent.querySelector(".nara-detail-img").alt = matchingNara.Nara;
+      detailContent.querySelector(".nara-detail-name").textContent = matchingNara.Nara;
+      detailContent.querySelector(".nara-detail-owner").textContent = matchingNara.Owner || "—";
+      detailContent.querySelector(".nara-detail-region").textContent = matchingNara.Region || "—";
+      detailContent.querySelector(".nara-detail-designer").textContent = matchingNara.Designer || "—";
+      detailContent.querySelector(".nara-detail-status").textContent = matchingNara.Status || "—";
+      detailContent.querySelector(".nara-detail-rarity").textContent = matchingNara.Rarity || "—";
+
+      detailView.innerHTML = "";
+      detailView.appendChild(detailContent);
+      detailView.style.display = "block";
+    }
+  }
+
   detailView.addEventListener("click", (e) => {
     if (e.target && (e.target.id === "back-btn" || e.target.closest("#back-btn"))) {
       detailView.style.display = "none";
       masterlistView.style.display = "grid";
+    }
+  });
+}
+
+
+// ==============================
+// =========== Featured =========
+// ==============================
+function loadRandomFeaturedNara(spreadsheetId, sheetName) {
+  console.log("[Sidebar Nara] Starting load...");
+
+  fetchSheetData(spreadsheetId, sheetName, data => {
+    console.log("[Sidebar Nara] Sheet data:", data);
+    console.log("[Sidebar Nara] First row keys:", Object.keys(data[0]));
+
+    // Filter for visible Naras
+    const visible = data.filter(nara =>
+      (nara.Hide !== true && nara.Hide !== "TRUE") &&
+      typeof nara.URL === "string" &&
+      nara.URL.trim() !== ""
+    );
+
+    console.log("[Sidebar Nara] Visible Naras:", visible.length);
+
+    if (visible.length === 0) {
+      console.warn("[Sidebar Nara] No visible Naras to display");
+      return;
+    }
+
+    // Pick a random one
+    const randomNara = visible[Math.floor(Math.random() * visible.length)];
+
+    // Inject into sidebar
+    const container = document.createElement("div");
+    container.className = "random-nara-preview";
+
+    const link = document.createElement("a");
+    link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
+    link.style.textDecoration = "none";
+
+    const img = document.createElement("img");
+    img.src = randomNara.URL;
+    img.alt = randomNara.Nara || "Featured Nara";
+    img.className = "random-nara-img";
+
+    const name = document.createElement("div");
+    name.textContent = randomNara.Nara || "Unnamed Nara";
+    name.className = "random-nara-name";
+
+    link.appendChild(img);
+    link.appendChild(name);
+    container.appendChild(link);
+
+    const sidebar = document.getElementById("featured-nara-sidebar");
+    if (sidebar) {
+      sidebar.innerHTML = "";
+      sidebar.appendChild(container);
+    } else {
+      console.warn("[Sidebar Nara] #featured-nara-sidebar not found");
     }
   });
 }
