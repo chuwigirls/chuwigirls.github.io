@@ -63,13 +63,6 @@ h1 {
   color: var(--dark-blue);
 }
 
-body.sidebar-open #mySidebar {
-  display: block !important;
-}
-body.sidebar-open #openNav {
-  display: none !important;
-}
-
 /* --------------------------- */
 /* -----------Header---------- */
 /* --------------------------- */
@@ -124,6 +117,8 @@ body.sidebar-open #openNav {
   margin-left: 6rem;
   margin-right: 3rem;
   background-color: var(--light-blue);
+  padding: 1rem;
+  gap: 1rem;
 }
 
 .nav-left,
@@ -233,7 +228,10 @@ hr.dropdown-div {
   }
 
   .nav-links {
-    display: none !important;
+    display: flex;
+    position: absolute;
+    left: 0;
+    top: 0;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -243,11 +241,30 @@ hr.dropdown-div {
     width: 100%;
     margin: 0;
     padding: 0;
+    gap: 0;
+
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0);
+    opacity: 0;
+    transform-origin: top;
+    transition: opacity 0.3s ease, transform 0.4s ease, max-height 0.5s ease-in-out;
   }
 
   .nav-links.show {
-    display: flex !important;
     max-height: 1000px;
+    padding: 1rem;
+    gap: 1rem;
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  .nav-links a,
+  .dropbtn {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    margin: 0.3rem 0;
   }
 
   .nav-left,
@@ -323,6 +340,34 @@ body.sidebar-open #mySidebar {
   transform: translateX(0);
 }
 
+#openNav {
+  left: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 0 20px 20px 0;
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  transition: transform 0.4s cubic-bezier(.77, 0, .18, 1), opacity 0.4s;
+}
+
+/* Slide button out when sidebar is open */
+body.sidebar-open #openNav {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Slide button in when sidebar is closed */
+body.sidebar-closed #openNav,
+body:not(.sidebar-open) #openNav {
+  transform: translateX(0);
+  opacity: 1;
+}
+
 /* Show toggler and close buttons on large screens */
 @media (min-width: 1550px) {
   #openNav,
@@ -347,11 +392,11 @@ body.sidebar-open #mySidebar {
   }
 
   body.sidebar-closed #mySidebar {
-    transform: translateX(-100%) !important;
+    transform: translateX(-100%);
   }
 
   body.sidebar-open #mySidebar {
-    transform: translateX(0) !important;
+    transform: translateX(0);
   }
 }
 
@@ -418,6 +463,11 @@ body.sidebar-open #mySidebar {
 }
 
 .column img {
+  width: 100%;
+  height: auto;
+}
+
+.imgArch {
   width: 100%;
   height: auto;
   margin-top: 50%;
