@@ -9,9 +9,6 @@
     if you're looking at this page to learn about coding,
     ask chuwigirls for help! */
 
-/* --------------------------- */
-/* ---------Variables--------- */
-/* --------------------------- */
 :root {
   --tan: #EFEFE7;
   --shadow: #f7f7f0;
@@ -27,15 +24,8 @@
   --playful: "Rubik Puddles", serif;
   --cyber: "Righteous", serif;
   --tropical: "Hanalei", serif;
-}
 
-/* --------------------------- */
-/* -------Google Fonts-------- */
-/* --------------------------- */
-.huninn-regular {
-  font-family: "Huninn", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+  --header-height: 200px; /* fallback */
 }
 
 /* --------------------------- */
@@ -72,7 +62,6 @@ h1 {
   color: var(--dark-blue);
 }
 
-/* Show sidebar when .sidebar-open is on body */
 body.sidebar-open #mySidebar {
   display: block !important;
 }
@@ -110,6 +99,7 @@ body.sidebar-open #openNav {
   border-radius: 9999px;
   background: none;
   gap: 1rem;
+  z-index: 1000;
 }
 
 .navbar-toggler,
@@ -142,6 +132,8 @@ body.sidebar-open #openNav {
   flex-direction: row;
   align-items: center;
   gap: 1rem;
+  margin-left: 5rem;
+  margin-right: 5rem;
 }
 
 .nav-center {
@@ -157,7 +149,6 @@ body.sidebar-open #openNav {
   justify-content: flex-end;
 }
 
-/* Nav links */
 .nav-links a,
 .dropbtn {
   cursor: pointer;
@@ -213,12 +204,15 @@ hr.dropdown-div {
   margin: 0.1rem 0;
 }
 
-@media (max-width: 767px) {
+/* --------------------------- */
+/* -----------Responsive------ */
+/* --------------------------- */
+@media (max-width: 1300px) {
   .navbar {
     position: relative;
-    min-height: 48px; /* or your button height */
+    min-height: 48px;
   }
-  
+
   .navbar-toggler {
     display: inline-flex !important;
     position: absolute;
@@ -249,10 +243,12 @@ hr.dropdown-div {
     margin: 0;
     padding: 0;
   }
+
   .nav-links.show {
     display: flex !important;
     max-height: 1000px;
   }
+
   .nav-left,
   .nav-center,
   .nav-right {
@@ -280,6 +276,72 @@ hr.dropdown-div {
     justify-content: center;
     z-index: 2100;
     box-sizing: border-box;
+  }
+}
+
+/* --------------------------- */
+/* -----------Sidebar--------- */
+/* --------------------------- */
+#mySidebar {
+  position: fixed;
+  top: var(--header-height, 200px);
+  left: 0;
+  width: 200px;
+  height: calc(100vh - var(--header-height, 200px));
+  background: var(--light-blue);
+  border-radius: 0 20px 20px 0;
+  z-index: 900;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(.77,0,.18,1);
+}
+
+.sidebar-close {
+  cursor: pointer;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 1.8rem;
+  border-radius: 0 20px 20px 0;
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
+  border: none;
+}
+
+/* Sidebar slide open on all screens */
+body.sidebar-open #mySidebar {
+  transform: translateX(0);
+}
+
+/* Show toggler and close buttons on large screens */
+@media (min-width: 1550px) {
+  #openNav,
+  #mySidebar .sidebar-close {
+    display: block !important;
+  }
+
+  .sidebar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: var(--header-height, 200px);
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 0 20px 20px 0;
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    border: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+  }
+
+  body.sidebar-closed #mySidebar {
+    transform: translateX(-100%) !important;
+  }
+
+  body.sidebar-open #mySidebar {
+    transform: translateX(0) !important;
   }
 }
 
@@ -317,55 +379,6 @@ hr.dropdown-div {
   margin-top: 5%;
   font-family: var(--bubbly);
   color: var(--dark-blue);
-}
-
-/* --------------------------- */
-/* -----------Sidebar--------- */
-/* --------------------------- */
-/* --------------------------- */
-/* -----------Sidebar--------- */
-/* --------------------------- */
-#mySidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200px;
-  height: 100vh;
-  background: var(--light-blue);
-  border-radius: 0 20px 20px 0;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.08);
-  z-index: 2000;
-  /* Animation for small screens is handled in media queries */
-}
-
-/* --- Sidebar animation for small screens --- */
-@media (max-width: 1199px) {
-  #mySidebar {
-    transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(.77,0,.18,1);
-  }
-  body.sidebar-open #mySidebar {
-    transform: translateX(0);
-  }
-}
-
-/* --- Sidebar always visible and overlaying on large screens --- */
-@media (min-width: 1200px) {
-  #mySidebar {
-    position: fixed;
-    top: 350px;
-    left: 0;
-    display: block !important;
-    transform: none !important;
-    transition: none !important;
-    width: 200px;
-    height: 100vh;
-    z-index: 2000;
-  }
-  body.sidebar-open #mySidebar {
-    /* No effect needed on large screens */
-    transform: none !important;
-  }
 }
 
 /* --------------------------- */
@@ -512,7 +525,7 @@ hr.dropdown-div {
 
 .masterlist-card-name {
   margin-top: 0.5rem;
-  font-family: var(--playful);
+  font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
@@ -525,6 +538,7 @@ hr.dropdown-div {
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
+  font-family: var(--calm);
 }
 
 .nara-detail-img {
@@ -535,7 +549,7 @@ hr.dropdown-div {
 
 .nara-detail-name {
   margin-top: 1rem;
-  font-family: var(--formal);
+  font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
