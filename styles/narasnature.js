@@ -62,9 +62,12 @@ function loadHeaderFooter() {
           el.innerHTML = html;
           loadCount++;
           if (loadCount === includes.length) {
-            initDropdowns();
-            initNavbarToggler();
-            initSidebar();  // <-- initialize sidebar buttons & behavior here
+            setTimeout(() => {
+              initDropdowns();
+              initNavbarToggler();
+              initSidebar();
+              setHeaderHeight();
+            }, 0);
           }
         })
         .catch(err => {
@@ -74,24 +77,28 @@ function loadHeaderFooter() {
   });
 }
 
+function setHeaderHeight() {
+  const header = document.getElementById("siteHeader");
+  if (header) {
+    const height = header.offsetHeight;
+    document.documentElement.style.setProperty('--header-height', `${height}px`);
+  }
+}
+
 function w3_open() {
-  const sidebar = document.getElementById("mySidebar");
-  const openBtn = document.getElementById("openNav");
   document.body.classList.add("sidebar-open");
 }
 
 function w3_close() {
-  const sidebar = document.getElementById("mySidebar");
-  const openBtn = document.getElementById("openNav");
   document.body.classList.remove("sidebar-open");
 }
 
-// On page load and resize, toggle sidebar visibility & navbar button
 function handleSidebarDisplay() {
   const width = window.innerWidth;
-  
-  if (width > 900) {
-    document.body.classList.remove("sidebar-open");
+  if (width >= 1550) {
+    if (!document.body.classList.contains("sidebar-closed")) {
+      document.body.classList.add("sidebar-open");
+    }
   } else {
     document.body.classList.remove("sidebar-open");
   }
@@ -101,28 +108,18 @@ function initSidebar() {
   const openBtn = document.getElementById("openNav");
   if (openBtn) openBtn.addEventListener("click", w3_open);
 
-  // Close button inside sidebar
   const closeBtn = document.querySelector("#mySidebar .sidebar-close");
   if (closeBtn) closeBtn.addEventListener("click", w3_close);
 
-  // Initial display
   handleSidebarDisplay();
-
-  // Adjust on window resize
-  window.addEventListener("resize", handleSidebarDisplay);
+  window.addEventListener("resize", () => {
+    handleSidebarDisplay();
+    setHeaderHeight();
+  });
 }
 
-if (closeBtn) closeBtn.addEventListener("click", function() {
-  console.log("Close clicked");
-  w3_close();
-});
-
-// Call initSidebar after your includes are loaded (e.g., in loadHeaderFooter)
-
 function initDropdowns() {
-  const dropdowns = document.querySelectorAll(".dropdown");
-
-  dropdowns.forEach(dropdown => {
+  document.querySelectorAll(".dropdown").forEach(dropdown => {
     const button = dropdown.querySelector(".dropbtn");
     const menu = dropdown.querySelector(".dropdown-content");
 
@@ -139,22 +136,20 @@ function initDropdowns() {
 }
 
 function initNavbarToggler() {
-  const toggler = document.getElementById("navbarToggle");
-  const navLinks = document.getElementById("navbarMenu");
+  let toggler = document.getElementById("navbarToggle");
+  let navLinks = document.getElementById("navbarMenu");
+
   if (toggler && navLinks) {
-    toggler.addEventListener("click", function () {
+    toggler.addEventListener("click", () => {
       navLinks.classList.toggle("show");
-      console.log('Toggled nav-links:', navLinks.className);
     });
   } else {
-    console.log('Navbar toggler or nav-links not found:', toggler, navLinks);
+    // Retry after slight delay if not loaded yet
+    setTimeout(initNavbarToggler, 100);
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  loadHeaderFooter();
-  
-});
+document.addEventListener("DOMContentLoaded", loadHeaderFooter);
 
 // ==============================
 // ========= Masterlist =========
