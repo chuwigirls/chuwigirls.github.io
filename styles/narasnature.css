@@ -279,47 +279,46 @@ hr.dropdown-div {
   }
 
   /* Mobile dropdown wrapper */
-.dropdown {
-  width: 100%;
-  text-align: center;
-}
-
-/* Override default dropdown positioning */
-.dropdown-content {
-  position: relative;
-  background-color: var(--light-blue);
-  border-radius: 10px;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: 
-    max-height 0.4s ease, 
-    opacity 0.3s ease, 
-    transform 0.4s ease;
-  pointer-events: none;
-}
-
-  /* Show dropdown */
-  .dropdown-content.show {
-    max-height: 500px;
-    opacity: 1;
-    transform: scaleY(1);
-    pointer-events: auto;
-    padding: 0.5rem 0;
-  }
-
-  /* Mobile dropdown links */
-  .dropdown-content a {
-    display: block;
-    padding: 0.5rem 1rem;
+  .dropdown {
+    width: 100%;
     text-align: center;
   }
 
+  /* Override default dropdown positioning */
+  .dropdown-content {
+    position: relative;
+    background-color: var(--light-blue);
+    border-radius: 10px;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: 
+      max-height 0.4s ease, 
+      opacity 0.3s ease, 
+      transform 0.4s ease;
+    pointer-events: none;
+  }
+
+    /* Show dropdown */
+    .dropdown-content.show {
+      max-height: 500px;
+      opacity: 1;
+      transform: scaleY(1);
+      pointer-events: auto;
+      padding: 0.5rem 0;
+    }
+
+    /* Mobile dropdown links */
+    .dropdown-content a {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-align: center;
+    }
 
   .sidebar {
     display: flex;
