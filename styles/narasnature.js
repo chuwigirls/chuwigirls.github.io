@@ -397,6 +397,11 @@ function logout() {
 document.addEventListener("DOMContentLoaded", () => {
   handleOAuthRedirect();
 
+  // Login button on login.html
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.addEventListener('click', redirectToDiscordOAuth);
+
+  // Logout button in dropdown menu
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 });
