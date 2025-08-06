@@ -100,15 +100,17 @@
         <a class="nav-link login-button" href="/login.html">Login</a>
       </div>
 
-      <!-- 👤 User Dropdown (Auth-Only) -->
-        <div class="dropdown" id="user-dropdown" style="display: none;">
-          <button class="dropbtn username">User <i class="fa fa-caret-down"></i></button>
-          <div class="dropdown-content">
-            <a href="/user.html"><i class="fa-solid fa-user"></i> Profile</a>
-            <hr class="dropdown-div">
-            <a href="#" id="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
-          </div>
+      <!-- User Dropdown -->
+      <div class="nav-right dropdown" id="user-dropdown" style="display: none;">
+        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+          <span class="username"></span> <i class="fa fa-caret-down"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="/user.html">Profile</a>
+          <button class="dropdown-item" id="logout-btn">Logout</button>
         </div>
+      </div>
+      
     </div>
   </div>
 </div>
