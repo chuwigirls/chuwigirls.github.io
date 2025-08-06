@@ -377,9 +377,12 @@ function updateNavbarUI() {
   const user = getStoredUser();
   if (user) {
     if (loginBtn) loginBtn.style.display = 'none';
+
     if (userDropdown) {
       const nameSlot = userDropdown.querySelector('.username');
-      if (nameSlot) nameSlot.textContent = user.username;
+      if (nameSlot) {
+        nameSlot.innerHTML = `${user.username} <i class="fa fa-caret-down"></i>`;
+      }
       userDropdown.style.display = 'block';
     }
   } else {
@@ -390,7 +393,7 @@ function updateNavbarUI() {
 
 function logout() {
   clearStoredUser();
-  updateNavbarUI();
+  window.location.reload();
 }
 
 // Run auth checks after DOM is ready
@@ -405,5 +408,3 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 });
-
-
