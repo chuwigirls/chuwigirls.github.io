@@ -381,7 +381,7 @@ function updateNavbarUI() {
     if (userDropdown) {
       const nameSlot = userDropdown.querySelector('.username');
       if (nameSlot) {
-        nameSlot.innerHTML = `${user.username} <i class="fa fa-caret-down"></i>`;
+        nameSlot.textContent = user.username;
       }
       userDropdown.style.display = 'block';
     }
@@ -393,7 +393,7 @@ function updateNavbarUI() {
 
 function logout() {
   clearStoredUser();
-  window.location.reload();
+  window.location.href = window.location.href;
 }
 
 // Run auth checks after DOM is ready
