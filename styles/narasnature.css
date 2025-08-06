@@ -11,6 +11,7 @@
 
 :root {
   --tan: #EFEFE7;
+  --tanb: #ccc;
   --shadow: #f7f7f0;
   --dark-blue: #4571b8;
   --bluey: #559DE7;
@@ -32,23 +33,17 @@
 /* --------------------------- */
 /* ---------Main body--------- */
 /* --------------------------- */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   overflow-x: hidden;
   font-family: var(--calm);
+  background-color: transparent;
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
   background-size: cover;
   background-position: top;
   background-attachment: fixed;
-  background-color: var(--tan);
 }
 
 .wrapper {
@@ -65,6 +60,37 @@ hr {
 h1 {
   font-family: var(--formal);
   color: var(--dark-blue);
+}
+
+.page {
+  background-color: var(--tan);
+  border-radius: 20px;
+  padding: 3rem;
+  margin: 3rem;
+  text-align: center;
+  border: 1px solid var(--tanb);
+}
+
+.page img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+button {
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
+  font-family: var(--bubbly);
+  border-radius: 9999px;
+  border: none;
+  padding: .01rem 2.2rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--light-pink);
+  color: var(--pink);
+  transition-duration: 0.4s;
 }
 
 /* --------------------------- */
@@ -207,7 +233,8 @@ hr.dropdown-div {
 /* --------------------------- */
 /* -----------Responsive------ */
 /* --------------------------- */
-@media (max-width: 1300px) {
+@media (max-width: 1600px) {
+
   .navbar {
     position: relative;
     min-height: 48px;
@@ -335,7 +362,9 @@ hr.dropdown-div {
     border-radius: 0 20px 20px 0;
     background-color: var(--light-blue);
     color: var(--dark-blue);
-    border: none;
+    
+  border: 1px solid var(--dark-blue);
+    
     align-items: center;
     justify-content: center;
     z-index: 2100;
@@ -401,20 +430,17 @@ body.sidebar-open #mySidebar {
   transition: transform 0.4s cubic-bezier(.77, 0, .18, 1), opacity 0.4s;
 }
 
-/* Slide button out when sidebar is open */
 body.sidebar-open #openNav {
   transform: translateX(-100%);
   opacity: 0;
 }
 
-/* Slide button in when sidebar is closed */
 body.sidebar-closed #openNav,
 body:not(.sidebar-open) #openNav {
   transform: translateX(0);
   opacity: 1;
 }
 
-/* Show toggler and close buttons on large screens */
 @media (min-width: 1550px) {
   #openNav,
   #mySidebar .sidebar-close {
@@ -528,6 +554,7 @@ body:not(.sidebar-open) #openNav {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  border: 1px solid var(--tanb);
 }
 
 .column img {
@@ -572,6 +599,7 @@ body:not(.sidebar-open) #openNav {
 
 .frontpage-intro {
   background-color: var(--tan);
+  border: 1px solid var(--tanb);
   border-radius: 10px;
   padding: 2rem;
   margin: 2rem 0;
@@ -581,13 +609,13 @@ body:not(.sidebar-open) #openNav {
 }
 
 .frontpage-intro img {
+  position: absolute;
+  float: right;
   width: 25%;
   height: auto;
   padding: 1rem;
-  position: absolute;
   right: 0;
-  top: 0;
-  margin: -70px -20px 0 0;
+  top: -18%;
   z-index: 1;
 }
 
@@ -607,6 +635,7 @@ body:not(.sidebar-open) #openNav {
 
 .newest-designs {
   background-color: var(--tan);
+  border: 1px solid var(--tanb);
   border-radius: 10px;
   padding: 2rem;
   margin: 2rem 0;
@@ -633,7 +662,7 @@ body:not(.sidebar-open) #openNav {
 }
 
 .masterlist-card {
-  border: 1px solid #ccc;
+  border: 1px solid var(--tanb);
   padding: 1rem;
   border-radius: 12px;
   background: var(--tan);
@@ -662,7 +691,6 @@ body:not(.sidebar-open) #openNav {
   padding: 1rem;
   border-radius: 12px;
   background: var(--tan);
-  box-shadow: 0 2px 8px rgba(var(--dark-blue),0.5);
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
