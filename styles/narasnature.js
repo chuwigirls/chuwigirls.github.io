@@ -313,15 +313,11 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
 document.addEventListener("DOMContentLoaded", () => {
   loadHeaderFooter();
 
-  // Optional: fade in main content container on initial load (if you want)
+  // Fade-in effect
   const mainContent = document.getElementById("output");
   if (mainContent) {
     mainContent.classList.add("fade-in");
   }
-
-  loadGoogleSheetsAPI(() => {
-    fetchSheetData(sheetConfigs.narapedia.id, sheetConfigs.narapedia.sheetName, data => {
-      Masterlist(data);
-    });
-  });
 });
+
+
