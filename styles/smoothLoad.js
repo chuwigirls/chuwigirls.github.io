@@ -65,11 +65,11 @@ function interceptInternalLinks() {
     if (!anchor) return;
 
     const href = anchor.getAttribute("href");
-    // Ignore empty, external, or hash links
-    if (!href || href.startsWith("http") && !href.startsWith(window.location.origin)) return;
+    // Ignore empty, external, hash links, or logout
+    if (!href || (href.startsWith("http") && !href.startsWith(window.location.origin))) return;
     if (href.startsWith("#")) return;
+    if (anchor.id === "logoutBtn") return; // <-- added line
 
-    // Prevent default nav
     e.preventDefault();
 
     const container = document.getElementById("smooth-load");
