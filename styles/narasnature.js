@@ -318,8 +318,37 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mainContent) {
     mainContent.classList.add("fade-in");
   }
-});
 
+  // Force full reload on internal link clicks
+  document.body.addEventListener("click", e => {
+    const link = e.target.closest("a");
+    if (!link) return;
+
+    const href = link.getAttribute("href");
+
+    // Skip external links, anchors, or JS-based links
+    if (
+      !href ||
+      (href.startsWith("http") && !href.includes(location.hostname)) ||
+      href.startsWith("#") ||
+      href.startsWith("javascript:")
+    ) return;
+
+    e.preventDefault();
+    window.location.href = href; // Force full reload
+  });
+
+  // OAuth login checks
+  handleOAuthRedirect();
+
+  // Login button on login.html
+  const loginBtn = document.querySelector('#login-btn a');
+  if (loginBtn) loginBtn.addEventListener('click', redirectToDiscordOAuth);
+
+  // Logout button in dropdown menu
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+});
 
 // ==============================
 // ========== Auth (Login) =====
