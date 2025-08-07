@@ -342,8 +342,13 @@ const REDIRECT_URI = 'https://chuwigirls.github.io/user.html';
 const SCOPES = 'identify';
 
 function getStoredUser() {
-  return JSON.parse(localStorage.getItem('discordUser'));
+  try {
+    return JSON.parse(localStorage.getItem('discordUser'));
+  } catch {
+    return null;
+  }
 }
+
 
 function setStoredUser(user) {
   localStorage.setItem('discordUser', JSON.stringify(user));
