@@ -1,3 +1,14 @@
+/* 
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+
+    if you're looking at this page to learn about coding,
+    ask chuwigirls for help! */
+
 // ==============================
 // ====== Smooth Load Utils =====
 // ==============================
@@ -111,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==============================
 // ===== Global Hook ===========
 // ==============================
-// Called after new content is loaded via smoothLoad
 async function afterContentLoad() {
   const masterlistView = document.getElementById("masterlist-view");
   if (masterlistView) {
@@ -122,7 +132,8 @@ async function afterContentLoad() {
     });
   }
 
-  // Similarly, re-run any page-specific JS needed on new content load here
+  // Re-run auth UI update on every partial load
+  updateNavbarUI();
 }
 
 // ==============================
