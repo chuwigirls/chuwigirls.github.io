@@ -361,49 +361,58 @@ function updateNavbarUI() {
 }
 
 function handleOAuthCallback() {
-  if (window.location.hash) {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = params.get("access_token");
-    if (accessToken) {
-      localStorage.setItem("access_token", accessToken);
-      fetch("https://discord.com/api/users/@me", {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      })
-      .then(res => res.json())
-      .then(user => {
-        localStorage.setItem("discordUser", JSON.stringify(user));
-        updateNavbarUI();
-        history.replaceState(null, "", window.location.pathname);
-      })
-      .catch(err => {
-        console.error("Discord user fetch failed:", err);
-      });
+  return new Promise((resolve) => {
+    if (window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = params.get("access_token");
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        fetch("https://discord.com/api/users/@me", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        })
+        .then(res => res.json())
+        .then(user => {
+          localStorage.setItem("discordUser", JSON.stringify(user));
+          updateNavbarUI();
+          history.replaceState(null, "", window.location.pathname);
+          resolve(); // Resolve when done
+        })
+        .catch(err => {
+          console.error("Discord user fetch failed:", err);
+          resolve(); // Resolve anyway on error
+        });
+      } else {
+        resolve(); // No token in URL, resolve immediately
+      }
+    } else {
+      resolve(); // No hash in URL, resolve immediately
     }
-  }
+  });
 }
 
 // ==============================
 // ========== Page Load =========
 // ==============================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   loadHeaderFooter();
-  handleOAuthCallback(); // Handles OAuth if token is present
-  updateNavbarUI();      // Sets UI from localStorage
 
-  // === ADD SESSION CHECK + REDIRECT LOGIC HERE ===
+  await handleOAuthCallback(); // wait for async OAuth fetch to finish
+
+  updateNavbarUI();      // update UI now that user data is ready
+
+  // Redirect logic after user data is guaranteed loaded
   const path = window.location.pathname;
   const userData = JSON.parse(localStorage.getItem("discordUser"));
 
-  // If user is logged in and on login.html → redirect to user.html
   if (userData && userData.username && path.endsWith("/login.html")) {
     window.location.href = "/user.html";
+    return;
   }
 
-  // If user is NOT logged in and on user.html → redirect to login.html
   if ((!userData || !userData.username) && path.endsWith("/user.html")) {
     window.location.href = "/login.html";
+    return;
   }
-  // === END SESSION CHECK + REDIRECT LOGIC ===
 
   const mainContent = document.getElementById("output");
   if (mainContent) {
