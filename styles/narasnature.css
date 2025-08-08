@@ -51,6 +51,20 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+
+  /* Transition for fade */
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* When fading out */
+.wrapper.fade-out {
+  opacity: 0;
+}
+
+/* When fading in */
+.wrapper.fade-in {
+  opacity: 1;
 }
 
 hr {
