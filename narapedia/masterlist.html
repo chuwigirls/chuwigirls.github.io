@@ -53,37 +53,35 @@
     <div class="includes" id="sidebar" data-source="../includes/sidebar.html"></div>
 
     <!-- Main Content -->
-    <div id="main" class="wrapper w3-container">
-    <main role="main" id="smooth-load">
+    <div class="wrapper">
       <div id="masterlist-view"></div>
       <div id="nara-detail-view" style="display: none;"></div>
-    
 
-    <!-- Templates -->
-    <template id="masterlist-card-template">
-      <div class="masterlist-card">
-        <img class="masterlist-card-img" src="" alt="">
-        <h3 class="masterlist-card-name"></h3>
-      </div>
-    </template>
-
-    <template id="nara-detail-template">
-      <div>
-        <button id="back-btn" class="btn btn-secondary mb-3">
-          <i class="fas fa-arrow-left"></i> Back to Masterlist
-        </button>
-        <div class="nara-detail-card">
-          <img class="nara-detail-img" src="" alt="">
-          <h2 class="nara-detail-name"></h2>
-          <hr>
-          <p><strong>Owner:</strong> <span class="nara-detail-owner"></span></p>
-          <p><strong>Region:</strong> <span class="nara-detail-region"></span></p>
-          <p><strong>Designer:</strong> <span class="nara-detail-designer"></span></p>
-          <p><strong>Status:</strong> <span class="nara-detail-status"></span></p>
-          <p><strong>Rarity:</strong> <span class="nara-detail-rarity"></span></p>
+      <!-- Templates -->
+      <template id="masterlist-card-template">
+        <div class="masterlist-card">
+          <img class="masterlist-card-img" src="" alt="">
+          <h3 class="masterlist-card-name"></h3>
         </div>
-      </div>
-    </template>
+      </template>
+
+      <template id="nara-detail-template">
+        <div>
+          <button id="back-btn" class="btn btn-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Back to Masterlist
+          </button>
+          <div class="nara-detail-card">
+            <img class="nara-detail-img" src="" alt="">
+            <h2 class="nara-detail-name"></h2>
+            <hr>
+            <p><strong>Owner:</strong> <span class="nara-detail-owner"></span></p>
+            <p><strong>Region:</strong> <span class="nara-detail-region"></span></p>
+            <p><strong>Designer:</strong> <span class="nara-detail-designer"></span></p>
+            <p><strong>Status:</strong> <span class="nara-detail-status"></span></p>
+            <p><strong>Rarity:</strong> <span class="nara-detail-rarity"></span></p>
+          </div>
+        </div>
+      </template>
 
     </div>
 
