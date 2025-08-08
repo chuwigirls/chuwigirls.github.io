@@ -53,51 +53,83 @@ function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
   let loadCount = 0;
 
-  includes.forEach(el => {
-    const source = el.getAttribute("data-source");
-    if (source) {
-      fetch(source)
-        .then(res => res.text())
-        .then(html => {
-          el.innerHTML = html;
-          loadCount++;
-          if (loadCount === includes.length) {
-            setTimeout(() => {
-              initDropdowns();
-              initNavbarToggler();
-              initSidebar();
-              setHeaderHeight();
+  return new Promise((resolve, reject) => {
+    includes.forEach(el => {
+      const source = el.getAttribute("data-source");
+      if (source) {
+        fetch(source)
+          .then(res => res.text())
+          .then(html => {
+            el.innerHTML = html;
+            loadCount++;
+            if (loadCount === includes.length) {
+              setTimeout(() => {
+                initDropdowns();
+                initNavbarToggler();
+                initSidebar();
+                setHeaderHeight();
 
-              // ✅ After header is loaded, hook up login/logout buttons & update UI
-              handleOAuthCallback();
-              updateNavbarUI();
-              document.getElementById("loginBtn")?.addEventListener("click", () => {
-                window.location.href = getDiscordOAuthURL();
-              });
-              document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
-                e.preventDefault();
-                localStorage.removeItem("discordUser");
-                localStorage.removeItem("access_token");
-                updateNavbarUI();
-                window.location.href = "/index.html";
-              });
+                handleOAuthCallback().then(() => {
+                  updateNavbarUI();
 
-              // ✅ Load Featured Nara after includes are inserted
-              loadGoogleSheetsAPI(() => {
-                loadRandomFeaturedNara(
-                  "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-                  "Masterlist"
-                );
-              });
-            }, 0);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to load:", source, err);
-        });
-    }
+                  document.getElementById("loginBtn")?.addEventListener("click", () => {
+                    window.location.href = getDiscordOAuthURL();
+                  });
+                  document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem("discordUser");
+                    localStorage.removeItem("access_token");
+                    updateNavbarUI();
+                    window.location.href = "/index.html";
+                  });
+
+                  loadGoogleSheetsAPI(() => {
+                    loadRandomFeaturedNara(
+                      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
+                      "Masterlist"
+                    );
+                  });
+
+                  resolve();
+                });
+              }, 0);
+            }
+          })
+          .catch(err => {
+            console.error("Failed to load:", source, err);
+            reject(err);
+          });
+      }
+    });
   });
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await loadHeaderFooter();
+
+    // Now safe to run after header/footer are loaded and UI updated
+    const path = window.location.pathname;
+    const userData = JSON.parse(localStorage.getItem("discordUser"));
+
+    if (userData && userData.username && path.endsWith("/login.html")) {
+      window.location.href = "/user.html";
+      return;
+    }
+
+    if ((!userData || !userData.username) && path.endsWith("/user.html")) {
+      window.location.href = "/login.html";
+      return;
+    }
+
+    const mainContent = document.getElementById("output");
+    if (mainContent) {
+      mainContent.classList.add("fade-in");
+    }
+  } catch (err) {
+    console.error("Error loading header/footer or initializing:", err);
+  }
+});
 
 function setHeaderHeight() {
   const header = document.getElementById("siteHeader");
