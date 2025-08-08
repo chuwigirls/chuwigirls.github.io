@@ -209,6 +209,12 @@ button:hover {
   justify-content: flex-end;
 }
 
+#loginNav {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
 .nav-links a,
 .dropbtn {
   cursor: pointer;
@@ -344,15 +350,13 @@ hr.dropdown-div {
     gap: 0.5rem;
   }
 
-/* .nav-right {
-  width: 100% !important;
-  display: flex !important;
-} */
-
-#loginNav {
-  display: flex !important;
-}
-
+  #loginNav {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    width: 100%;  
+    display: none;
+  }
 
   /* Mobile dropdown wrapper */
   .dropdown {
