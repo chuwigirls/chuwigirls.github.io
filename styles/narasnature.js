@@ -64,9 +64,23 @@ function loadHeaderFooter() {
           if (loadCount === includes.length) {
             setTimeout(() => {
               initDropdowns();
-              initNavbarToggler();  // <-- only here
+              initNavbarToggler();
               initSidebar();
               setHeaderHeight();
+
+              // ✅ After header is loaded, hook up login/logout buttons & update UI
+              handleOAuthCallback();
+              updateNavbarUI();
+              document.getElementById("loginBtn")?.addEventListener("click", () => {
+                window.location.href = getDiscordOAuthURL();
+              });
+              document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
+                e.preventDefault();
+                localStorage.removeItem("discordUser");
+                localStorage.removeItem("access_token");
+                updateNavbarUI();
+                window.location.href = "/index.html";
+              });
 
               // ✅ Load Featured Nara after includes are inserted
               loadGoogleSheetsAPI(() => {
@@ -143,10 +157,10 @@ function initDropdowns() {
 
     menu.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", () => {
-        menu.classList.remove("show");          // Close dropdown menu
+        menu.classList.remove("show");
         const navbarMenu = document.getElementById("navbarMenu");
-        if (navbarMenu.classList.contains("show")) {
-          navbarMenu.classList.remove("show");  // Close navbar on mobile if open
+        if (navbarMenu?.classList.contains("show")) {
+          navbarMenu.classList.remove("show");
         }
       });
     });
@@ -158,12 +172,10 @@ function initNavbarToggler() {
   const navLinks = document.getElementById("navbarMenu");
 
   if (!toggler || !navLinks) {
-    // Elements not yet loaded, retry shortly
     setTimeout(initNavbarToggler, 100);
     return;
   }
 
-  // To prevent multiple event listeners, remove any previous ones by cloning element
   const newToggler = toggler.cloneNode(true);
   toggler.parentNode.replaceChild(newToggler, toggler);
 
@@ -171,21 +183,6 @@ function initNavbarToggler() {
     navLinks.classList.toggle("show");
   });
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadHeaderFooter();  // Loads header/footer/sidebar dynamically if any
-
-  // Initialize toggler for static header or immediately available header
-  initNavbarToggler();
-
-  handleOAuthCallback();
-  updateNavbarUI();
-
-  const mainContent = document.getElementById("output");
-  if (mainContent) {
-    mainContent.classList.add("fade-in");
-  }
-});
 
 // ==============================
 // ========= Masterlist =========
@@ -334,21 +331,7 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
 }
 
 // ==============================
-// ========== Load Page ========
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  loadHeaderFooter();
-  handleOAuthCallback();
-  updateNavbarUI();
-
-  const mainContent = document.getElementById("output");
-  if (mainContent) {
-    mainContent.classList.add("fade-in");
-  }
-});
-
-// ==============================
-// ========== Login ========
+// ========== Login =============
 // ==============================
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
@@ -369,9 +352,7 @@ function updateNavbarUI() {
     if (userDropdown) {
       userDropdown.style.display = "block";
       const usernameSpan = userDropdown.querySelector(".username");
-      if (usernameSpan) {
-        usernameSpan.textContent = userData.username;  // <-- sets Discord username here
-      }
+      if (usernameSpan) usernameSpan.textContent = userData.username;
     }
   } else {
     if (loginNav) loginNav.style.display = "block";
@@ -379,19 +360,12 @@ function updateNavbarUI() {
   }
 }
 
-document.getElementById("loginBtn")?.addEventListener("click", () => {
-  window.location.href = getDiscordOAuthURL();
-});
-
 function handleOAuthCallback() {
   if (window.location.hash) {
     const params = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = params.get("access_token");
     if (accessToken) {
-      // Save token for API calls if needed
       localStorage.setItem("access_token", accessToken);
-
-      // Fetch Discord user info
       fetch("https://discord.com/api/users/@me", {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
@@ -399,7 +373,6 @@ function handleOAuthCallback() {
       .then(user => {
         localStorage.setItem("discordUser", JSON.stringify(user));
         updateNavbarUI();
-        // Remove access token from URL to clean up
         history.replaceState(null, "", window.location.pathname);
       })
       .catch(err => {
@@ -409,18 +382,13 @@ function handleOAuthCallback() {
   }
 }
 
-document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  localStorage.removeItem("discordUser");
-  localStorage.removeItem("access_token");
-  updateNavbarUI();
-  window.location.href = "/index.html";
-});
-
+// ==============================
+// ========== Page Load =========
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  updateNavbarUI();
-
-  if (window.location.pathname.endsWith("/user.html")) {
-    handleOAuthCallback();
+  loadHeaderFooter();
+  const mainContent = document.getElementById("output");
+  if (mainContent) {
+    mainContent.classList.add("fade-in");
   }
 });
