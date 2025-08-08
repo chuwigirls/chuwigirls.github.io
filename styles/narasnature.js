@@ -387,6 +387,24 @@ function handleOAuthCallback() {
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
   loadHeaderFooter();
+  handleOAuthCallback(); // Handles OAuth if token is present
+  updateNavbarUI();      // Sets UI from localStorage
+
+  // === ADD SESSION CHECK + REDIRECT LOGIC HERE ===
+  const path = window.location.pathname;
+  const userData = JSON.parse(localStorage.getItem("discordUser"));
+
+  // If user is logged in and on login.html → redirect to user.html
+  if (userData && userData.username && path.endsWith("/login.html")) {
+    window.location.href = "/user.html";
+  }
+
+  // If user is NOT logged in and on user.html → redirect to login.html
+  if ((!userData || !userData.username) && path.endsWith("/user.html")) {
+    window.location.href = "/login.html";
+  }
+  // === END SESSION CHECK + REDIRECT LOGIC ===
+
   const mainContent = document.getElementById("output");
   if (mainContent) {
     mainContent.classList.add("fade-in");
