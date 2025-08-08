@@ -317,95 +317,104 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mainContent) {
     mainContent.classList.add("fade-in");
   }
-
-  handleOAuthRedirect();
-
-  // Login button on login.html
-  const loginBtn = document.getElementById('loginBtn');
-  if (loginBtn) loginBtn.addEventListener('click', redirectToDiscordOAuth);
-
-  // Logout button in dropdown menu
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', e => {
-      e.preventDefault();
-      logout();
-    });
-  }
 });
 
-// ==============================
-// ========== Auth (Login) =====
-// ==============================
-const CLIENT_ID = '1319474218550689863';
-const REDIRECT_URI = 'https://chuwigirls.github.io/user.html';
-const SCOPES = 'identify';
+// =============================
+// Discord OAuth Login & Logout
+// =============================
 
-function getStoredUser() {
-  return JSON.parse(localStorage.getItem('discordUser'));
+// Your Discord app credentials
+const CLIENT_ID = "1319474218550689863";
+const REDIRECT_URI = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
+
+// Build OAuth URL
+function getDiscordOAuthURL() {
+    return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
 }
 
-function setStoredUser(user) {
-  localStorage.setItem('discordUser', JSON.stringify(user));
-}
-
-function clearStoredUser() {
-  localStorage.removeItem('discordUser');
-}
-
-function isLoggedIn() {
-  return !!getStoredUser();
-}
-
-function redirectToDiscordOAuth() {
-  const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${SCOPES}`;
-  window.location.href = oauthUrl;
-}
-
-function fetchDiscordUser(token) {
-  return fetch('https://discord.com/api/users/@me', {
-    headers: { Authorization: `Bearer ${token}` }
-  }).then(res => res.json());
-}
-
-function handleOAuthRedirect() {
-  if (window.location.hash.includes('access_token')) {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const token = params.get('access_token');
-    if (token) {
-      fetchDiscordUser(token).then(user => {
-        setStoredUser({ ...user, token });
-        updateNavbarUI();
-      });
-    }
-  } else {
-    updateNavbarUI();
-  }
-}
-
+// =============================
+// Navbar UI Update
+// =============================
 function updateNavbarUI() {
-  const loginBtn = document.getElementById('login-btn');
-  const userDropdown = document.getElementById('user-dropdown');
+    const userData = JSON.parse(localStorage.getItem("discordUser"));
+    const loginNav = document.getElementById("loginNav");
+    const userDropdown = document.getElementById("userDropdown");
 
-  const user = getStoredUser();
-  if (user) {
-    if (loginBtn) loginBtn.style.display = 'none';
-
-    if (userDropdown) {
-      const nameSlot = userDropdown.querySelector('.username');
-      if (nameSlot) {
-        nameSlot.textContent = user.username;
-      }
-      userDropdown.style.display = 'block';
+    if (userData && userData.username) {
+        // Hide Login link
+        if (loginNav) loginNav.style.display = "none";
+        // Show user dropdown
+        if (userDropdown) {
+            userDropdown.style.display = "block";
+            userDropdown.querySelector(".username").textContent = userData.username;
+        }
+    } else {
+        // Show Login link
+        if (loginNav) loginNav.style.display = "block";
+        // Hide user dropdown
+        if (userDropdown) userDropdown.style.display = "none";
     }
-  } else {
-    if (loginBtn) loginBtn.style.display = 'block';
-    if (userDropdown) userDropdown.style.display = 'none';
-  }
 }
 
-function logout() {
-  clearStoredUser();
-  // Full reload and redirect to index
-  window.location.replace('/index.html');
+// =============================
+// Handle Login Button Click
+// =============================
+document.getElementById("loginBtn")?.addEventListener("click", function () {
+    window.location.href = getDiscordOAuthURL();
+});
+
+// =============================
+// Check OAuth Callback
+// =============================
+function handleOAuthCallback() {
+    if (window.location.hash) {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = params.get("access_token");
+
+        if (accessToken) {
+            // Save token
+            localStorage.setItem("access_token", accessToken);
+
+            // Fetch Discord user info
+            fetch("https://discord.com/api/users/@me", {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+                .then(res => res.json())
+                .then(user => {
+                    localStorage.setItem("discordUser", JSON.stringify(user));
+                    updateNavbarUI();
+                    window.location.href = "/user.html";
+                })
+                .catch(err => console.error("OAuth fetch error:", err));
+        }
+    }
 }
+
+// =============================
+// Logout Button
+// =============================
+document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    // Clear stored data
+    localStorage.removeItem("discordUser");
+    localStorage.removeItem("access_token");
+    sessionStorage.clear();
+
+    // Update navbar instantly
+    updateNavbarUI();
+
+    // Redirect home
+    window.location.href = "/index.html";
+});
+
+// =============================
+// Run on page load
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+    handleOAuthCallback();
+    updateNavbarUI();
+});
+
+// If smoothLoad swaps content dynamically, update navbar after new content is inserted
+document.addEventListener("contentLoaded", updateNavbarUI);
