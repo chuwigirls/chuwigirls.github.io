@@ -347,96 +347,80 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// =============================
-// Discord OAuth Login & Logout
-// =============================
-
-// Your Discord app credentials
+// ==============================
+// ========== Login ========
+// ==============================
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
 
-// Build OAuth URL
 function getDiscordOAuthURL() {
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+  const scope = "identify";
+  const responseType = "token";
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=${responseType}&scope=${scope}`;
 }
 
-// =============================
-// Navbar UI Update
-// =============================
 function updateNavbarUI() {
   const userData = JSON.parse(localStorage.getItem("discordUser"));
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
   if (userData && userData.username) {
-    // Hide Login link
     if (loginNav) loginNav.style.display = "none";
-    // Show user dropdown
     if (userDropdown) {
       userDropdown.style.display = "block";
-      userDropdown.querySelector(".username").textContent = userData.username;
+      const usernameSpan = userDropdown.querySelector(".username");
+      if (usernameSpan) {
+        usernameSpan.textContent = userData.username;  // <-- sets Discord username here
+      }
     }
   } else {
-    // Show Login link
     if (loginNav) loginNav.style.display = "block";
-    // Hide user dropdown
     if (userDropdown) userDropdown.style.display = "none";
   }
 }
 
-// =============================
-// Handle Login Button Click
-// =============================
-document.getElementById("loginBtn")?.addEventListener("click", function () {
+document.getElementById("loginBtn")?.addEventListener("click", () => {
   window.location.href = getDiscordOAuthURL();
 });
 
-// =============================
-// Check OAuth Callback
-// =============================
 function handleOAuthCallback() {
   if (window.location.hash) {
     const params = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = params.get("access_token");
-
     if (accessToken) {
-      // Save token
+      // Save token for API calls if needed
       localStorage.setItem("access_token", accessToken);
 
       // Fetch Discord user info
       fetch("https://discord.com/api/users/@me", {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-        .then(res => res.json())
-        .then(user => {
-          localStorage.setItem("discordUser", JSON.stringify(user));
-          updateNavbarUI();
-          window.location.href = "/user.html";
-        })
-        .catch(err => console.error("OAuth fetch error:", err));
+      .then(res => res.json())
+      .then(user => {
+        localStorage.setItem("discordUser", JSON.stringify(user));
+        updateNavbarUI();
+        // Remove access token from URL to clean up
+        history.replaceState(null, "", window.location.pathname);
+      })
+      .catch(err => {
+        console.error("Discord user fetch failed:", err);
+      });
     }
   }
 }
 
-// =============================
-// Logout Button
-// =============================
-document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
+document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
   e.preventDefault();
-
-  // Clear stored data
   localStorage.removeItem("discordUser");
   localStorage.removeItem("access_token");
-  sessionStorage.clear();
-
-  // Update navbar instantly
   updateNavbarUI();
-
-  // Redirect home
   window.location.href = "/index.html";
 });
 
-// ==============================
-// If smoothLoad swaps content dynamically, update navbar after new content is inserted
-// ==============================
-document.addEventListener("contentLoaded", updateNavbarUI);
+document.addEventListener("DOMContentLoaded", () => {
+  updateNavbarUI();
+
+  if (window.location.pathname.endsWith("/user.html")) {
+    handleOAuthCallback();
+  }
+});
