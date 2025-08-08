@@ -8,7 +8,6 @@
 
     if you're looking at this page to learn about coding,
     ask chuwigirls for help! */
-
 // ==============================
 // ====== Smooth Load Utils =====
 // ==============================
