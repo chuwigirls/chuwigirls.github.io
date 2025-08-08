@@ -380,14 +380,16 @@ function updateNavbarUI() {
   const userDropdown = document.getElementById("userDropdown");
 
   if (userData && userData.username) {
+    // User logged in: hide loginNav, show userDropdown
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
-      userDropdown.style.display = "block";
+      userDropdown.style.display = "flex";  // use flex to show and center contents
       const usernameSpan = userDropdown.querySelector(".username");
       if (usernameSpan) usernameSpan.textContent = userData.username;
     }
   } else {
-    if (loginNav) loginNav.style.display = "block";
+    // User NOT logged in: show loginNav, hide userDropdown
+    if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
   }
 }
