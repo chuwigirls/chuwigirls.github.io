@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Your Discord app credentials
 const CLIENT_ID = "1319474218550689863";
-const REDIRECT_URI = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
+const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
 
 // Build OAuth URL
 function getDiscordOAuthURL() {
