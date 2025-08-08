@@ -3,7 +3,7 @@
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
-      (_/ _)__(_ \_)\_
+      (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
@@ -64,18 +64,17 @@ function loadHeaderFooter() {
           if (loadCount === includes.length) {
             setTimeout(() => {
               initDropdowns();
-              initNavbarToggler();
+              initNavbarToggler();  // <-- only here
               initSidebar();
               setHeaderHeight();
 
               // ✅ Load Featured Nara after includes are inserted
               loadGoogleSheetsAPI(() => {
                 loadRandomFeaturedNara(
-                  "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms", // your spreadsheet ID
+                  "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
                   "Masterlist"
                 );
               });
-
             }, 0);
           }
         })
@@ -141,24 +140,52 @@ function initDropdowns() {
     dropdown.addEventListener("mouseleave", () => {
       menu.classList.remove("show");
     });
+
+    menu.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        menu.classList.remove("show");          // Close dropdown menu
+        const navbarMenu = document.getElementById("navbarMenu");
+        if (navbarMenu.classList.contains("show")) {
+          navbarMenu.classList.remove("show");  // Close navbar on mobile if open
+        }
+      });
+    });
   });
 }
 
 function initNavbarToggler() {
-  let toggler = document.getElementById("navbarToggle");
-  let navLinks = document.getElementById("navbarMenu");
+  const toggler = document.getElementById("navbarToggle");
+  const navLinks = document.getElementById("navbarMenu");
 
-  if (toggler && navLinks) {
-    toggler.addEventListener("click", () => {
-      navLinks.classList.toggle("show");
-    });
-  } else {
-    // Retry after slight delay if not loaded yet
+  if (!toggler || !navLinks) {
+    // Elements not yet loaded, retry shortly
     setTimeout(initNavbarToggler, 100);
+    return;
   }
+
+  // To prevent multiple event listeners, remove any previous ones by cloning element
+  const newToggler = toggler.cloneNode(true);
+  toggler.parentNode.replaceChild(newToggler, toggler);
+
+  newToggler.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
 }
 
-document.addEventListener("DOMContentLoaded", loadHeaderFooter);
+document.addEventListener("DOMContentLoaded", () => {
+  loadHeaderFooter();  // Loads header/footer/sidebar dynamically if any
+
+  // Initialize toggler for static header or immediately available header
+  initNavbarToggler();
+
+  handleOAuthCallback();
+  updateNavbarUI();
+
+  const mainContent = document.getElementById("output");
+  if (mainContent) {
+    mainContent.classList.add("fade-in");
+  }
+});
 
 // ==============================
 // ========= Masterlist =========
@@ -248,7 +275,6 @@ function Masterlist(data) {
   });
 }
 
-
 // ==============================
 // =========== Featured =========
 // ==============================
@@ -312,6 +338,8 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
   loadHeaderFooter();
+  handleOAuthCallback();
+  updateNavbarUI();
 
   const mainContent = document.getElementById("output");
   if (mainContent) {
@@ -329,92 +357,86 @@ const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
 
 // Build OAuth URL
 function getDiscordOAuthURL() {
-    return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
 }
 
 // =============================
 // Navbar UI Update
 // =============================
 function updateNavbarUI() {
-    const userData = JSON.parse(localStorage.getItem("discordUser"));
-    const loginNav = document.getElementById("loginNav");
-    const userDropdown = document.getElementById("userDropdown");
+  const userData = JSON.parse(localStorage.getItem("discordUser"));
+  const loginNav = document.getElementById("loginNav");
+  const userDropdown = document.getElementById("userDropdown");
 
-    if (userData && userData.username) {
-        // Hide Login link
-        if (loginNav) loginNav.style.display = "none";
-        // Show user dropdown
-        if (userDropdown) {
-            userDropdown.style.display = "block";
-            userDropdown.querySelector(".username").textContent = userData.username;
-        }
-    } else {
-        // Show Login link
-        if (loginNav) loginNav.style.display = "block";
-        // Hide user dropdown
-        if (userDropdown) userDropdown.style.display = "none";
+  if (userData && userData.username) {
+    // Hide Login link
+    if (loginNav) loginNav.style.display = "none";
+    // Show user dropdown
+    if (userDropdown) {
+      userDropdown.style.display = "block";
+      userDropdown.querySelector(".username").textContent = userData.username;
     }
+  } else {
+    // Show Login link
+    if (loginNav) loginNav.style.display = "block";
+    // Hide user dropdown
+    if (userDropdown) userDropdown.style.display = "none";
+  }
 }
 
 // =============================
 // Handle Login Button Click
 // =============================
 document.getElementById("loginBtn")?.addEventListener("click", function () {
-    window.location.href = getDiscordOAuthURL();
+  window.location.href = getDiscordOAuthURL();
 });
 
 // =============================
 // Check OAuth Callback
 // =============================
 function handleOAuthCallback() {
-    if (window.location.hash) {
-        const params = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = params.get("access_token");
+  if (window.location.hash) {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = params.get("access_token");
 
-        if (accessToken) {
-            // Save token
-            localStorage.setItem("access_token", accessToken);
+    if (accessToken) {
+      // Save token
+      localStorage.setItem("access_token", accessToken);
 
-            // Fetch Discord user info
-            fetch("https://discord.com/api/users/@me", {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            })
-                .then(res => res.json())
-                .then(user => {
-                    localStorage.setItem("discordUser", JSON.stringify(user));
-                    updateNavbarUI();
-                    window.location.href = "/user.html";
-                })
-                .catch(err => console.error("OAuth fetch error:", err));
-        }
+      // Fetch Discord user info
+      fetch("https://discord.com/api/users/@me", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+        .then(res => res.json())
+        .then(user => {
+          localStorage.setItem("discordUser", JSON.stringify(user));
+          updateNavbarUI();
+          window.location.href = "/user.html";
+        })
+        .catch(err => console.error("OAuth fetch error:", err));
     }
+  }
 }
 
 // =============================
 // Logout Button
 // =============================
 document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Clear stored data
-    localStorage.removeItem("discordUser");
-    localStorage.removeItem("access_token");
-    sessionStorage.clear();
+  // Clear stored data
+  localStorage.removeItem("discordUser");
+  localStorage.removeItem("access_token");
+  sessionStorage.clear();
 
-    // Update navbar instantly
-    updateNavbarUI();
+  // Update navbar instantly
+  updateNavbarUI();
 
-    // Redirect home
-    window.location.href = "/index.html";
+  // Redirect home
+  window.location.href = "/index.html";
 });
 
-// =============================
-// Run on page load
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-    handleOAuthCallback();
-    updateNavbarUI();
-});
-
+// ==============================
 // If smoothLoad swaps content dynamically, update navbar after new content is inserted
+// ==============================
 document.addEventListener("contentLoaded", updateNavbarUI);
