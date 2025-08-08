@@ -1,426 +1,117 @@
-/* 
+<!-- 
         _..---.--.
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
-      (_/ _)__(_ \_)_
+      (_/ _)__(_ \_)\_
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    ask chuwigirls for help! */
-
-// ==============================
-// Load Google Visualization API
-// ==============================
-function loadGoogleSheetsAPI(callback) {
-  const script = document.createElement("script");
-  script.src = "https://www.gstatic.com/charts/loader.js";
-  script.onload = () => {
-    google.charts.load("current", { packages: ["corechart", "table"] });
-    google.charts.setOnLoadCallback(callback);
-  };
-  document.head.appendChild(script);
-}
-
-function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
-  const query = encodeURIComponent(`SELECT *`);
-  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?sheet=${sheetName}&tq=${query}`;
-
-  fetch(url)
-    .then(res => res.text())
-    .then(raw => {
-      const json = JSON.parse(raw.substring(47).slice(0, -2));
-      const headers = json.table.cols.map(col => col.label);
-      const rows = json.table.rows.map(row =>
-        row.c.map(cell => (cell ? cell.v : ""))
-      );
-      const data = rows.map(row => {
-        const obj = {};
-        headers.forEach((header, i) => {
-          obj[header] = row[i];
-        });
-        return obj;
-      });
-      onSuccess(data);
-    })
-    .catch(err => console.error("Sheet fetch error:", err));
-}
-
-// ==============================
-// === Header, Footer, Sidebar ==
-// ==============================
-function loadHeaderFooter() {
-  const includes = document.querySelectorAll(".includes");
-  let loadCount = 0;
-
-  includes.forEach(el => {
-    const source = el.getAttribute("data-source");
-    if (source) {
-      fetch(source)
-        .then(res => res.text())
-        .then(html => {
-          el.innerHTML = html;
-          loadCount++;
-          if (loadCount === includes.length) {
-            setTimeout(() => {
-              initDropdowns();
-              initNavbarToggler();  // <-- only here
-              initSidebar();
-              setHeaderHeight();
-
-              // ✅ Load Featured Nara after includes are inserted
-              loadGoogleSheetsAPI(() => {
-                loadRandomFeaturedNara(
-                  "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-                  "Masterlist"
-                );
-              });
-            }, 0);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to load:", source, err);
-        });
-    }
-  });
-}
-
-function setHeaderHeight() {
-  const header = document.getElementById("siteHeader");
-  if (header) {
-    const height = header.offsetHeight;
-    document.documentElement.style.setProperty('--header-height', `${height}px`);
-  }
-}
-
-function w3_open() {
-  document.body.classList.add("sidebar-open");
-}
-
-function w3_close() {
-  document.body.classList.remove("sidebar-open");
-}
-
-function handleSidebarDisplay() {
-  const width = window.innerWidth;
-  if (width >= 1550) {
-    if (!document.body.classList.contains("sidebar-closed")) {
-      document.body.classList.add("sidebar-open");
-    }
-  } else {
-    document.body.classList.remove("sidebar-open");
-  }
-}
-
-function initSidebar() {
-  const openBtn = document.getElementById("openNav");
-  if (openBtn) openBtn.addEventListener("click", w3_open);
-
-  const closeBtn = document.querySelector("#mySidebar .sidebar-close");
-  if (closeBtn) closeBtn.addEventListener("click", w3_close);
-
-  handleSidebarDisplay();
-  window.addEventListener("resize", () => {
-    handleSidebarDisplay();
-    setHeaderHeight();
-  });
-}
-
-function initDropdowns() {
-  document.querySelectorAll(".dropdown").forEach(dropdown => {
-    const button = dropdown.querySelector(".dropbtn");
-    const menu = dropdown.querySelector(".dropdown-content");
-
-    if (!button || !menu) return;
-
-    dropdown.addEventListener("mouseenter", () => {
-      menu.classList.add("show");
-    });
-
-    dropdown.addEventListener("mouseleave", () => {
-      menu.classList.remove("show");
-    });
-
-    menu.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        menu.classList.remove("show");          // Close dropdown menu
-        const navbarMenu = document.getElementById("navbarMenu");
-        if (navbarMenu.classList.contains("show")) {
-          navbarMenu.classList.remove("show");  // Close navbar on mobile if open
-        }
-      });
-    });
-  });
-}
-
-function initNavbarToggler() {
-  const toggler = document.getElementById("navbarToggle");
-  const navLinks = document.getElementById("navbarMenu");
-
-  if (!toggler || !navLinks) {
-    // Elements not yet loaded, retry shortly
-    setTimeout(initNavbarToggler, 100);
-    return;
-  }
-
-  // To prevent multiple event listeners, remove any previous ones by cloning element
-  const newToggler = toggler.cloneNode(true);
-  toggler.parentNode.replaceChild(newToggler, toggler);
-
-  newToggler.addEventListener("click", () => {
-    navLinks.classList.toggle("show");
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadHeaderFooter();  // Loads header/footer/sidebar dynamically if any
-
-  // Initialize toggler for static header or immediately available header
-  initNavbarToggler();
-
-  handleOAuthCallback();
-  updateNavbarUI();
-
-  const mainContent = document.getElementById("output");
-  if (mainContent) {
-    mainContent.classList.add("fade-in");
-  }
-});
-
-// ==============================
-// ========= Masterlist =========
-// ==============================
-function Masterlist(data) {
-  const masterlistView = document.getElementById("masterlist-view");
-  const detailView = document.getElementById("nara-detail-view");
-
-  if (!masterlistView || !detailView) return;
-
-  const visibleNaras = data.filter(nara =>
-    (nara.Hide !== true && nara.Hide !== "TRUE") &&
-    nara["URL"] && nara["Nara"]
-  );
-
-  // Check for ?design= parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const selectedDesign = urlParams.get("design");
-
-  masterlistView.innerHTML = "";
-  masterlistView.classList.add("masterlist-grid");
-  masterlistView.style.display = "grid";
-
-  visibleNaras.forEach(nara => {
-    const template = document.querySelector("#masterlist-card-template");
-    if (!template) return;
-    const card = template.content.cloneNode(true);
-    const cardEl = card.querySelector(".masterlist-card");
-    cardEl.querySelector(".masterlist-card-img").src = nara["URL"];
-    cardEl.querySelector(".masterlist-card-img").alt = nara.Nara;
-    cardEl.querySelector(".masterlist-card-name").textContent = nara.Nara;
-
-    cardEl.addEventListener("click", () => {
-      masterlistView.style.display = "none";
-
-      const detailCard = document.querySelector("#nara-detail-template");
-      if (!detailCard) return;
-      const detailContent = detailCard.content.cloneNode(true);
-
-      detailContent.querySelector(".nara-detail-img").src = nara["URL"];
-      detailContent.querySelector(".nara-detail-img").alt = nara.Nara;
-      detailContent.querySelector(".nara-detail-name").textContent = nara.Nara;
-      detailContent.querySelector(".nara-detail-owner").textContent = nara.Owner || "—";
-      detailContent.querySelector(".nara-detail-region").textContent = nara.Region || "—";
-      detailContent.querySelector(".nara-detail-designer").textContent = nara.Designer || "—";
-      detailContent.querySelector(".nara-detail-status").textContent = nara.Status || "—";
-      detailContent.querySelector(".nara-detail-rarity").textContent = nara.Rarity || "—";
-
-      detailView.innerHTML = "";
-      detailView.appendChild(detailContent);
-      detailView.style.display = "block";
-    });
-
-    masterlistView.appendChild(card);
-  });
-
-  // If a Nara was requested via URL, trigger its detail view
-  if (selectedDesign) {
-    const matchingNara = visibleNaras.find(n => n.Nara === selectedDesign);
-    if (matchingNara) {
-      masterlistView.style.display = "none";
-
-      const detailCard = document.querySelector("#nara-detail-template");
-      if (!detailCard) return;
-      const detailContent = detailCard.content.cloneNode(true);
-
-      detailContent.querySelector(".nara-detail-img").src = matchingNara["URL"];
-      detailContent.querySelector(".nara-detail-img").alt = matchingNara.Nara;
-      detailContent.querySelector(".nara-detail-name").textContent = matchingNara.Nara;
-      detailContent.querySelector(".nara-detail-owner").textContent = matchingNara.Owner || "—";
-      detailContent.querySelector(".nara-detail-region").textContent = matchingNara.Region || "—";
-      detailContent.querySelector(".nara-detail-designer").textContent = matchingNara.Designer || "—";
-      detailContent.querySelector(".nara-detail-status").textContent = matchingNara.Status || "—";
-      detailContent.querySelector(".nara-detail-rarity").textContent = matchingNara.Rarity || "—";
-
-      detailView.innerHTML = "";
-      detailView.appendChild(detailContent);
-      detailView.style.display = "block";
-    }
-  }
-
-  detailView.addEventListener("click", (e) => {
-    if (e.target && (e.target.id === "back-btn" || e.target.closest("#back-btn"))) {
-      detailView.style.display = "none";
-      masterlistView.style.display = "grid";
-    }
-  });
-}
-
-// ==============================
-// =========== Featured =========
-// ==============================
-function loadRandomFeaturedNara(spreadsheetId, sheetName) {
-  console.log("[Sidebar Nara] Starting load...");
-
-  fetchSheetData(spreadsheetId, sheetName, data => {
-    console.log("[Sidebar Nara] Sheet data:", data);
-    console.log("[Sidebar Nara] First row keys:", Object.keys(data[0]));
-
-    // Filter for visible Naras
-    const visible = data.filter(nara =>
-      (nara.Hide !== true && nara.Hide !== "TRUE") &&
-      typeof nara.URL === "string" &&
-      nara.URL.trim() !== ""
-    );
-
-    console.log("[Sidebar Nara] Visible Naras:", visible.length);
-
-    if (visible.length === 0) {
-      console.warn("[Sidebar Nara] No visible Naras to display");
-      return;
-    }
-
-    // Pick a random one
-    const randomNara = visible[Math.floor(Math.random() * visible.length)];
-
-    // Inject into sidebar
-    const container = document.createElement("div");
-    container.className = "random-nara-preview";
-
-    const link = document.createElement("a");
-    link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
-    link.style.textDecoration = "none";
-
-    const img = document.createElement("img");
-    img.src = randomNara.URL;
-    img.alt = randomNara.Nara || "Featured Nara";
-    img.className = "random-nara-img";
-
-    const name = document.createElement("div");
-    name.textContent = randomNara.Nara || "Unnamed Nara";
-    name.className = "random-nara-name";
-
-    link.appendChild(img);
-    link.appendChild(name);
-    container.appendChild(link);
-
-    const sidebar = document.getElementById("featured-nara-sidebar");
-    if (sidebar) {
-      sidebar.innerHTML = "";
-      sidebar.appendChild(container);
-    } else {
-      console.warn("[Sidebar Nara] #featured-nara-sidebar not found");
-    }
-  });
-}
-
-// ==============================
-// ========== Load Page ========
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  loadHeaderFooter();
-  handleOAuthCallback();
-  updateNavbarUI();
-
-  const mainContent = document.getElementById("output");
-  if (mainContent) {
-    mainContent.classList.add("fade-in");
-  }
-});
-
-// ==============================
-// ========== Login ========
-// ==============================
-const CLIENT_ID = "1319474218550689863";
-const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
-
-function getDiscordOAuthURL() {
-  const scope = "identify";
-  const responseType = "token";
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=${responseType}&scope=${scope}`;
-}
-
-function updateNavbarUI() {
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
-  const loginNav = document.getElementById("loginNav");
-  const userDropdown = document.getElementById("userDropdown");
-
-  if (userData && userData.username) {
-    if (loginNav) loginNav.style.display = "none";
-    if (userDropdown) {
-      userDropdown.style.display = "block";
-      const usernameSpan = userDropdown.querySelector(".username");
-      if (usernameSpan) {
-        usernameSpan.textContent = userData.username;  // <-- sets Discord username here
-      }
-    }
-  } else {
-    if (loginNav) loginNav.style.display = "block";
-    if (userDropdown) userDropdown.style.display = "none";
-  }
-}
-
-document.getElementById("loginBtn")?.addEventListener("click", () => {
-  window.location.href = getDiscordOAuthURL();
-});
-
-function handleOAuthCallback() {
-  if (window.location.hash) {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = params.get("access_token");
-    if (accessToken) {
-      // Save token for API calls if needed
-      localStorage.setItem("access_token", accessToken);
-
-      // Fetch Discord user info
-      fetch("https://discord.com/api/users/@me", {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      })
-      .then(res => res.json())
-      .then(user => {
-        localStorage.setItem("discordUser", JSON.stringify(user));
-        updateNavbarUI();
-        // Remove access token from URL to clean up
-        history.replaceState(null, "", window.location.pathname);
-      })
-      .catch(err => {
-        console.error("Discord user fetch failed:", err);
-      });
-    }
-  }
-}
-
-document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  localStorage.removeItem("discordUser");
-  localStorage.removeItem("access_token");
-  updateNavbarUI();
-  window.location.href = "/index.html";
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  updateNavbarUI();
-
-  if (window.location.pathname.endsWith("/user.html")) {
-    handleOAuthCallback();
-  }
-});
+    ask chuwigirls for help! -->
+
+<div id="siteHeader">
+  <!-- Site title -->
+  <h1 class="site-title">
+    <a href="/index.html">Naras Nature <i class="fa-solid fa-wand-sparkles"></i></a>
+  </h1>
+
+  <!-- Responsive Navbar -->
+  <div class="navbar">
+    <!-- Navbar menu -->
+    <button class="navbar-toggler" id="navbarToggle">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <button id="openNav" onclick="w3_open()" class="sidebar" aria-label="Open sidebar">
+      <i class="fa-solid fa-meteor"></i>
+    </button>
+
+    <div class="nav-links" id="navbarMenu">
+      <div class="nav-left">
+        <a class="nav-link" href="/news.html">News</a>
+      </div>
+
+      <div class="nav-center">
+        <!-- Explore Dropdown -->
+        <div class="dropdown">
+          <button class="dropbtn">
+            Explore <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/encyclopedia.html"><i class="fa-solid fa-book-bookmark"></i> Encyclopedia</a>
+            <a href="/lore.html"><i class="fa-solid fa-globe"></i> Lore</a>
+            <hr class="dropdown-div">
+            <a href="/bazaar.html"><i class="fa-solid fa-gem"></i> Bazaar Market</a>
+            <a href="/commerce.html"><i class="fa-solid fa-rotate"></i> Commerce</a>
+            <a href="/catalog/nursery.html"><i class="fa-solid fa-seedling"></i> Nursery</a>
+          </div>
+        </div>
+
+        <!-- Recreation Dropdown -->
+        <div class="dropdown">
+          <button class="dropbtn">
+            Recreation <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/daily.html"><i class="fa-solid fa-cookie-bite"></i> Dailies</a>
+            <hr class="dropdown-div">
+            <a href="/pursuits.html"><i class="fa-solid fa-paintbrush"></i> Pursuits</a>
+            <a href="/callings.html"><i class="fa-solid fa-certificate"></i> Callings</a>
+            <hr class="dropdown-div">
+            <a href="/magic.html"><i class="fa-solid fa-wand-magic-sparkles"></i> Magic</a>
+            <a href="/magicomp.html"><i class="fa-solid fa-explosion"></i> Magicomp</a>
+          </div>
+        </div>
+
+        <!-- Narapedia Dropdown -->
+        <div class="dropdown">
+          <button class="dropbtn">
+            Narapedia <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/narapedia/masterlist.html"><i class="fa-solid fa-list-ul"></i> Masterlist</a>
+            <a href="/narapedia/features.html"><i class="fa-solid fa-cube"></i> Features</a>
+            <hr class="dropdown-div">
+            <a href="/narapedia/artifacts.html"><i class="fa-solid fa-award"></i> Artifacts</a>
+            <a href="/narapedia/palcharms.html"><i class="fa-solid fa-paw"></i> Palcharms</a>
+            <hr class="dropdown-div">
+            <a href="/narapedia/civilians.html"><i class="fa-solid fa-shield-cat"></i> Civilians</a>
+          </div>
+        </div>
+
+        <!-- Help Dropdown -->
+        <div class="dropdown">
+          <button class="dropbtn">
+            Help <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/help/guides.html"><i class="fa-solid fa-feather"></i> Guides</a>
+            <a href="/help/staff.html"><i class="fa-solid fa-crown"></i> Staff</a>
+            <hr class="dropdown-div">
+            <a href="/help/rules.html"><i class="fa-solid fa-circle-exclamation"></i> Rules</a>
+            <a href="/help/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+            <a href="/help/terms.html"><i class="fa-solid fa-circle-info"></i> TOS</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔐 Login Button -->
+      <div class="nav-right" id="loginNav">
+        <a class="nav-link" href="/login.html">Login</a>
+      </div>
+
+      <!-- User Dropdown -->
+      <div class="nav-right dropdown" id="userDropdown" style="display: none;">
+        <button class="dropbtn">
+          <span class="username"></span> <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="/user.html"><i class="fa-solid fa-user"></i> Profile</a>
+          <hr class="dropdown-div">
+            <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
