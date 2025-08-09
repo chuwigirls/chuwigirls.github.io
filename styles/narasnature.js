@@ -149,7 +149,7 @@ function w3_close() {
 
 function handleSidebarDisplay() {
   const width = window.innerWidth;
-  if (width >= 1550) {
+  if (width >= 1275) {
     if (!document.body.classList.contains("sidebar-closed")) {
       document.body.classList.add("sidebar-open");
     }
@@ -297,7 +297,7 @@ function Masterlist(data) {
   }
 
   detailView.addEventListener("click", (e) => {
-    if (e.target && (e.target.id === "back-btn" || e.target.closest("#back-btn"))) {
+    if (e.target && (e.target.id === "backML" || e.target.closest("#backML"))) {
       detailView.style.display = "none";
       masterlistView.style.display = "grid";
     }
