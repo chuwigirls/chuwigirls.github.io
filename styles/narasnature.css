@@ -58,6 +58,13 @@ body {
   transition: opacity 0.5s ease-in-out;
 }
 
+/* Fit sidebar on my screen size */
+@media (max-width: 1280px) {
+  .wrapper {
+    max-width: 850px;
+  }
+}
+
 /* When fading out */
 .wrapper.fade-out {
   opacity: 0;
@@ -66,6 +73,12 @@ body {
 /* When fading in */
 .wrapper.fade-in {
   opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapper {
+    transition: none;
+  }
 }
 
 /* unvisited link */
@@ -102,8 +115,9 @@ h1 {
 .page {
   background-color: var(--tan);
   border-radius: 20px;
-  text-align: center;
   border: 1px solid var(--tanb);
+  padding: 2rem;
+  text-align: center;
 }
 
 .page img {
@@ -124,6 +138,7 @@ button {
 
 button:hover {
   background-color: var(--light-pink);
+  border: 1px solid var(--pinkb);
   color: var(--pink);
   transition-duration: 0.4s;
 }
@@ -292,7 +307,7 @@ hr.dropdown-div {
 /* --------------------------- */
 /* -----------Responsive------ */
 /* --------------------------- */
-@media (max-width: 1275px) {
+@media (max-width: 980px) {
 
   .navbar {
     position: relative;
@@ -437,7 +452,6 @@ hr.dropdown-div {
   }
 }
 
-
 /* --------------------------- */
 /* -----------Sidebar--------- */
 /* --------------------------- */
@@ -525,7 +539,7 @@ body:not(.sidebar-open) #openNav {
   opacity: 1;
 }
 
-@media (min-width: 1275px) {
+@media (min-width: 1000px) {
   #openNav,
   #mySidebar .sidebar-close {
     display: block !important;
@@ -790,7 +804,7 @@ body:not(.sidebar-open) #openNav {
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
-  font-family: var(--calm);
+  font-family: var(--calm);  
 }
 
 .nara-detail-img {
