@@ -52,7 +52,6 @@ body {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
 
   /* Transition for fade */
   opacity: 1;
@@ -103,8 +102,6 @@ h1 {
 .page {
   background-color: var(--tan);
   border-radius: 20px;
-  padding: 1.5rem;
-  margin: 1.5rem;
   text-align: center;
   border: 1px solid var(--tanb);
 }
@@ -156,8 +153,10 @@ button:hover {
   background-image: url("../assets/header.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 6%;
+  height: 20vh;
   text-align: left;
+  padding-left: 6%;
+  padding-top: 2%;
   font-family: var(--formal);
   color: var(--dark-blue);
   letter-spacing: 5px;
@@ -203,7 +202,6 @@ button:hover {
   margin-right: 3rem;
   background-color: var(--light-blue);
   border: 1px solid var(--blueb);
-  padding: 1rem;
   gap: 1rem;
 }
 
@@ -257,8 +255,6 @@ button:hover {
   color: var(--pink);
   background-color: transparent;
 }
-
-/* Dropdown */
 .dropdown-content {
   position: absolute;
   background-color: var(--light-blue);
@@ -296,7 +292,7 @@ hr.dropdown-div {
 /* --------------------------- */
 /* -----------Responsive------ */
 /* --------------------------- */
-@media (max-width: 1600px) {
+@media (max-width: 1275px) {
 
   .navbar {
     position: relative;
@@ -466,8 +462,8 @@ hr.dropdown-div {
 .sidebar-close {
   cursor: pointer;
   margin: auto;
-  width: 100%;
-  height: 48px;
+  width: 25%;
+  height: 10%;
   padding: 0;
   font-size: 1.8rem;
   border-radius: 20px 20px 20px 20px;
@@ -479,8 +475,8 @@ hr.dropdown-div {
 .sidebar-close:hover {
   cursor: pointer;
   margin: auto;
-  width: 100%;
-  height: 48px;
+  width: 25%;
+  height: 10%;
   padding: 0;
   font-size: 1.8rem;
   border-radius: 20px 20px 20px 20px;
@@ -489,17 +485,17 @@ hr.dropdown-div {
   border: 1px solid var(--pinkb);
 }
 
-#mySidebar h3 {
+#mySidebar h4 {
   font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
-#mySidebar h4 {
+#mySidebar h5 {
   font-family: var(--cyber);
   color: var(--dark-blue);
 }
 
-/* Sidebar slide open on all screens */
+/* Sidebar open on large screens */
 body.sidebar-open #mySidebar {
   transform: translateX(0);
 }
@@ -529,7 +525,7 @@ body:not(.sidebar-open) #openNav {
   opacity: 1;
 }
 
-@media (min-width: 1550px) {
+@media (min-width: 1275px) {
   #openNav,
   #mySidebar .sidebar-close {
     display: block !important;
@@ -608,9 +604,9 @@ body:not(.sidebar-open) #openNav {
   background-repeat: no-repeat;
   font-family: var(--bubbly);
   color: var(--dark-blue);
-  margin: .5rem;
+  padding: 2%;
   margin-top: 2rem;
-  height: 150px;
+  height: 30vh;
   display: flex;
   align-items: flex-end;
 }
