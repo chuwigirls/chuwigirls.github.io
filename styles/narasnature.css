@@ -132,7 +132,8 @@ button {
   font-family: var(--bubbly);
   border-radius: 9999px;
   border: 1px solid var(--blueb);
-  padding: .01rem 2.2rem;
+  padding: 1rem;
+  margin: 1rem;
   cursor: pointer;
 }
 
@@ -269,6 +270,7 @@ button:hover {
   transition-duration: 0.4s;
   color: var(--pink);
   background-color: transparent;
+  border: none;
 }
 .dropdown-content {
   position: absolute;
@@ -384,7 +386,6 @@ hr.dropdown-div {
   }
 
   #loginNav {
-    display: none;
     justify-content: center;
     align-items: center;
     width: 100%;  
@@ -423,13 +424,11 @@ hr.dropdown-div {
     opacity: 1;
     transform: scaleY(1);
     pointer-events: auto;
-    padding: 0.5rem 0;
   }
 
   /* Mobile dropdown links */
   .dropdown-content a {
     display: block;
-    padding: 0.5rem 1rem;
     text-align: center;
   }
 
@@ -777,6 +776,17 @@ body:not(.sidebar-open) #openNav {
   max-width: 350px;
   margin: 0 auto;
   box-sizing: border-box;
+
+  /* masterlist-card-name */
+  margin-top: 0.5rem;
+  font-family: var(--bubbly);
+  color: var(--dark-blue);
+}
+
+.masterlist-card:hover {
+  background-color: var(--pinkb);
+  color: var(--pink);
+  transition-duration: 0.4s;
 }
 
 .masterlist-card-img {
@@ -785,26 +795,20 @@ body:not(.sidebar-open) #openNav {
   border-radius: 8px;
 }
 
-.masterlist-card-name {
-  margin-top: 0.5rem;
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-}
-
-.masterlist-card-name:hover {
-  transition-duration: 0.4s;
-  color: var(--pink);
-}
-
 .nara-detail-card {
   border: 1px solid var(--tanb);
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--tan);
-  max-width: 600px;
-  margin: 0 auto;
   text-align: center;
-  font-family: var(--calm);  
+  font-family: var(--calm);
+  width: 1200px;
+}
+
+@media (max-width: 1280px) {
+  .nara-detail-card {
+    width: 900px;
+  }
 }
 
 .nara-detail-img {
@@ -821,7 +825,7 @@ body:not(.sidebar-open) #openNav {
 
 @media (max-width: 1024px) {
   .masterlist-grid {
-    grid-template-columns: repeat(3, 1fr); /* tablet */
+    grid-template-columns: repeat(4, 1fr); /* tablet */
   }
 }
 
