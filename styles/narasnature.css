@@ -274,6 +274,11 @@ button:hover {
   background-color: transparent;
   border: none;
 }
+
+.dropdown {
+  position: relative;
+}
+
 .dropdown-content {
   position: absolute;
   background-color: var(--light-blue);
@@ -450,6 +455,13 @@ hr.dropdown-div {
     justify-content: center;
     z-index: 2100;
     box-sizing: border-box;
+  }
+}
+
+@media (min-width: 981px) {
+  .dropdown-content {
+    top: 100%;
+    
   }
 }
 
