@@ -108,7 +108,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    // Now safe to run after header/footer are loaded and UI updated
     const path = window.location.pathname;
     const userData = JSON.parse(localStorage.getItem("discordUser"));
 
@@ -139,12 +138,8 @@ function setHeaderHeight() {
   }
 }
 
-function w3_open() {
-  document.body.classList.add("sidebar-open");
-}
-
-function w3_close() {
-  document.body.classList.remove("sidebar-open");
+function toggleSidebar() {
+  document.body.classList.toggle("sidebar-open");
 }
 
 function handleSidebarDisplay() {
@@ -158,18 +153,29 @@ function handleSidebarDisplay() {
   }
 }
 
-function initSidebar() {
-  const openBtn = document.getElementById("openNav");
-  if (openBtn) openBtn.addEventListener("click", w3_open);
+function handleSidebarScrollPosition() {
+  const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0;
+  if (window.scrollY > headerHeight) {
+    document.body.classList.add("sidebar-fixed");
+  } else {
+    document.body.classList.remove("sidebar-fixed");
+  }
+}
 
-  const closeBtn = document.querySelector("#mySidebar .sidebar-close");
-  if (closeBtn) closeBtn.addEventListener("click", w3_close);
+function initSidebar() {
+  const toggleBtn = document.getElementById("openNav");
+  if (toggleBtn) toggleBtn.addEventListener("click", toggleSidebar);
 
   handleSidebarDisplay();
+  handleSidebarScrollPosition();
+
   window.addEventListener("resize", () => {
     handleSidebarDisplay();
     setHeaderHeight();
+    handleSidebarScrollPosition();
   });
+
+  window.addEventListener("scroll", handleSidebarScrollPosition);
 }
 
 function initDropdowns() {
