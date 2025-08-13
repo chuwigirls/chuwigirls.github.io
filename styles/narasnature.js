@@ -244,11 +244,15 @@ async function loadHeaderFooter() {
   setupBackToTop();
 
   loadGoogleSheetsAPI(() => {
-    loadRandomFeaturedNara(
-      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-      "Masterlist"
-    );
-  });
+  fetchSheetData(
+    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
+    "Masterlist",
+    data => {
+      Masterlist(data);
+      loadRandomFeaturedNaraFromData(data);
+    }
+  );
+});
 }
 
 // ==============================
@@ -336,44 +340,42 @@ function Masterlist(data) {
   });
 }
 
-function loadRandomFeaturedNara(spreadsheetId, sheetName) {
-  fetchSheetData(spreadsheetId, sheetName, data => {
-    const visible = data.filter(nara =>
-      (nara.Hide !== true && nara.Hide !== "TRUE") &&
-      typeof nara.URL === "string" &&
-      nara.URL.trim() !== ""
-    );
+function loadRandomFeaturedNaraFromData(data) {
+  const visible = data.filter(nara =>
+    (nara.Hide !== true && nara.Hide !== "TRUE") &&
+    typeof nara.URL === "string" &&
+    nara.URL.trim() !== ""
+  );
 
-    if (visible.length === 0) return;
+  if (visible.length === 0) return;
 
-    const randomNara = visible[Math.floor(Math.random() * visible.length)];
+  const randomNara = visible[Math.floor(Math.random() * visible.length)];
 
-    const container = document.createElement("div");
-    container.className = "random-nara-preview";
+  const container = document.createElement("div");
+  container.className = "random-nara-preview";
 
-    const link = document.createElement("a");
-    link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
-    link.style.textDecoration = "none";
+  const link = document.createElement("a");
+  link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
+  link.style.textDecoration = "none";
 
-    const img = document.createElement("img");
-    img.src = randomNara.URL;
-    img.alt = randomNara.Nara || "Featured Nara";
-    img.className = "random-nara-img";
+  const img = document.createElement("img");
+  img.src = randomNara.URL;
+  img.alt = randomNara.Nara || "Featured Nara";
+  img.className = "random-nara-img";
 
-    const name = document.createElement("div");
-    name.textContent = randomNara.Nara || "Unnamed Nara";
-    name.className = "random-nara-name";
+  const name = document.createElement("div");
+  name.textContent = randomNara.Nara || "Unnamed Nara";
+  name.className = "random-nara-name";
 
-    link.appendChild(img);
-    link.appendChild(name);
-    container.appendChild(link);
+  link.appendChild(img);
+  link.appendChild(name);
+  container.appendChild(link);
 
-    const sidebar = document.getElementById("featured-nara-sidebar");
-    if (sidebar) {
-      sidebar.innerHTML = "";
-      sidebar.appendChild(container);
-    }
-  });
+  const sidebar = document.getElementById("featured-nara-sidebar");
+  if (sidebar) {
+    sidebar.innerHTML = "";
+    sidebar.appendChild(container);
+  }
 }
 
 // ==============================
