@@ -5,9 +5,7 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    ask chuwigirls for help! */
+*/
 
 // ==============================
 // Load Google Visualization API
@@ -22,6 +20,9 @@ function loadGoogleSheetsAPI(callback) {
   document.head.appendChild(script);
 }
 
+// ==============================
+// Fetch Sheet Data
+// ==============================
 function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
   const query = encodeURIComponent(`SELECT *`);
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?sheet=${sheetName}&tq=${query}`;
@@ -47,107 +48,90 @@ function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
 }
 
 // ==============================
-// === Header, Footer, Sidebar ==
+// Discord OAuth Config
 // ==============================
-function loadHeaderFooter() {
-  const includes = document.querySelectorAll(".includes");
-  let loadCount = 0;
+const CLIENT_ID = "1319474218550689863";
+const REDIRECT_URI = `${window.location.origin}/user.html`;
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
 
-  return new Promise((resolve, reject) => {
-    if (includes.length === 0) {
-      // No includes to load, resolve immediately
-      resolve();
-      return;
-    }
-
-    includes.forEach(el => {
-      const source = el.getAttribute("data-source");
-      if (!source) {
-        loadCount++;
-        if (loadCount === includes.length) {
-          resolve();
-        }
-        return;
-      }
-      fetch(source)
-        .then(res => res.text())
-        .then(html => {
-          el.innerHTML = html;
-          loadCount++;
-          if (loadCount === includes.length) {
-            // Delay init to next event loop tick
-            setTimeout(() => {
-              initDropdowns();
-              initNavbarToggler();
-              initSidebar();
-              updateHeaderHeightCSSVar();
-
-              handleOAuthCallback().then(() => {
-                updateNavbarUI();
-
-                const loginBtn = document.getElementById("loginBtn");
-                if (loginBtn) {
-                  loginBtn.addEventListener("click", () => {
-                    window.location.href = getDiscordOAuthURL();
-                  });
-                }
-
-                const logoutBtn = document.getElementById("logoutBtn");
-                if (logoutBtn) {
-                  logoutBtn.addEventListener("click", e => {
-                    e.preventDefault();
-                    localStorage.removeItem("discordUser");
-                    localStorage.removeItem("access_token");
-                    updateNavbarUI();
-                    window.location.href = "/index.html";
-                  });
-                }
-
-                loadGoogleSheetsAPI(() => {
-                  loadRandomFeaturedNara(
-                    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-                    "Masterlist"
-                  );
-                });
-
-                resolve();
-              });
-            }, 0);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to load:", source, err);
-          reject(err);
-        });
-    });
-  });
+function getDiscordOAuthURL() {
+  const scope = "identify";
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    await loadHeaderFooter();
+// ==============================
+// Navbar UI Updates
+// ==============================
+function updateNavbarUI() {
+  const userData = JSON.parse(localStorage.getItem("discordUser"));
+  const loginNav = document.getElementById("loginNav");
+  const userDropdown = document.getElementById("userDropdown");
 
-    const path = window.location.pathname;
-    const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
-
-    if (userData.username && path.endsWith("/login.html")) {
-      window.location.href = "/user.html";
-      return;
+  if (userData && userData.username) {
+    if (loginNav) loginNav.style.display = "none";
+    if (userDropdown) {
+      userDropdown.style.display = "flex";
+      const usernameSpan = userDropdown.querySelector(".username");
+      if (usernameSpan) usernameSpan.textContent = userData.username;
     }
-    if ((!userData.username) && path.endsWith("/user.html")) {
-      window.location.href = "/login.html";
-      return;
-    }
-
-    const mainContent = document.getElementById("output");
-    if (mainContent) {
-      mainContent.classList.add("fade-in");
-    }
-  } catch (err) {
-    console.error("Error loading header/footer or initializing:", err);
+  } else {
+    if (loginNav) loginNav.style.display = "flex";
+    if (userDropdown) userDropdown.style.display = "none";
   }
-});
+}
 
+// ==============================
+// Handle Discord OAuth Callback
+// ==============================
+async function handleOAuthCallback() {
+  if (window.location.hash) {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = params.get("access_token");
+
+    if (accessToken) {
+      localStorage.setItem("access_token", accessToken);
+
+      try {
+        const discordUser = await fetch("https://discord.com/api/users/@me", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        }).then(res => res.json());
+
+        localStorage.setItem("discordUser", JSON.stringify(discordUser));
+
+        if (discordUser.id) {
+          const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
+          const gasData = await fetch(gasUrl).then(res => res.json());
+          localStorage.setItem("userData", JSON.stringify(gasData));
+        }
+
+        history.replaceState(null, "", window.location.pathname);
+      } catch (err) {
+        console.error("OAuth handling error:", err);
+      }
+    }
+  }
+}
+
+// ==============================
+// Logout Handler
+// ==============================
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", e => {
+      e.preventDefault();
+      localStorage.removeItem("discordUser");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("userData");
+      updateNavbarUI();
+      window.location.href = "/index.html";
+    });
+  }
+}
+
+// ==============================
+// Sidebar, Dropdowns, Header
+// ==============================
 function updateHeaderHeightCSSVar() {
   const header = document.getElementById('siteHeader');
   if (header) {
@@ -234,12 +218,11 @@ window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
 // ==============================
-// ========= Masterlist =========
+// Masterlist Renderer
 // ==============================
 function Masterlist(data) {
   const masterlistView = document.getElementById("masterlist-view");
   const detailView = document.getElementById("nara-detail-view");
-
   if (!masterlistView || !detailView) return;
 
   const visibleNaras = data.filter(nara =>
@@ -247,7 +230,6 @@ function Masterlist(data) {
     nara["URL"] && nara["Nara"]
   );
 
-  // Check for ?design= parameter
   const urlParams = new URLSearchParams(window.location.search);
   const selectedDesign = urlParams.get("design");
 
@@ -258,19 +240,20 @@ function Masterlist(data) {
   visibleNaras.forEach(nara => {
     const template = document.querySelector("#masterlist-card-template");
     if (!template) return;
+
     const card = template.content.cloneNode(true);
     const cardEl = card.querySelector(".masterlist-card");
+
     cardEl.querySelector(".masterlist-card-img").src = nara["URL"];
     cardEl.querySelector(".masterlist-card-img").alt = nara.Nara;
     cardEl.querySelector(".masterlist-card-name").textContent = nara.Nara;
 
     cardEl.addEventListener("click", () => {
       masterlistView.style.display = "none";
-
       const detailCard = document.querySelector("#nara-detail-template");
       if (!detailCard) return;
-      const detailContent = detailCard.content.cloneNode(true);
 
+      const detailContent = detailCard.content.cloneNode(true);
       detailContent.querySelector(".nara-detail-img").src = nara["URL"];
       detailContent.querySelector(".nara-detail-img").alt = nara.Nara;
       detailContent.querySelector(".nara-detail-name").textContent = nara.Nara;
@@ -288,16 +271,14 @@ function Masterlist(data) {
     masterlistView.appendChild(card);
   });
 
-  // If a Nara was requested via URL, trigger its detail view
   if (selectedDesign) {
     const matchingNara = visibleNaras.find(n => n.Nara === selectedDesign);
     if (matchingNara) {
       masterlistView.style.display = "none";
-
       const detailCard = document.querySelector("#nara-detail-template");
       if (!detailCard) return;
-      const detailContent = detailCard.content.cloneNode(true);
 
+      const detailContent = detailCard.content.cloneNode(true);
       detailContent.querySelector(".nara-detail-img").src = matchingNara["URL"];
       detailContent.querySelector(".nara-detail-img").alt = matchingNara.Nara;
       detailContent.querySelector(".nara-detail-name").textContent = matchingNara.Nara;
@@ -322,33 +303,20 @@ function Masterlist(data) {
 }
 
 // ==============================
-// =========== Featured =========
+// Featured Sidebar Nara
 // ==============================
 function loadRandomFeaturedNara(spreadsheetId, sheetName) {
-  console.log("[Sidebar Nara] Starting load...");
-
   fetchSheetData(spreadsheetId, sheetName, data => {
-    console.log("[Sidebar Nara] Sheet data:", data);
-    console.log("[Sidebar Nara] First row keys:", Object.keys(data[0]));
-
-    // Filter for visible Naras
     const visible = data.filter(nara =>
       (nara.Hide !== true && nara.Hide !== "TRUE") &&
       typeof nara.URL === "string" &&
       nara.URL.trim() !== ""
     );
 
-    console.log("[Sidebar Nara] Visible Naras:", visible.length);
+    if (visible.length === 0) return;
 
-    if (visible.length === 0) {
-      console.warn("[Sidebar Nara] No visible Naras to display");
-      return;
-    }
-
-    // Pick a random one
     const randomNara = visible[Math.floor(Math.random() * visible.length)];
 
-    // Inject into sidebar
     const container = document.createElement("div");
     container.className = "random-nara-preview";
 
@@ -373,147 +341,35 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
     if (sidebar) {
       sidebar.innerHTML = "";
       sidebar.appendChild(container);
-    } else {
-      console.warn("[Sidebar Nara] #featured-nara-sidebar not found");
     }
   });
 }
 
 // ==============================
-// Discord OAuth Config
-// ==============================
-const CLIENT_ID = "1319474218550689863";
-// Dynamically set the redirect URI based on current domain
-const REDIRECT_URI = `${window.location.origin}/user.html`;
-const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
-
-function getDiscordOAuthURL() {
-  const scope = "identify";
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
-}
-
-// ==============================
-// Navbar UI Updates
-// ==============================
-function updateNavbarUI() {
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
-  const loginNav = document.getElementById("loginNav");
-  const userDropdown = document.getElementById("userDropdown");
-
-  if (userData && userData.username) {
-    if (loginNav) loginNav.style.display = "none";
-    if (userDropdown) {
-      userDropdown.style.display = "flex";
-      const usernameSpan = userDropdown.querySelector(".username");
-      if (usernameSpan) usernameSpan.textContent = userData.username;
-    }
-  } else {
-    if (loginNav) loginNav.style.display = "flex";
-    if (userDropdown) userDropdown.style.display = "none";
-  }
-}
-
-// ==============================
-// Handle Discord OAuth Callback
-// ==============================
-async function handleOAuthCallback() {
-  if (window.location.hash) {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = params.get("access_token");
-
-    if (accessToken) {
-      localStorage.setItem("access_token", accessToken);
-
-      try {
-        const discordUser = await fetch("https://discord.com/api/users/@me", {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        }).then(res => res.json());
-
-        localStorage.setItem("discordUser", JSON.stringify(discordUser));
-
-        if (discordUser.id) {
-          const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
-          const gasData = await fetch(gasUrl).then(res => res.json());
-          localStorage.setItem("userData", JSON.stringify(gasData));
-        }
-
-        updateNavbarUI();
-        history.replaceState(null, "", window.location.pathname);
-      } catch (err) {
-        console.error("OAuth handling error:", err);
-      }
-    }
-  }
-}
-
-// ==============================
-// Logout Handler
-// ==============================
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", e => {
-      e.preventDefault();
-      localStorage.removeItem("discordUser");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("userData");
-      updateNavbarUI();
-    });
-  }
-}
-
-// ==============================
-// Page Load Init
+// Centralized Page Load
 // ==============================
 document.addEventListener("DOMContentLoaded", async () => {
-  await handleOAuthCallback();
-  updateNavbarUI();
+  try {
+    // Load header/footer/sidebar includes
+    await loadHeaderFooter();
 
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-      window.location.href = getDiscordOAuthURL();
-    });
-  }
+    // Redirect logic
+    const path = window.location.pathname;
+    const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
-  setupLogoutButton();
+    if (userData.username && path.endsWith("/login.html")) {
+      window.location.href = "/user.html";
+      return;
+    }
+    if ((!userData.username) && path.endsWith("/user.html")) {
+      window.location.href = "/login.html";
+      return;
+    }
 
-  const path = window.location.pathname;
-  const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
-
-  if (userData.username && path.endsWith("/login.html")) {
-    window.location.href = "/user.html";
-  } else if (!userData.username && path.endsWith("/user.html")) {
-    window.location.href = "/login.html";
-  }
-});
-
-// ==============================
-// ========== Page Load =========
-// ==============================
-document.addEventListener("DOMContentLoaded", async () => {
-  loadHeaderFooter();
-
-  await handleOAuthCallback(); // wait for async OAuth fetch to finish
-
-  updateNavbarUI();      // update UI now that user data is ready
-
-  // Redirect logic after user data is guaranteed loaded
-  const path = window.location.pathname;
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
-
-  if (userData && userData.username && path.endsWith("/login.html")) {
-    window.location.href = "/user.html";
-    return;
-  }
-
-  if ((!userData || !userData.username) && path.endsWith("/user.html")) {
-    window.location.href = "/login.html";
-    return;
-  }
-
-  const mainContent = document.getElementById("output");
-  if (mainContent) {
-    mainContent.classList.add("fade-in");
+    // Fade-in effect for main content
+    const mainContent = document.getElementById("output");
+    if (mainContent) mainContent.classList.add("fade-in");
+  } catch (err) {
+    console.error("Error during page initialization:", err);
   }
 });
