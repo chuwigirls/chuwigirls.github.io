@@ -383,8 +383,9 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
 // Discord OAuth Config
 // ==============================
 const CLIENT_ID = "1319474218550689863";
-const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
-const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec"; 
+// Dynamically set the redirect URI based on current domain
+const REDIRECT_URI = `${window.location.origin}/user.html`;
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
 
 function getDiscordOAuthURL() {
   const scope = "identify";
@@ -424,24 +425,18 @@ async function handleOAuthCallback() {
       localStorage.setItem("access_token", accessToken);
 
       try {
-        // Fetch Discord profile
         const discordUser = await fetch("https://discord.com/api/users/@me", {
           headers: { Authorization: `Bearer ${accessToken}` }
         }).then(res => res.json());
 
-        // Store locally
         localStorage.setItem("discordUser", JSON.stringify(discordUser));
 
-        // Call GAS endpoint to sync data
         if (discordUser.id) {
           const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
           const gasData = await fetch(gasUrl).then(res => res.json());
-
-          // Save GAS data to localStorage
           localStorage.setItem("userData", JSON.stringify(gasData));
         }
 
-        // Update UI instantly
         updateNavbarUI();
         history.replaceState(null, "", window.location.pathname);
       } catch (err) {
@@ -462,7 +457,7 @@ function setupLogoutButton() {
       localStorage.removeItem("discordUser");
       localStorage.removeItem("access_token");
       localStorage.removeItem("userData");
-      updateNavbarUI(); // instantly show login button again
+      updateNavbarUI();
     });
   }
 }
@@ -474,7 +469,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await handleOAuthCallback();
   updateNavbarUI();
 
-  // Attach login redirect
   const loginBtn = document.getElementById("loginBtn");
   if (loginBtn) {
     loginBtn.addEventListener("click", () => {
@@ -484,7 +478,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setupLogoutButton();
 
-  // Redirect guard
   const path = window.location.pathname;
   const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
