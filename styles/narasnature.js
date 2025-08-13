@@ -384,7 +384,7 @@ function loadRandomFeaturedNara(spreadsheetId, sheetName) {
 // ==============================
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = "https://chuwigirls.github.io/user.html";
-const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec"; // <-- replace with your deployed GAS URL
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec"; 
 
 function getDiscordOAuthURL() {
   const scope = "identify";
@@ -397,7 +397,7 @@ function getDiscordOAuthURL() {
 function updateNavbarUI() {
   const userData = JSON.parse(localStorage.getItem("discordUser"));
   const loginNav = document.getElementById("loginNav");
-  const userDropdown = document.getElementById("userNav");
+  const userDropdown = document.getElementById("userDropdown");
 
   if (userData && userData.username) {
     if (loginNav) loginNav.style.display = "none";
@@ -441,6 +441,7 @@ async function handleOAuthCallback() {
           localStorage.setItem("userData", JSON.stringify(gasData));
         }
 
+        // Update UI instantly
         updateNavbarUI();
         history.replaceState(null, "", window.location.pathname);
       } catch (err) {
@@ -460,8 +461,8 @@ function setupLogoutButton() {
       e.preventDefault();
       localStorage.removeItem("discordUser");
       localStorage.removeItem("access_token");
-      localStorage.removeItem("userData"); // clear GAS data
-      updateNavbarUI();
+      localStorage.removeItem("userData");
+      updateNavbarUI(); // instantly show login button again
     });
   }
 }
@@ -483,7 +484,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setupLogoutButton();
 
-  // Optional: redirect guard
+  // Redirect guard
   const path = window.location.pathname;
   const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
