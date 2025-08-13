@@ -7,7 +7,7 @@
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    ask chuwigirls for help! */
+    you can ask chuwigirls for help! */
 
 // ==============================
 // Load Google Visualization API
@@ -54,52 +54,71 @@ function loadHeaderFooter() {
   let loadCount = 0;
 
   return new Promise((resolve, reject) => {
+    if (includes.length === 0) {
+      // No includes to load, resolve immediately
+      resolve();
+      return;
+    }
+
     includes.forEach(el => {
       const source = el.getAttribute("data-source");
-      if (source) {
-        fetch(source)
-          .then(res => res.text())
-          .then(html => {
-            el.innerHTML = html;
-            loadCount++;
-            if (loadCount === includes.length) {
-              setTimeout(() => {
-                initDropdowns();
-                initNavbarToggler();
-                initSidebar();
-                setHeaderHeight();
+      if (!source) {
+        loadCount++;
+        if (loadCount === includes.length) {
+          resolve();
+        }
+        return;
+      }
+      fetch(source)
+        .then(res => res.text())
+        .then(html => {
+          el.innerHTML = html;
+          loadCount++;
+          if (loadCount === includes.length) {
+            // Delay init to next event loop tick
+            setTimeout(() => {
+              initDropdowns();
+              initNavbarToggler();
+              initSidebar();
+              updateHeaderHeightCSSVar();
 
-                handleOAuthCallback().then(() => {
-                  updateNavbarUI();
+              handleOAuthCallback().then(() => {
+                updateNavbarUI();
 
-                  document.getElementById("loginBtn")?.addEventListener("click", () => {
+                const loginBtn = document.getElementById("loginBtn");
+                if (loginBtn) {
+                  loginBtn.addEventListener("click", () => {
                     window.location.href = getDiscordOAuthURL();
                   });
-                  document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
+                }
+
+                const logoutBtn = document.getElementById("logoutBtn");
+                if (logoutBtn) {
+                  logoutBtn.addEventListener("click", e => {
                     e.preventDefault();
                     localStorage.removeItem("discordUser");
                     localStorage.removeItem("access_token");
                     updateNavbarUI();
                     window.location.href = "/index.html";
                   });
+                }
 
-                  loadGoogleSheetsAPI(() => {
-                    loadRandomFeaturedNara(
-                      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-                      "Masterlist"
-                    );
-                  });
-
-                  resolve();
+                loadGoogleSheetsAPI(() => {
+                  loadRandomFeaturedNara(
+                    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
+                    "Masterlist"
+                  );
                 });
-              }, 0);
-            }
-          })
-          .catch(err => {
-            console.error("Failed to load:", source, err);
-            reject(err);
-          });
-      }
+
+                resolve();
+              });
+            }, 0);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to load:", source, err);
+          reject(err);
+        });
     });
   });
 }
@@ -109,14 +128,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadHeaderFooter();
 
     const path = window.location.pathname;
-    const userData = JSON.parse(localStorage.getItem("discordUser"));
+    const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
-    if (userData && userData.username && path.endsWith("/login.html")) {
+    if (userData.username && path.endsWith("/login.html")) {
       window.location.href = "/user.html";
       return;
     }
-
-    if ((!userData || !userData.username) && path.endsWith("/user.html")) {
+    if ((!userData.username) && path.endsWith("/user.html")) {
       window.location.href = "/login.html";
       return;
     }
@@ -130,11 +148,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function setHeaderHeight() {
-  const header = document.getElementById("siteHeader");
+function updateHeaderHeightCSSVar() {
+  const header = document.getElementById('siteHeader');
   if (header) {
-    const height = header.offsetHeight;
-    document.documentElement.style.setProperty('--header-height', `${height}px`);
+    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
   }
 }
 
@@ -143,8 +160,7 @@ function toggleSidebar() {
 }
 
 function handleSidebarDisplay() {
-  const width = window.innerWidth;
-  if (width >= 1275) {
+  if (window.innerWidth >= 1275) {
     if (!document.body.classList.contains("sidebar-closed")) {
       document.body.classList.add("sidebar-open");
     }
@@ -171,7 +187,7 @@ function initSidebar() {
 
   window.addEventListener("resize", () => {
     handleSidebarDisplay();
-    setHeaderHeight();
+    updateHeaderHeightCSSVar();
     handleSidebarScrollPosition();
   });
 
@@ -182,16 +198,10 @@ function initDropdowns() {
   document.querySelectorAll(".dropdown").forEach(dropdown => {
     const button = dropdown.querySelector(".dropbtn");
     const menu = dropdown.querySelector(".dropdown-content");
-
     if (!button || !menu) return;
 
-    dropdown.addEventListener("mouseenter", () => {
-      menu.classList.add("show");
-    });
-
-    dropdown.addEventListener("mouseleave", () => {
-      menu.classList.remove("show");
-    });
+    dropdown.addEventListener("mouseenter", () => menu.classList.add("show"));
+    dropdown.addEventListener("mouseleave", () => menu.classList.remove("show"));
 
     menu.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", () => {
@@ -217,10 +227,11 @@ function initNavbarToggler() {
   const newToggler = toggler.cloneNode(true);
   toggler.parentNode.replaceChild(newToggler, toggler);
 
-  newToggler.addEventListener("click", () => {
-    navLinks.classList.toggle("show");
-  });
+  newToggler.addEventListener("click", () => navLinks.classList.toggle("show"));
 }
+
+window.addEventListener('load', updateHeaderHeightCSSVar);
+window.addEventListener('resize', updateHeaderHeightCSSVar);
 
 // ==============================
 // ========= Masterlist =========
