@@ -48,46 +48,6 @@ function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
 }
 
 // ==============================
-// Load Header, Footer, Sidebar Includes
-// ==============================
-async function loadHeaderFooter() {
-  const includes = document.querySelectorAll(".includes");
-  for (const el of includes) {
-    const source = el.getAttribute("data-source");
-    if (!source) continue;
-    try {
-      const res = await fetch(source);
-      const html = await res.text();
-      el.innerHTML = html;
-    } catch (err) {
-      console.error("Failed to load include:", source, err);
-    }
-  }
-
-  // Initialize UI after includes are loaded
-  initDropdowns();
-  initNavbarToggler();
-  initSidebar();
-  updateHeaderHeightCSSVar();
-
-  await handleOAuthCallback();
-  updateNavbarUI();
-  setupLogoutButton();
-
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) loginBtn.addEventListener("click", () => {
-    window.location.href = getDiscordOAuthURL();
-  });
-
-  loadGoogleSheetsAPI(() => {
-    loadRandomFeaturedNara(
-      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-      "Masterlist"
-    );
-  });
-}
-
-// ==============================
 // Discord OAuth Config
 // ==============================
 const CLIENT_ID = "1319474218550689863";
@@ -258,9 +218,9 @@ window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
 // ==============================
-// Masterlist Renderer
+// Render Functions (Modular)
 // ==============================
-function Masterlist(data) {
+function renderMasterlist(data) {
   const masterlistView = document.getElementById("masterlist-view");
   const detailView = document.getElementById("nara-detail-view");
   if (!masterlistView || !detailView) return;
@@ -342,47 +302,42 @@ function Masterlist(data) {
   });
 }
 
-// ==============================
-// Featured Sidebar Nara
-// ==============================
-function loadRandomFeaturedNara(spreadsheetId, sheetName) {
-  fetchSheetData(spreadsheetId, sheetName, data => {
-    const visible = data.filter(nara =>
-      (nara.Hide !== true && nara.Hide !== "TRUE") &&
-      typeof nara.URL === "string" &&
-      nara.URL.trim() !== ""
-    );
+function renderFeaturedNara(data) {
+  const visible = data.filter(nara =>
+    (nara.Hide !== true && nara.Hide !== "TRUE") &&
+    typeof nara.URL === "string" &&
+    nara.URL.trim() !== ""
+  );
 
-    if (visible.length === 0) return;
+  if (visible.length === 0) return;
 
-    const randomNara = visible[Math.floor(Math.random() * visible.length)];
+  const randomNara = visible[Math.floor(Math.random() * visible.length)];
 
-    const container = document.createElement("div");
-    container.className = "random-nara-preview";
+  const container = document.createElement("div");
+  container.className = "random-nara-preview";
 
-    const link = document.createElement("a");
-    link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
-    link.style.textDecoration = "none";
+  const link = document.createElement("a");
+  link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
+  link.style.textDecoration = "none";
 
-    const img = document.createElement("img");
-    img.src = randomNara.URL;
-    img.alt = randomNara.Nara || "Featured Nara";
-    img.className = "random-nara-img";
+  const img = document.createElement("img");
+  img.src = randomNara.URL;
+  img.alt = randomNara.Nara || "Featured Nara";
+  img.className = "random-nara-img";
 
-    const name = document.createElement("div");
-    name.textContent = randomNara.Nara || "Unnamed Nara";
-    name.className = "random-nara-name";
+  const name = document.createElement("div");
+  name.textContent = randomNara.Nara || "Unnamed Nara";
+  name.className = "random-nara-name";
 
-    link.appendChild(img);
-    link.appendChild(name);
-    container.appendChild(link);
+  link.appendChild(img);
+  link.appendChild(name);
+  container.appendChild(link);
 
-    const sidebar = document.getElementById("featured-nara-sidebar");
-    if (sidebar) {
-      sidebar.innerHTML = "";
-      sidebar.appendChild(container);
-    }
-  });
+  const sidebar = document.getElementById("featured-nara-sidebar");
+  if (sidebar) {
+    sidebar.innerHTML = "";
+    sidebar.appendChild(container);
+  }
 }
 
 // ==============================
@@ -409,6 +364,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fade-in effect for main content
     const mainContent = document.getElementById("output");
     if (mainContent) mainContent.classList.add("fade-in");
+
+    // Fetch and render Masterlist
+    fetchSheetData("1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms", "Masterlist", renderMasterlist);
+
+    // Fetch and render Featured Nara Sidebar
+    fetchSheetData("1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms", "Masterlist", renderFeaturedNara);
+
+    // Placeholder for future features
+    // fetchSheetData(itemsSheetId, "Items", renderItems);
+    // fetchSheetData(petsSheetId, "Pets", renderPets);
+
   } catch (err) {
     console.error("Error during page initialization:", err);
   }
