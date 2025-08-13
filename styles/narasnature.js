@@ -203,10 +203,130 @@ async function handleOAuthCallback() {
 }
 
 // ==============================
-// Sheet Rendering (Modular)
+// Masterlist Rendering
 // ==============================
-function renderMasterlist(data) { /* same as previous modular code */ }
-function renderFeaturedNara(data) { /* same as previous modular code */ }
+function renderMasterlist(data) {
+  const masterlistView = document.getElementById("masterlist-view");
+  const detailView = document.getElementById("nara-detail-view");
+  if (!masterlistView || !detailView) return;
+
+  const visibleNaras = data.filter(nara =>
+    (nara.Hide !== true && nara.Hide !== "TRUE") &&
+    nara["URL"] && nara["Nara"]
+  );
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDesign = urlParams.get("design");
+
+  masterlistView.innerHTML = "";
+  masterlistView.classList.add("masterlist-grid");
+  masterlistView.style.display = "grid";
+
+  visibleNaras.forEach(nara => {
+    const template = document.querySelector("#masterlist-card-template");
+    if (!template) return;
+
+    const card = template.content.cloneNode(true);
+    const cardEl = card.querySelector(".masterlist-card");
+
+    cardEl.querySelector(".masterlist-card-img").src = nara["URL"];
+    cardEl.querySelector(".masterlist-card-img").alt = nara.Nara;
+    cardEl.querySelector(".masterlist-card-name").textContent = nara.Nara;
+
+    cardEl.addEventListener("click", () => {
+      masterlistView.style.display = "none";
+      const detailCard = document.querySelector("#nara-detail-template");
+      if (!detailCard) return;
+
+      const detailContent = detailCard.content.cloneNode(true);
+      detailContent.querySelector(".nara-detail-img").src = nara["URL"];
+      detailContent.querySelector(".nara-detail-img").alt = nara.Nara;
+      detailContent.querySelector(".nara-detail-name").textContent = nara.Nara;
+      detailContent.querySelector(".nara-detail-owner").textContent = nara.Owner || "—";
+      detailContent.querySelector(".nara-detail-region").textContent = nara.Region || "—";
+      detailContent.querySelector(".nara-detail-designer").textContent = nara.Designer || "—";
+      detailContent.querySelector(".nara-detail-status").textContent = nara.Status || "—";
+      detailContent.querySelector(".nara-detail-rarity").textContent = nara.Rarity || "—";
+
+      detailView.innerHTML = "";
+      detailView.appendChild(detailContent);
+      detailView.style.display = "block";
+    });
+
+    masterlistView.appendChild(card);
+  });
+
+  if (selectedDesign) {
+    const matchingNara = visibleNaras.find(n => n.Nara === selectedDesign);
+    if (matchingNara) {
+      masterlistView.style.display = "none";
+      const detailCard = document.querySelector("#nara-detail-template");
+      if (!detailCard) return;
+
+      const detailContent = detailCard.content.cloneNode(true);
+      detailContent.querySelector(".nara-detail-img").src = matchingNara["URL"];
+      detailContent.querySelector(".nara-detail-img").alt = matchingNara.Nara;
+      detailContent.querySelector(".nara-detail-name").textContent = matchingNara.Nara;
+      detailContent.querySelector(".nara-detail-owner").textContent = matchingNara.Owner || "—";
+      detailContent.querySelector(".nara-detail-region").textContent = matchingNara.Region || "—";
+      detailContent.querySelector(".nara-detail-designer").textContent = matchingNara.Designer || "—";
+      detailContent.querySelector(".nara-detail-status").textContent = matchingNara.Status || "—";
+      detailContent.querySelector(".nara-detail-rarity").textContent = matchingNara.Rarity || "—";
+
+      detailView.innerHTML = "";
+      detailView.appendChild(detailContent);
+      detailView.style.display = "block";
+    }
+  }
+
+  detailView.addEventListener("click", (e) => {
+    if (e.target && (e.target.id === "backML" || e.target.closest("#backML"))) {
+      detailView.style.display = "none";
+      masterlistView.style.display = "grid";
+    }
+  });
+}
+
+// ==============================
+// Featured Nara Rendering
+// ==============================
+function renderFeaturedNara(data) {
+  const visible = data.filter(nara =>
+    (nara.Hide !== true && nara.Hide !== "TRUE") &&
+    typeof nara.URL === "string" &&
+    nara.URL.trim() !== ""
+  );
+
+  if (visible.length === 0) return;
+
+  const randomNara = visible[Math.floor(Math.random() * visible.length)];
+
+  const container = document.createElement("div");
+  container.className = "random-nara-preview";
+
+  const link = document.createElement("a");
+  link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
+  link.style.textDecoration = "none";
+
+  const img = document.createElement("img");
+  img.src = randomNara.URL;
+  img.alt = randomNara.Nara || "Featured Nara";
+  img.className = "random-nara-img";
+
+  const name = document.createElement("div");
+  name.textContent = randomNara.Nara || "Unnamed Nara";
+  name.className = "random-nara-name";
+
+  link.appendChild(img);
+  link.appendChild(name);
+  container.appendChild(link);
+
+  const sidebar = document.getElementById("featured-nara-sidebar");
+  if (sidebar) {
+    sidebar.innerHTML = "";
+    sidebar.appendChild(container);
+  }
+}
 
 // ==============================
 // Centralized Page Load
