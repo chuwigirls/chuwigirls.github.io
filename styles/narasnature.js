@@ -209,6 +209,49 @@ window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
 // ==============================
+// ===== Load Header/Footer/Sidebar & Initialize Page ====
+// ==============================
+async function loadHeaderFooter() {
+  const includes = document.querySelectorAll(".includes");
+  for (const el of includes) {
+    const source = el.getAttribute("data-source");
+    if (!source) continue;
+    try {
+      const res = await fetch(source);
+      const html = await res.text();
+      el.innerHTML = html;
+    } catch (err) {
+      console.error("Failed to load include:", source, err);
+    }
+  }
+
+  // Initialize UI
+  initDropdowns();
+  initNavbarToggler();
+  initSidebar();
+  updateHeaderHeightCSSVar();
+
+  await handleOAuthCallback();
+  updateNavbarUI();
+  setupLogoutButton();
+
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) loginBtn.addEventListener("click", () => {
+    window.location.href = getDiscordOAuthURL();
+  });
+
+  setupPageTransitions();
+  setupBackToTop();
+
+  loadGoogleSheetsAPI(() => {
+    loadRandomFeaturedNara(
+      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
+      "Masterlist"
+    );
+  });
+}
+
+// ==============================
 // ===== Masterlist & Sidebar ====
 // ==============================
 function Masterlist(data) {
@@ -378,49 +421,6 @@ function setupBackToTop() {
       button.style.display = "none";
     }
   }
-}
-
-// ==============================
-// ===== Load Header/Footer/Sidebar & Initialize Page ====
-// ==============================
-async function loadHeaderFooter() {
-  const includes = document.querySelectorAll(".includes");
-  for (const el of includes) {
-    const source = el.getAttribute("data-source");
-    if (!source) continue;
-    try {
-      const res = await fetch(source);
-      const html = await res.text();
-      el.innerHTML = html;
-    } catch (err) {
-      console.error("Failed to load include:", source, err);
-    }
-  }
-
-  // Initialize UI
-  initDropdowns();
-  initNavbarToggler();
-  initSidebar();
-  updateHeaderHeightCSSVar();
-
-  await handleOAuthCallback();
-  updateNavbarUI();
-  setupLogoutButton();
-
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) loginBtn.addEventListener("click", () => {
-    window.location.href = getDiscordOAuthURL();
-  });
-
-  setupPageTransitions();
-  setupBackToTop();
-
-  loadGoogleSheetsAPI(() => {
-    loadRandomFeaturedNara(
-      "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-      "Masterlist"
-    );
-  });
 }
 
 // ==============================
