@@ -216,6 +216,8 @@ window.addEventListener('resize', updateHeaderHeightCSSVar);
 // ==============================
 async function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
+
+  // Load all includes
   for (const el of includes) {
     const source = el.getAttribute("data-source");
     if (!source) continue;
@@ -228,34 +230,28 @@ async function loadHeaderFooter() {
     }
   }
 
-  // Initialize UI
+  // Initialize UI elements that require DOM
   initDropdowns();
   initNavbarToggler();
   initSidebar();
   updateHeaderHeightCSSVar();
 
-  await handleOAuthCallback();
-  updateNavbarUI();
+  // --- OAuth handling ---
+  await handleOAuthCallback(); // if coming back from Discord login
+  updateNavbarUI();            // always update navbar immediately if user is logged in
   setupLogoutButton();
 
+  // Login button (if still visible)
   const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) loginBtn.addEventListener("click", () => {
-    window.location.href = getDiscordOAuthURL();
-  });
+  if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+      window.location.href = getDiscordOAuthURL();
+    });
+  }
 
+  // Page transitions and back-to-top button
   setupPageTransitions();
   setupBackToTop();
-
-  loadGoogleSheetsAPI(() => {
-  fetchSheetData(
-    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-    "Masterlist",
-    data => {
-      Masterlist(data);
-      loadRandomFeaturedNaraFromData(data);
-    }
-  );
-});
 }
 
 // ==============================
