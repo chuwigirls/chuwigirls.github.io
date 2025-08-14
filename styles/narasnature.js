@@ -59,8 +59,8 @@ function getDiscordOAuthURL() {
 // ==============================
 // ===== Navbar & OAuth =========
 // ==============================
-function updateNavbarUI() {
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
+function updateNavbarUI(userDataParam) {
+  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser"));
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
@@ -82,14 +82,11 @@ async function handleOAuthCallback() {
   const accessToken = params.get("access_token");
 
   if (accessToken) {
-    // 1️⃣ Show spinner immediately
     showLoadingOverlay();
 
-    // Store token
     localStorage.setItem("discordAccessToken", accessToken);
 
     try {
-      // 2️⃣ Fetch user info
       const userResponse = await fetch("https://discord.com/api/users/@me", {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
@@ -98,26 +95,20 @@ async function handleOAuthCallback() {
 
       const userData = await userResponse.json();
 
-      // Store user data
+      // Store and update immediately
       localStorage.setItem("discordUser", JSON.stringify(userData));
-
-      // Update UI right away
       updateNavbarUI(userData);
 
-      // 3️⃣ Remove the access token from URL without reload yet
       window.history.replaceState({}, document.title, "/user.html");
 
-      // 4️⃣ Hide spinner after short delay for smoothness
-      setTimeout(() => {
-        hideLoadingOverlay();
-      }, 300);
-
+      setTimeout(hideLoadingOverlay, 300);
     } catch (error) {
       console.error("OAuth callback error:", error);
       hideLoadingOverlay();
     }
   }
 }
+
 
 function setupLogoutButton() {
   const logoutBtn = document.getElementById("logoutBtn");
