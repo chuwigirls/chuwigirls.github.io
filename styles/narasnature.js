@@ -5,9 +5,6 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help!
 */
 
 // ==============================
@@ -62,8 +59,8 @@ function getDiscordOAuthURL() {
 // ==============================
 // ===== Navbar & OAuth =========
 // ==============================
-function updateNavbarUI() {
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
+function updateNavbarUI(userDataParam) {
+  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser"));
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
@@ -81,54 +78,40 @@ function updateNavbarUI() {
 }
 
 async function handleOAuthCallback() {
-  if (!window.location.hash) return;
-
-  const params = new URLSearchParams(window.location.hash.slice(1));
+  const params = new URLSearchParams(window.location.hash.substring(1));
   const accessToken = params.get("access_token");
+
   if (!accessToken) return;
 
-  localStorage.setItem("access_token", accessToken);
+  showLoadingOverlay();
 
   try {
-    const discordUser = await fetch("https://discord.com/api/users/@me", {
+    // Save token immediately
+    localStorage.setItem("discordAccessToken", accessToken);
+
+    // Fetch Discord user data
+    const userResponse = await fetch("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${accessToken}` }
-    }).then(res => res.json());
+    });
 
-    localStorage.setItem("discordUser", JSON.stringify(discordUser));
+    if (!userResponse.ok) throw new Error("Failed to fetch user info");
 
-    if (discordUser.id) {
-      const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
-      const gasData = await fetch(gasUrl).then(res => res.json());
-      localStorage.setItem("userData", JSON.stringify(gasData));
-    }
+    const userData = await userResponse.json();
 
-    await waitForElement("#loginNav");
-    updateNavbarUI();
+    // Store and update UI immediately
+    localStorage.setItem("discordUser", JSON.stringify(userData));
+    updateNavbarUI(userData); // ensures dropdown replaces login instantly
 
-    history.replaceState(null, "", window.location.pathname);
+    // Clean up URL (remove #access_token) before navigating
+    window.history.replaceState({}, document.title, window.location.pathname);
 
-    if (!window.location.pathname.endsWith("/user.html")) {
-      window.location.href = "/user.html";
-    }
-  } catch (err) {
-    console.error("OAuth handling error:", err);
+    // Redirect to user profile page
+    window.location.href = "/user.html";
+  } catch (error) {
+    console.error("OAuth callback error:", error);
+  } finally {
+    hideLoadingOverlay();
   }
-}
-
-// Helper: wait until an element exists
-function waitForElement(selector, timeout = 3000) {
-  return new Promise((resolve, reject) => {
-    const interval = 50;
-    let elapsed = 0;
-    const check = () => {
-      const el = document.querySelector(selector);
-      if (el) return resolve(el);
-      elapsed += interval;
-      if (elapsed >= timeout) return reject(`Timeout waiting for ${selector}`);
-      setTimeout(check, interval);
-    };
-    check();
-  });
 }
 
 function setupLogoutButton() {
