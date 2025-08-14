@@ -162,6 +162,11 @@ button:hover {
   background: var(--light-pink)
 }
 
+#loadingOverlay {
+  display: none;
+}
+
+
 /* --------------------------- */
 /* -----------Header---------- */
 /* --------------------------- */
