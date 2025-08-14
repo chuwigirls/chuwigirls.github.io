@@ -86,28 +86,36 @@ async function handleOAuthCallback() {
       localStorage.setItem("access_token", accessToken);
 
       try {
+        // Fetch Discord user
         const discordUser = await fetch("https://discord.com/api/users/@me", {
           headers: { Authorization: `Bearer ${accessToken}` }
         }).then(res => res.json());
 
         localStorage.setItem("discordUser", JSON.stringify(discordUser));
 
+        // Fetch user data from your GAS endpoint if needed
         if (discordUser.id) {
           const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
           const gasData = await fetch(gasUrl).then(res => res.json());
           localStorage.setItem("userData", JSON.stringify(gasData));
         }
 
-        updateNavbarUI();
+        // --- IMMEDIATE NAVBAR UPDATE ---
+        updateNavbarUI(); // show username instantly
 
+        // Clean up URL (remove access token hash)
         history.replaceState(null, "", window.location.pathname);
+
+        // Optional: redirect to user.html only if not already there
+        if (!window.location.pathname.endsWith("/user.html")) {
+          window.location.href = "/user.html";
+        }
       } catch (err) {
         console.error("OAuth handling error:", err);
       }
     }
   }
 }
-
 
 function setupLogoutButton() {
   const logoutBtn = document.getElementById("logoutBtn");
