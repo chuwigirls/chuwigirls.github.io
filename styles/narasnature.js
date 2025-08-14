@@ -5,6 +5,9 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
+
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
 */
 
 // ==============================
@@ -78,43 +81,54 @@ function updateNavbarUI() {
 }
 
 async function handleOAuthCallback() {
-  if (window.location.hash) {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = params.get("access_token");
+  if (!window.location.hash) return;
 
-    if (accessToken) {
-      localStorage.setItem("access_token", accessToken);
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const accessToken = params.get("access_token");
+  if (!accessToken) return;
 
-      try {
-        // Fetch Discord user
-        const discordUser = await fetch("https://discord.com/api/users/@me", {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        }).then(res => res.json());
+  localStorage.setItem("access_token", accessToken);
 
-        localStorage.setItem("discordUser", JSON.stringify(discordUser));
+  try {
+    const discordUser = await fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    }).then(res => res.json());
 
-        // Fetch user data from your GAS endpoint if needed
-        if (discordUser.id) {
-          const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
-          const gasData = await fetch(gasUrl).then(res => res.json());
-          localStorage.setItem("userData", JSON.stringify(gasData));
-        }
+    localStorage.setItem("discordUser", JSON.stringify(discordUser));
 
-        // --- IMMEDIATE NAVBAR UPDATE ---
-        updateNavbarUI(); // show username instantly
-
-        // Clean up URL (remove access token hash)
-        history.replaceState(null, "", window.location.pathname);
-
-        // Optional: redirect to user.html only if not already there
-        if (!window.location.pathname.endsWith("/user.html")) {
-          window.location.href = "/user.html";
-        }
-      } catch (err) {
-        console.error("OAuth handling error:", err);
-      }
+    if (discordUser.id) {
+      const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
+      const gasData = await fetch(gasUrl).then(res => res.json());
+      localStorage.setItem("userData", JSON.stringify(gasData));
     }
+
+    await waitForElement("#loginNav");
+    updateNavbarUI();
+
+    history.replaceState(null, "", window.location.pathname);
+
+    if (!window.location.pathname.endsWith("/user.html")) {
+      window.location.href = "/user.html";
+    }
+  } catch (err) {
+    console.error("OAuth handling error:", err);
   }
+}
+
+// Helper: wait until an element exists
+function waitForElement(selector, timeout = 3000) {
+  return new Promise((resolve, reject) => {
+    const interval = 50;
+    let elapsed = 0;
+    const check = () => {
+      const el = document.querySelector(selector);
+      if (el) return resolve(el);
+      elapsed += interval;
+      if (elapsed >= timeout) return reject(`Timeout waiting for ${selector}`);
+      setTimeout(check, interval);
+    };
+    check();
+  });
 }
 
 function setupLogoutButton() {
@@ -220,12 +234,11 @@ window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
 // ==============================
-// ===== Load Header/Footer/Sidebar & Initialize Page ====
+// ===== Load Includes & Initialize Page ====
 // ==============================
 async function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
 
-  // Load all includes
   for (const el of includes) {
     const source = el.getAttribute("data-source");
     if (!source) continue;
@@ -238,26 +251,21 @@ async function loadHeaderFooter() {
     }
   }
 
-  // Initialize UI elements that require DOM
+  // Now header exists
+  await handleOAuthCallback(); 
+  updateNavbarUI();
+  setupLogoutButton();
+
   initDropdowns();
   initNavbarToggler();
   initSidebar();
   updateHeaderHeightCSSVar();
 
-  // --- OAuth handling ---
-  await handleOAuthCallback(); // if coming back from Discord login
-  updateNavbarUI();            // always update navbar immediately if user is logged in
-  setupLogoutButton();
-
-  // Login button (if still visible)
   const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-      window.location.href = getDiscordOAuthURL();
-    });
-  }
+  if (loginBtn) loginBtn.addEventListener("click", () => {
+    window.location.href = getDiscordOAuthURL();
+  });
 
-  // Page transitions and back-to-top button
   setupPageTransitions();
   setupBackToTop();
 }
