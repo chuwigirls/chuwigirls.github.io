@@ -264,7 +264,6 @@ async function loadHeaderFooter() {
     }
   );
 });
-}
 
 // ==============================
 // ===== Masterlist & Sidebar ====
