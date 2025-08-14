@@ -5,9 +5,6 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help!
 */
 
 // ==============================
@@ -81,54 +78,45 @@ function updateNavbarUI() {
 }
 
 async function handleOAuthCallback() {
-  if (!window.location.hash) return;
-
-  const params = new URLSearchParams(window.location.hash.slice(1));
+  const params = new URLSearchParams(window.location.hash.substring(1));
   const accessToken = params.get("access_token");
-  if (!accessToken) return;
 
-  localStorage.setItem("access_token", accessToken);
+  if (accessToken) {
+    // 1️⃣ Show spinner immediately
+    showLoadingOverlay();
 
-  try {
-    const discordUser = await fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    }).then(res => res.json());
+    // Store token
+    localStorage.setItem("discordAccessToken", accessToken);
 
-    localStorage.setItem("discordUser", JSON.stringify(discordUser));
+    try {
+      // 2️⃣ Fetch user info
+      const userResponse = await fetch("https://discord.com/api/users/@me", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
 
-    if (discordUser.id) {
-      const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
-      const gasData = await fetch(gasUrl).then(res => res.json());
-      localStorage.setItem("userData", JSON.stringify(gasData));
+      if (!userResponse.ok) throw new Error("Failed to fetch user info");
+
+      const userData = await userResponse.json();
+
+      // Store user data
+      localStorage.setItem("discordUser", JSON.stringify(userData));
+
+      // Update UI right away
+      updateNavbarUI(userData);
+
+      // 3️⃣ Remove the access token from URL without reload yet
+      window.history.replaceState({}, document.title, "/user.html");
+
+      // 4️⃣ Hide spinner after short delay for smoothness
+      setTimeout(() => {
+        hideLoadingOverlay();
+      }, 300);
+
+    } catch (error) {
+      console.error("OAuth callback error:", error);
+      hideLoadingOverlay();
     }
-
-    await waitForElement("#loginNav");
-    updateNavbarUI();
-
-    history.replaceState(null, "", window.location.pathname);
-
-    if (!window.location.pathname.endsWith("/user.html")) {
-      window.location.href = "/user.html";
-    }
-  } catch (err) {
-    console.error("OAuth handling error:", err);
   }
-}
-
-// Helper: wait until an element exists
-function waitForElement(selector, timeout = 3000) {
-  return new Promise((resolve, reject) => {
-    const interval = 50;
-    let elapsed = 0;
-    const check = () => {
-      const el = document.querySelector(selector);
-      if (el) return resolve(el);
-      elapsed += interval;
-      if (elapsed >= timeout) return reject(`Timeout waiting for ${selector}`);
-      setTimeout(check, interval);
-    };
-    check();
-  });
 }
 
 function setupLogoutButton() {
