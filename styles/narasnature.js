@@ -5,9 +5,6 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help!
 */
 
 // ==============================
@@ -60,10 +57,10 @@ function getDiscordOAuthURL() {
 }
 
 // ==============================
-// ===== Navbar & OAuth =========
+// ===== Navbar =========
 // ==============================
-function updateNavbarUI() {
-  const userData = JSON.parse(localStorage.getItem("discordUser"));
+function updateNavbarUI(userDataParam) {
+  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser"));
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
@@ -80,55 +77,88 @@ function updateNavbarUI() {
   }
 }
 
-async function handleOAuthCallback() {
-  if (!window.location.hash) return;
+// ==============================
+// ===== Header Auth Spinner ====
+// ==============================
+function showHeaderAuthSpinner() {
+  const loginNav = document.getElementById("loginNav");
+  if (!loginNav) return;
 
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const accessToken = params.get("access_token");
-  if (!accessToken) return;
+  // Remember what was there so we can restore (if needed)
+  if (!loginNav.dataset.prevHtml) {
+    loginNav.dataset.prevHtml = loginNav.innerHTML;
+  }
 
-  localStorage.setItem("access_token", accessToken);
+  // Minimal spinner UI (Font Awesome assumed)
+  loginNav.innerHTML = '<div class="spinner" id="authSpinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+  loginNav.style.display = "flex";
+}
 
-  try {
-    const discordUser = await fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    }).then(res => res.json());
+function hideHeaderAuthSpinner() {
+  const loginNav = document.getElementById("loginNav");
+  if (!loginNav) return;
 
-    localStorage.setItem("discordUser", JSON.stringify(discordUser));
-
-    if (discordUser.id) {
-      const gasUrl = `${GAS_ENDPOINT}?id=${discordUser.id}&username=${encodeURIComponent(discordUser.username)}`;
-      const gasData = await fetch(gasUrl).then(res => res.json());
-      localStorage.setItem("userData", JSON.stringify(gasData));
-    }
-
-    await waitForElement("#loginNav");
-    updateNavbarUI();
-
-    history.replaceState(null, "", window.location.pathname);
-
-    if (!window.location.pathname.endsWith("/user.html")) {
-      window.location.href = "/user.html";
-    }
-  } catch (err) {
-    console.error("OAuth handling error:", err);
+  const prev = loginNav.dataset.prevHtml;
+  if (prev) {
+    loginNav.innerHTML = prev;
+    delete loginNav.dataset.prevHtml;
+  } else {
+    // Fallback: just remove spinner if it exists
+    const s = document.getElementById("authSpinner");
+    if (s && s.parentNode) s.parentNode.removeChild(s);
   }
 }
 
-// Helper: wait until an element exists
-function waitForElement(selector, timeout = 3000) {
-  return new Promise((resolve, reject) => {
-    const interval = 50;
-    let elapsed = 0;
-    const check = () => {
-      const el = document.querySelector(selector);
-      if (el) return resolve(el);
-      elapsed += interval;
-      if (elapsed >= timeout) return reject(`Timeout waiting for ${selector}`);
-      setTimeout(check, interval);
-    };
-    check();
-  });
+// ==============================
+// ===== OAuth =========
+// ==============================
+async function handleOAuthCallback() {
+  const params = new URLSearchParams(window.location.hash.substring(1));
+  const accessToken = params.get("access_token");
+  if (!accessToken) return;
+
+  // Show spinner in header while we process OAuth
+  showHeaderAuthSpinner();
+
+  try {
+    // Store token (use the same key that logout clears)
+    localStorage.setItem("access_token", accessToken);
+
+    // Fetch Discord user
+    const userResponse = await fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!userResponse.ok) throw new Error("Failed to fetch user info");
+
+    const userData = await userResponse.json();
+    localStorage.setItem("discordUser", JSON.stringify(userData));
+
+    // (Optional) fire-and-forget your GAS call; don't block redirect
+    // If you prefer to await it, move the redirect below into a .then
+    if (userData.id) {
+      fetch(`${GAS_ENDPOINT}?id=${userData.id}&username=${encodeURIComponent(userData.username)}`)
+        .then(res => res.json())
+        .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
+        .catch(() => {}); // ignore GAS errors here
+    }
+
+    // Clean the hash and do a full reload to /user.html
+    // Full reload ensures header includes load and navbar updates from localStorage
+    if (!window.location.pathname.endsWith("/user.html")) {
+      window.location.replace("/user.html");
+      return; // page is navigating, no need to hide spinner
+    } else {
+      // Already on /user.html: just clean hash and update immediately
+      history.replaceState(null, "", window.location.pathname);
+      updateNavbarUI();
+      hideHeaderAuthSpinner();
+    }
+  } catch (err) {
+    console.error("OAuth handling error:", err);
+    // On error, clean hash and restore header
+    history.replaceState(null, "", window.location.pathname);
+    hideHeaderAuthSpinner();
+  }
 }
 
 function setupLogoutButton() {
@@ -137,8 +167,9 @@ function setupLogoutButton() {
     logoutBtn.addEventListener("click", e => {
       e.preventDefault();
       localStorage.removeItem("discordUser");
-      localStorage.removeItem("access_token");
       localStorage.removeItem("userData");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("discordAccessToken"); // <- optional cleanup
       updateNavbarUI();
       window.location.href = "/index.html";
     });
