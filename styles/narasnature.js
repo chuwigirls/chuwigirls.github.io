@@ -254,6 +254,18 @@ async function loadHeaderFooter() {
   setupBackToTop();
 }
 
+  loadGoogleSheetsAPI(() => {
+  fetchSheetData(
+    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
+    "Masterlist",
+    data => {
+      Masterlist(data);
+      loadRandomFeaturedNaraFromData(data);
+    }
+  );
+});
+}
+
 // ==============================
 // ===== Masterlist & Sidebar ====
 // ==============================
