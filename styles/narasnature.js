@@ -98,6 +98,8 @@ async function handleOAuthCallback() {
           localStorage.setItem("userData", JSON.stringify(gasData));
         }
 
+        updateNavbarUI();
+
         history.replaceState(null, "", window.location.pathname);
       } catch (err) {
         console.error("OAuth handling error:", err);
@@ -105,6 +107,7 @@ async function handleOAuthCallback() {
     }
   }
 }
+
 
 function setupLogoutButton() {
   const logoutBtn = document.getElementById("logoutBtn");
