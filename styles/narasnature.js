@@ -5,6 +5,9 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)_
     mrf(_..)--(.._)'--'
+
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
 */
 
 // ==============================
@@ -454,13 +457,19 @@ function setupPageTransitions() {
       !link.href.startsWith("javascript:")
     ) {
       e.preventDefault();
+
       wrapper.classList.remove("fade-in");
       wrapper.classList.add("fade-out");
 
       setTimeout(() => {
         window.location.href = link.href;
-      }, 500);
+      }, 400);
     }
+  });
+
+  window.addEventListener("beforeunload", () => {
+    wrapper.classList.remove("fade-in");
+    wrapper.classList.add("fade-out");
   });
 }
 
@@ -507,3 +516,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error during page initialization:", err);
   }
 });
+
+window.addEventListener("load", () => {
+  document.querySelector(".smoothLoad").classList.add("loaded");
+});
+
