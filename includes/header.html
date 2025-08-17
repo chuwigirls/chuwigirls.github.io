@@ -101,7 +101,9 @@
       </div>
 
       <!-- User Dropdown -->
-      <div class="nav-right dropdown" id="userDropdown" style="display: none;">
+      <div class="nav-right dropdown" id="userDropdown" style="display: none;"> 
+      
+      <div class="dropdown">
         <button class="dropbtn">
           <span class="username"></span> <i class="fa fa-caret-down"></i>
         </button>
@@ -109,9 +111,9 @@
           <a href="/user.html"><i class="fa-solid fa-user"></i> Profile</a>
           <a href="/queue.html"><i class="fa-solid fa-user"></i> My Queue</a>
           <a href="/settings.html"><i class="fa-solid fa-user"></i> Settings</a>
-          <hr class="dropdown-div">
-            <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
+      </div>
+      <div class="dropdown">
         <button class="dropbtn">
           Submit <i class="fa fa-caret-down"></i>
         </button>
@@ -122,23 +124,9 @@
           <hr class="dropdown-div">
             <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
+      </div> 
       </div>
 
-      <div id="loadingOverlay" style="
-        display:none;
-        position:fixed;
-        inset:0;
-        background-color:rgba(255,255,255,0.85);
-        z-index:9999;
-        align-items:center;
-        justify-content:center;
-      ">
-        <div class="spinner">
-          <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        </div>
-      </div>
-
-      
     </div>
   </div>
 </div>
