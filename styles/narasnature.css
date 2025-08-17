@@ -254,6 +254,12 @@ button:hover {
   justify-content: flex-end;
 }
 
+.nav-right .dropdown-content {
+  left: auto;
+  right: 0;
+}
+
+
 #loginNav {
   display: flex;
   justify-content: center;
@@ -313,6 +319,10 @@ button:hover {
 .dropdown-content a:hover {
   color: var(--pink);
   box-shadow: 0px 0px 0px var(--bluey);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 hr.dropdown-div {
