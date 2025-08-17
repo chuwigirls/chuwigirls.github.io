@@ -41,19 +41,33 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   font-family: var(--calm);
-  background-color: transparent;
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
+  background-color: var(--light-blue);
   background-size: cover;
   background-position: top;
   background-attachment: fixed;
 }
 
+/* --------------------------- */
+/* ---- Overall Page Fade ---- */
+/* --------------------------- */
+.smoothLoad {
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+}
+
+.smoothLoad.loaded {
+  opacity: 1;
+}
+
+/* --------------------------- */
+/* ---- Inner Content Fade --- */
+/* --------------------------- */
 .wrapper {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
 
-  /* Transition for fade */
   opacity: 1;
   transition: opacity 0.4s ease-in-out;
 }
@@ -62,7 +76,6 @@ body {
 @media (max-width: 1280px) {
   .wrapper {
     max-width: 850px;
-    
   }
 }
 
@@ -76,7 +89,11 @@ body {
   opacity: 1;
 }
 
+/* --------------------------- */
+/* --- Reduced Motion Safe --- */
+/* --------------------------- */
 @media (prefers-reduced-motion: reduce) {
+  .smoothLoad,
   .wrapper {
     transition: none;
   }
