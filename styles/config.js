@@ -7,7 +7,7 @@
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    ask chuwigirls for help! */
+    you can ask chuwigirls for help! */
 
 // ==============================
 // =========== Sheets ===========
@@ -29,4 +29,56 @@ const sheetConfigs = {
 const discordClientId = '1319474218550689863';
 const redirectUri = 'https://chuwigirls.github.io/user.html';
 const discordScopes = 'identify';
+
+// ==============================
+// ======== Render Sheets =======
+// ==============================
+renderSheets(data, {
+  listId: "masterlist-view",
+  detailId: "nara-detail-view",
+  cardTemplate: "#masterlist-card-template",
+  detailTemplate: "#nara-detail-template",
+  imageField: "URL",
+  nameField: "Nara",
+  queryParam: "design",
+  extraFields: [
+    { field: "Owner", className: "nara-detail-owner" },
+    { field: "Region", className: "nara-detail-region" },
+    { field: "Designer", className: "nara-detail-designer" },
+    { field: "Status", className: "nara-detail-status" },
+    { field: "Rarity", className: "nara-detail-rarity" }
+  ]
+});
+
+renderSheets(data, {
+  listId: "artifact-view",
+  detailId: "artifact-detail-view",
+  cardTemplate: "#artifact-card-template",
+  detailTemplate: "#artifact-detail-template",
+  imageField: "Image",
+  nameField: "Artifact",
+  queryParam: "artifact",
+  extraFields: [
+    { field: "Type", className: "artifact-detail-type" },
+    { field: "Price", className: "artifact-detail-price" },
+    { field: "Rarity", className: "artifact-detail-rarity" },
+    { field: "Found", className: "artifact-detail-found" },
+    { field: "Description", className: "artifact-detail-description" }
+  ]
+});
+
+renderSheets(data, {
+  listId: "palcharm-view",
+  detailId: "palcharm-detail-view",
+  cardTemplate: "#palcharm-card-template",
+  detailTemplate: "#palcharm-detail-template",
+  imageField: "Image",
+  nameField: "Palcharm",
+  queryParam: "palcharm",
+  extraFields: [
+    { field: "Ability", className: "palcharm-detail-ability" }
+  ]
+});
+
+
 
