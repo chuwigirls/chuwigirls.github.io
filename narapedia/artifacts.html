@@ -60,6 +60,29 @@
       <div class="page">
       <h1>Artifacts</h1>
       </div>
+
+      <div id="artifact-view"></div>
+      <div id="artifact-detail-view" style="display:none;"></div>
+
+      <template id="artifact-card-template">
+        <div class="masterlist-card">
+          <img class="masterlist-card-img" src="" alt="">
+          <h4 class="masterlist-card-name"></h4>
+        </div>
+      </template>
+
+      <template id="artifact-detail-template">
+        <div class="artifact-detail-card">
+          <img class="nara-detail-img" src="" alt="">
+          <h2 class="nara-detail-name"></h2>
+          <p><strong>Type:</strong> <span class="artifact-detail-type"></span></p>
+          <p><strong>Price:</strong> <span class="artifact-detail-price"></span></p>
+          <p><strong>Rarity:</strong> <span class="artifact-detail-rarity"></span></p>
+          <p><strong>Found:</strong> <span class="artifact-detail-found"></span></p>
+          <p><strong>Description:</strong> <span class="artifact-detail-description"></span></p>
+        </div>
+      </template>
+
     </div>
 
     <!-- Footer -->
