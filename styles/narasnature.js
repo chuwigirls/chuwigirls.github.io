@@ -86,12 +86,10 @@ function showHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
 
-  // Remember what was there so we can restore (if needed)
   if (!loginNav.dataset.prevHtml) {
     loginNav.dataset.prevHtml = loginNav.innerHTML;
   }
 
-  // Minimal spinner UI (Font Awesome assumed)
   loginNav.innerHTML = '<div class="spinner" id="authSpinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
   loginNav.style.display = "flex";
 }
@@ -105,7 +103,6 @@ function hideHeaderAuthSpinner() {
     loginNav.innerHTML = prev;
     delete loginNav.dataset.prevHtml;
   } else {
-    // Fallback: just remove spinner if it exists
     const s = document.getElementById("authSpinner");
     if (s && s.parentNode) s.parentNode.removeChild(s);
   }
@@ -119,14 +116,11 @@ async function handleOAuthCallback() {
   const accessToken = params.get("access_token");
   if (!accessToken) return;
 
-  // Show spinner in header while we process OAuth
   showHeaderAuthSpinner();
 
   try {
-    // Store token (use the same key that logout clears)
     localStorage.setItem("access_token", accessToken);
 
-    // Fetch Discord user
     const userResponse = await fetch("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
@@ -135,8 +129,6 @@ async function handleOAuthCallback() {
     const userData = await userResponse.json();
     localStorage.setItem("discordUser", JSON.stringify(userData));
 
-    // (Optional) fire-and-forget your GAS call; don't block redirect
-    // If you prefer to await it, move the redirect below into a .then
     if (userData.id) {
       fetch(`${GAS_ENDPOINT}?id=${userData.id}&username=${encodeURIComponent(userData.username)}`)
         .then(res => res.json())
@@ -144,20 +136,16 @@ async function handleOAuthCallback() {
         .catch(() => {}); // ignore GAS errors here
     }
 
-    // Clean the hash and do a full reload to /user.html
-    // Full reload ensures header includes load and navbar updates from localStorage
     if (!window.location.pathname.endsWith("/user.html")) {
       window.location.replace("/user.html");
-      return; // page is navigating, no need to hide spinner
+      return;
     } else {
-      // Already on /user.html: just clean hash and update immediately
       history.replaceState(null, "", window.location.pathname);
       updateNavbarUI();
       hideHeaderAuthSpinner();
     }
   } catch (err) {
     console.error("OAuth handling error:", err);
-    // On error, clean hash and restore header
     history.replaceState(null, "", window.location.pathname);
     hideHeaderAuthSpinner();
   }
@@ -171,7 +159,7 @@ function setupLogoutButton() {
       localStorage.removeItem("discordUser");
       localStorage.removeItem("userData");
       localStorage.removeItem("access_token");
-      localStorage.removeItem("discordAccessToken"); // <- optional cleanup
+      localStorage.removeItem("discordAccessToken");
       updateNavbarUI();
       window.location.href = "/index.html";
     });
@@ -284,7 +272,6 @@ async function loadHeaderFooter() {
     }
   }
 
-  // Now header exists
   await handleOAuthCallback(); 
   updateNavbarUI();
   setupLogoutButton();
@@ -495,7 +482,7 @@ function renderSheets(data, config) {
 
     listView.appendChild(card);
   });
-}
+}    
 
 // ==============================
 // ====== Transitions & Top =====
