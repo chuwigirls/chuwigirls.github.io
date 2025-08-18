@@ -7,8 +7,7 @@
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help!
-*/
+    you can ask chuwigirls for help! */
 
 // ==============================
 // ===== Sheet Utilities ========
@@ -439,7 +438,67 @@ function loadRandomFeaturedNaraFromData(data) {
 }
 
 // ==============================
-// ===== Page Transitions & Back-to-Top ====
+// ===== Render Sheets ====
+// ==============================
+function renderSheets(data, config) {
+  const listView = document.getElementById(config.listId);
+  const detailView = document.getElementById(config.detailId);
+  if (!listView || !detailView) return;
+
+  // Filter out hidden rows
+  const visibleItems = data.filter(item =>
+    (item.Hide !== true && item.Hide !== "TRUE") &&
+    item[config.imageField] && item[config.nameField]
+  );
+
+  // Check for detail param (optional)
+  const urlParams = new URLSearchParams(window.location.search);
+  const selected = urlParams.get(config.queryParam || "id");
+
+  listView.innerHTML = "";
+  listView.classList.add("masterlist-grid");
+  listView.style.display = "grid";
+
+  visibleItems.forEach(item => {
+    const template = document.querySelector(config.cardTemplate);
+    if (!template) return;
+
+    const card = template.content.cloneNode(true);
+    const cardEl = card.querySelector(".masterlist-card");
+
+    // Populate card
+    cardEl.querySelector(".masterlist-card-img").src = item[config.imageField];
+    cardEl.querySelector(".masterlist-card-img").alt = item[config.nameField];
+    cardEl.querySelector(".masterlist-card-name").textContent = item[config.nameField];
+
+    // Click → show detail
+    cardEl.addEventListener("click", () => {
+      listView.style.display = "none";
+      const detailCard = document.querySelector(config.detailTemplate);
+      if (!detailCard) return;
+
+      const detailContent = detailCard.content.cloneNode(true);
+      detailContent.querySelector(".nara-detail-img").src = item[config.imageField];
+      detailContent.querySelector(".nara-detail-img").alt = item[config.nameField];
+      detailContent.querySelector(".nara-detail-name").textContent = item[config.nameField];
+
+      // Fill extra fields dynamically
+      config.extraFields.forEach(f => {
+        const span = detailContent.querySelector(`.${f.className}`);
+        if (span) span.textContent = item[f.field] || "—";
+      });
+
+      detailView.innerHTML = "";
+      detailView.appendChild(detailContent);
+      detailView.style.display = "block";
+    });
+
+    listView.appendChild(card);
+  });
+}
+
+// ==============================
+// ====== Transitions & Top =====
 // ==============================
 function setupPageTransitions() {
   const wrapper = document.querySelector(".wrapper");
@@ -492,7 +551,7 @@ function setupBackToTop() {
 }
 
 // ==============================
-// ===== Centralized Page Load ====
+// ====== Centralized Load =====
 // ==============================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -520,4 +579,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.addEventListener("load", () => {
   document.querySelector(".smoothLoad").classList.add("loaded");
 });
-
