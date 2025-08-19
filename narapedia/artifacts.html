@@ -46,8 +46,8 @@
 </head>
 <body>
     
-  <!-- Page load -->
-  <div class="smoothLoad"> 
+<!-- Page load -->
+<div class="smoothLoad"> 
 
     <!-- Header -->
     <div class="includes" id="header" data-source="../includes/header.html"></div>
@@ -61,37 +61,49 @@
       <h1>Artifacts</h1>
       </div>
 
-      <div id="artifact-view"></div>
-      <div id="artifact-detail-view" style="display:none;"></div>
+    <!-- Grid List -->
+    <div id="narapedia-view" class="narapedia-grid"></div>
 
-      <template id="artifact-card-template">
-        <div class="masterlist-card">
-          <img class="masterlist-card-img" src="" alt="">
-          <h4 class="masterlist-card-name"></h4>
-        </div>
-      </template>
-
-      <template id="artifact-detail-template">
-        <div class="artifact-detail-card">
-          <img class="nara-detail-img" src="" alt="">
-          <h2 class="nara-detail-name"></h2>
-          <p><strong>Type:</strong> <span class="artifact-detail-type"></span></p>
-          <p><strong>Price:</strong> <span class="artifact-detail-price"></span></p>
-          <p><strong>Rarity:</strong> <span class="artifact-detail-rarity"></span></p>
-          <p><strong>Found:</strong> <span class="artifact-detail-found"></span></p>
-          <p><strong>Description:</strong> <span class="artifact-detail-description"></span></p>
-        </div>
-      </template>
-
+      <!-- Detail View -->
+      <div id="artifact-detail-view" class="detail-view" style="display:none;"></div>
     </div>
 
     <!-- Footer -->
     <div class="includes" id="footer" data-source="../includes/footer.html"></div>
-     
-  </div>
+</div>
 
+  <!-- Templates -->
+  <template id="narapedia-card-template">
+    <div class="narapedia-card">
+      <img class="narapedia-card-img" src="" alt="">
+      <div class="narapedia-card-name"></div>
+    </div>
+  </template>
+
+  <template id="artifact-detail-template">
+    <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Artifacts</button>
+    <div class="detail-card">
+      <img class="detail-img" src="" alt="">
+      <h2 class="detail-name"></h2>
+      <div class="row">
+        <div class="col-sm-6">
+            <p><strong>Type:</strong> <span class="artifact-detail-type"></span></p>
+            <p><strong>Rarity:</strong> <span class="artifact-detail-rarity"></span></p>
+        </div>
+        <div class="col-sm-6">
+            <p><strong>Price:</strong> <span class="artifact-detail-price"></span></p>
+            <p><strong>Found:</strong> <span class="artifact-detail-found"></span></p>
+        </div>
+      </div>
+      
+      
+      
+      <p class="artifact-detail-description"></p>
+    </div>
+  </template>
+
+  <!-- Scripts -->
   <script src="../styles/config.js"></script>
   <script src="../styles/narasnature.js"></script>
-  <script src="../styles/smoothLoad.js"></script>
 </body>
 </html>
