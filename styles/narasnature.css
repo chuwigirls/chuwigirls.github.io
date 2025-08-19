@@ -48,6 +48,18 @@ body {
   background-attachment: fixed;
 }
 
+.loading-spinner {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--dark-blue);
+}
+
+.loading-spinner i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+}
+
 /* --------------------------- */
 /* ---- Overall Page Fade ---- */
 /* --------------------------- */
@@ -832,18 +844,23 @@ body.sidebar-fixed #openNav {
 }
 
 /* --------------------------- */
-/* ----------Masterlist------- */
+/* ----------Narapedia-------- */
 /* --------------------------- */
-.masterlist-grid {
+.narapedia-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
 }
 
-.masterlist-card {
+.narapedia-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   border: 1px solid var(--tanb);
   padding: 1rem;
   border-radius: 12px;
@@ -854,47 +871,53 @@ body.sidebar-fixed #openNav {
   margin: 0 auto;
   box-sizing: border-box;
 
-  /* masterlist-card-name */
+  /* card-name */
   margin-top: 0.5rem;
   font-family: var(--bubbly);
   color: var(--dark-blue);
 }
 
-.masterlist-card:hover {
+.narapedia-card:hover {
   background-color: var(--pinkb);
   color: var(--pink);
   transition-duration: 0.4s;
 }
 
-.masterlist-card-img {
+.narapedia-card-img {
   width: 100%;
   height: auto;
+  max-width: 500px;
   border-radius: 8px;
 }
 
-.nara-detail-card {
-  border: 1px solid var(--tanb);
+.detail-card {
+  width: 1200px;
   padding: 1rem;
-  border-radius: 10px;
   background: var(--tan);
+  border: 1px solid var(--tanb);
+  border-radius: 20px;
   text-align: center;
   font-family: var(--calm);
-  width: 1200px;
+  color: var(--dark-blue);
+}
+
+.detail-name {
+  font-family: var(--bubbly)
 }
 
 @media (max-width: 1280px) {
-  .nara-detail-card {
-    width: 900px;
+  .detail-card {
+    width: 850px;
   }
 }
 
-.nara-detail-img {
+.detail-img {
   width: 100%;
-  max-width: 400px;
+  max-width: 200px;
   border-radius: 8px;
 }
 
-.nara-detail-name {
+detail-name {
   margin-top: 1rem;
   font-family: var(--bubbly);
   color: var(--dark-blue);
@@ -902,25 +925,36 @@ body.sidebar-fixed #openNav {
 
 /* tablet */
 @media (max-width: 1024px) {
-  .masterlist-grid {
+  .narapedia-grid {
     grid-template-columns: repeat(4, 1fr); 
   }
 
-  .nara-detail-card {
+  .detail-card {
     width: 100%;
   }
 }
 
 /* mobile */
 @media (max-width: 600px) {
-  .masterlist-grid {
+  .narapedia-grid {
     grid-template-columns: repeat(2, 1fr); 
   }
 
-  .nara-detail-card {
+  .detail-card {
     width: 100%;
   }
 }
+
+/* --------------------------- */
+/* ----------Masterlist------- */
+/* --------------------------- */
+.masterlist-detail-img {
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  border-radius: 8px;
+}
+
 
 /* --------------------------- */
 /* ---- Smooth Loading ------- */
