@@ -8,7 +8,7 @@
     
     if you're looking at this page to learn about coding,
     you can ask chuwigirls for help! */
-
+    
 // ==========================
 // Google Sheets Config
 // ==========================
@@ -136,6 +136,48 @@ const EMBLEMS_CONFIG = {
     { field: "Rarity", className: "emblem-detail-rarity" },
     { field: "Found", className: "emblem-detail-found" },
     { field: "Description", className: "emblem-detail-description" }
+  ]
+};
+
+// ==========================
+// Staff Config
+// ==========================
+const STAFF_CONFIG = {
+  listId: "narapedia-view",
+  detailId: "staff-detail-view",
+  cardTemplate: "#narapedia-card-template",
+  detailTemplate: "#staff-detail-template",
+  imageField: "URL",
+  nameField: "Staff",
+  queryParam: "staff",
+  extraFields: [
+    { field: "Role", className: "staff-detail-role" },
+    { field: "Pronouns", className: "staff-detail-pronouns" },
+    { field: "Civilian Profile", className: "staff-detail-civilian" },
+    { field: "Duties", className: "staff-detail-duties" },
+    { field: "Custom Status", className: "staff-detail-status" },
+    { field: "Blurb", className: "staff-detail-blurb" }
+  ]
+};
+
+// ==========================
+// FAQ Config
+// ==========================
+const FAQ_CONFIG = {
+  listId: "narapedia-view",
+  detailId: "faq-detail-view",
+  cardTemplate: "#narapedia-card-template",
+  detailTemplate: "#faq-detail-template",
+  imageField: "URL",
+  nameField: "FAQ",
+  queryParam: "faq",
+  extraFields: [
+    { field: "Role", className: "faq-detail-role" },
+    { field: "Pronouns", className: "faq-detail-pronouns" },
+    { field: "Rarity", className: "faq-detail-rarity" },
+    { field: "Duties", className: "faq-detail-duties" },
+    { field: "Custom Status", className: "faq-detail-status" },
+    { field: "Blurb", className: "faq-detail-blurb" }
   ]
 };
 
