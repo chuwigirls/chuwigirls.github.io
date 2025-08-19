@@ -7,8 +7,7 @@
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! 
-*/
+    you can ask chuwigirls for help! */
 
 /* ==============================
    ===== Discord OAuth Config ===
@@ -589,7 +588,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG },
       trials: { sheet: "Trials", config: TRIALS_CONFIG },
       emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
-      civilians: { sheet: "Civilians", config: CIVILIANS_CONFIG }
+      civilians: { sheet: "Staff", config: STAFF_CONFIG },
+      civilians: { sheet: "FAQ", config: FAQ }
     };
 
     if (SHEET_CONFIGS[pageName]) {
