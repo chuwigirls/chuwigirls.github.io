@@ -589,7 +589,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       trials: { sheet: "Trials", config: TRIALS_CONFIG },
       emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
       civilians: { sheet: "Staff", config: STAFF_CONFIG },
-      civilians: { sheet: "FAQ", config: FAQ }
+      civilians: { sheet: "FAQ", config: FAQ_CONFIG }
     };
 
     if (SHEET_CONFIGS[pageName]) {
