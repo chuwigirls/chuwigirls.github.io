@@ -8,7 +8,7 @@
     
     if you're looking at this page to learn about coding,
     you can ask chuwigirls for help! */
-    
+
 // ==========================
 // Google Sheets Config
 // ==========================
