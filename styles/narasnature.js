@@ -1,51 +1,3 @@
-/* 
-        _..---.--.
-       .'\ __|/O.__)
-      /__.' _/ .-'_\
-     (____.'.-_\____)
-      (_/ _)__(_ \_)_
-    mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! */
-
-// ==============================
-// ===== Sheet Utilities ========
-// ==============================
-function loadGoogleSheetsAPI(callback) {
-  const script = document.createElement("script");
-  script.src = "https://www.gstatic.com/charts/loader.js";
-  script.onload = () => {
-    google.charts.load("current", { packages: ["corechart", "table"] });
-    google.charts.setOnLoadCallback(callback);
-  };
-  document.head.appendChild(script);
-}
-
-function fetchSheetData(spreadsheetId, sheetName, onSuccess) {
-  const query = encodeURIComponent(`SELECT *`);
-  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?sheet=${sheetName}&tq=${query}`;
-
-  fetch(url)
-    .then(res => res.text())
-    .then(raw => {
-      const json = JSON.parse(raw.substring(47).slice(0, -2));
-      const headers = json.table.cols.map(col => col.label);
-      const rows = json.table.rows.map(row =>
-        row.c.map(cell => (cell ? cell.v : ""))
-      );
-      const data = rows.map(row => {
-        const obj = {};
-        headers.forEach((header, i) => {
-          obj[header] = row[i];
-        });
-        return obj;
-      });
-      onSuccess(data);
-    })
-    .catch(err => console.error("Sheet fetch error:", err));
-}
-
 // ==============================
 // ===== Discord OAuth Config ====
 // ==============================
@@ -62,7 +14,7 @@ function getDiscordOAuthURL() {
 // ===== Navbar =========
 // ==============================
 function updateNavbarUI(userDataParam) {
-  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser"));
+  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
@@ -133,7 +85,7 @@ async function handleOAuthCallback() {
       fetch(`${GAS_ENDPOINT}?id=${userData.id}&username=${encodeURIComponent(userData.username)}`)
         .then(res => res.json())
         .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
-        .catch(() => {}); // ignore GAS errors here
+        .catch(() => {}); // ignore GAS errors
     }
 
     if (!window.location.pathname.endsWith("/user.html")) {
@@ -254,235 +206,210 @@ function initNavbarToggler() {
 window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
-// ==============================
-// ===== Load Includes & Initialize Page ====
-// ==============================
-async function loadHeaderFooter() {
+// ==========================
+// Load Header & Footer
+// ==========================
+function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
+  let loadCount = 0;
 
-  for (const el of includes) {
-    const source = el.getAttribute("data-source");
-    if (!source) continue;
-    try {
-      const res = await fetch(source);
-      const html = await res.text();
-      el.innerHTML = html;
-    } catch (err) {
-      console.error("Failed to load include:", source, err);
-    }
-  }
-
-  await handleOAuthCallback(); 
-  updateNavbarUI();
-  setupLogoutButton();
-
-  initDropdowns();
-  initNavbarToggler();
-  initSidebar();
-  updateHeaderHeightCSSVar();
-
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) loginBtn.addEventListener("click", () => {
-    window.location.href = getDiscordOAuthURL();
-  });
-
-  setupPageTransitions();
-  setupBackToTop();
-}
-
-  loadGoogleSheetsAPI(() => {
-  fetchSheetData(
-    "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms",
-    "Masterlist",
-    data => {
-      Masterlist(data);
-      loadRandomFeaturedNaraFromData(data);
-    }
-  );
-});
-
-// ==============================
-// ===== Masterlist & Sidebar ====
-// ==============================
-function Masterlist(data) {
-  const masterlistView = document.getElementById("masterlist-view");
-  const detailView = document.getElementById("nara-detail-view");
-  if (!masterlistView || !detailView) return;
-
-  const visibleNaras = data.filter(nara =>
-    (nara.Hide !== true && nara.Hide !== "TRUE") &&
-    nara["URL"] && nara["Nara"]
-  );
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const selectedDesign = urlParams.get("design");
-
-  masterlistView.innerHTML = "";
-  masterlistView.classList.add("masterlist-grid");
-  masterlistView.style.display = "grid";
-
-  visibleNaras.forEach(nara => {
-    const template = document.querySelector("#masterlist-card-template");
-    if (!template) return;
-
-    const card = template.content.cloneNode(true);
-    const cardEl = card.querySelector(".masterlist-card");
-
-    cardEl.querySelector(".masterlist-card-img").src = nara["URL"];
-    cardEl.querySelector(".masterlist-card-img").alt = nara.Nara;
-    cardEl.querySelector(".masterlist-card-name").textContent = nara.Nara;
-
-    cardEl.addEventListener("click", () => {
-      masterlistView.style.display = "none";
-      const detailCard = document.querySelector("#nara-detail-template");
-      if (!detailCard) return;
-
-      const detailContent = detailCard.content.cloneNode(true);
-      detailContent.querySelector(".nara-detail-img").src = nara["URL"];
-      detailContent.querySelector(".nara-detail-img").alt = nara.Nara;
-      detailContent.querySelector(".nara-detail-name").textContent = nara.Nara;
-      detailContent.querySelector(".nara-detail-owner").textContent = nara.Owner || "—";
-      detailContent.querySelector(".nara-detail-region").textContent = nara.Region || "—";
-      detailContent.querySelector(".nara-detail-designer").textContent = nara.Designer || "—";
-      detailContent.querySelector(".nara-detail-status").textContent = nara.Status || "—";
-      detailContent.querySelector(".nara-detail-rarity").textContent = nara.Rarity || "—";
-
-      detailView.innerHTML = "";
-      detailView.appendChild(detailContent);
-      detailView.style.display = "block";
+  return new Promise((resolve, reject) => {
+    if (!includes.length) resolve();
+    includes.forEach(el => {
+      const source = el.getAttribute("data-source");
+      if (source) {
+        fetch(source)
+          .then(res => res.text())
+          .then(data => {
+            el.innerHTML = data;
+            loadCount++;
+            if (loadCount === includes.length) resolve();
+          })
+          .catch(err => {
+            console.error("Error loading include:", err);
+            loadCount++;
+            if (loadCount === includes.length) resolve();
+          });
+      } else {
+        loadCount++;
+        if (loadCount === includes.length) resolve();
+      }
     });
-
-    masterlistView.appendChild(card);
-  });
-
-  if (selectedDesign) {
-    const matchingNara = visibleNaras.find(n => n.Nara === selectedDesign);
-    if (matchingNara) {
-      masterlistView.style.display = "none";
-      const detailCard = document.querySelector("#nara-detail-template");
-      if (!detailCard) return;
-
-      const detailContent = detailCard.content.cloneNode(true);
-      detailContent.querySelector(".nara-detail-img").src = matchingNara["URL"];
-      detailContent.querySelector(".nara-detail-img").alt = matchingNara.Nara;
-      detailContent.querySelector(".nara-detail-name").textContent = matchingNara.Nara;
-      detailContent.querySelector(".nara-detail-owner").textContent = matchingNara.Owner || "—";
-      detailContent.querySelector(".nara-detail-region").textContent = matchingNara.Region || "—";
-      detailContent.querySelector(".nara-detail-designer").textContent = matchingNara.Designer || "—";
-      detailContent.querySelector(".nara-detail-status").textContent = matchingNara.Status || "—";
-      detailContent.querySelector(".nara-detail-rarity").textContent = matchingNara.Rarity || "—";
-
-      detailView.innerHTML = "";
-      detailView.appendChild(detailContent);
-      detailView.style.display = "block";
-    }
-  }
-
-  detailView.addEventListener("click", (e) => {
-    if (e.target && (e.target.id === "backML" || e.target.closest("#backML"))) {
-      detailView.style.display = "none";
-      masterlistView.style.display = "grid";
-    }
   });
 }
 
-function loadRandomFeaturedNaraFromData(data) {
-  const visible = data.filter(nara =>
-    (nara.Hide !== true && nara.Hide !== "TRUE") &&
-    typeof nara.URL === "string" &&
-    nara.URL.trim() !== ""
-  );
-
-  if (visible.length === 0) return;
-
-  const randomNara = visible[Math.floor(Math.random() * visible.length)];
-
-  const container = document.createElement("div");
-  container.className = "random-nara-preview";
-
-  const link = document.createElement("a");
-  link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(randomNara.Nara || "")}`;
-  link.style.textDecoration = "none";
-
-  const img = document.createElement("img");
-  img.src = randomNara.URL;
-  img.alt = randomNara.Nara || "Featured Nara";
-  img.className = "random-nara-img";
-
-  const name = document.createElement("div");
-  name.textContent = randomNara.Nara || "Unnamed Nara";
-  name.className = "random-nara-name";
-
-  link.appendChild(img);
-  link.appendChild(name);
-  container.appendChild(link);
-
-  const sidebar = document.getElementById("featured-nara-sidebar");
-  if (sidebar) {
-    sidebar.innerHTML = "";
-    sidebar.appendChild(container);
-  }
+// ==========================
+// Fetch Google Sheets Data
+// ==========================
+async function fetchSheetData(sheetName) {
+  const url = `${SHEET_BASE_URL}/${sheetName}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Error fetching sheet: ${sheetName}`);
+  return await response.json();
 }
 
-// ==============================
-// ===== Render Sheets ====
-// ==============================
+// ==========================
+// Universal Renderer
+// ==========================
 function renderSheets(data, config) {
-  const listView = document.getElementById(config.listId);
-  const detailView = document.getElementById(config.detailId);
-  if (!listView || !detailView) return;
+  const listEl = document.getElementById(config.listId);
+  const detailEl = document.getElementById(config.detailId);
+  const pageEl = document.querySelector(".page");
+  const cardTemplate = document.querySelector(config.cardTemplate);
+  const detailTemplate = document.querySelector(config.detailTemplate);
 
-  // Filter out hidden rows
-  const visibleItems = data.filter(item =>
-    (item.Hide !== true && item.Hide !== "TRUE") &&
-    item[config.imageField] && item[config.nameField]
-  );
+  if (!listEl || !detailEl || !cardTemplate || !detailTemplate) {
+    console.error("Missing required DOM elements for rendering:", config);
+    return;
+  }
 
-  // Check for detail param (optional)
-  const urlParams = new URLSearchParams(window.location.search);
-  const selected = urlParams.get(config.queryParam || "id");
+  // Store default display type for page wrapper
+  const pageDefaultDisplay = pageEl ? getComputedStyle(pageEl).display : "block";
 
-  listView.innerHTML = "";
-  listView.classList.add("masterlist-grid");
-  listView.style.display = "grid";
+  // Clear any previous content
+  listEl.innerHTML = "";
+  detailEl.innerHTML = "";
 
-  visibleItems.forEach(item => {
-    const template = document.querySelector(config.cardTemplate);
-    if (!template) return;
+  // --- Render Cards ---
+  data.forEach(row => {
+    if (row.Hide && row.Hide.toLowerCase() === "true") return;
 
-    const card = template.content.cloneNode(true);
-    const cardEl = card.querySelector(".masterlist-card");
+    const hasName = row[config.nameField] && row[config.nameField].trim() !== "";
+    const hasImage = row[config.imageField] && row[config.imageField].trim() !== "";
+    if (!hasName && !hasImage) return;
 
-    // Populate card
-    cardEl.querySelector(".masterlist-card-img").src = item[config.imageField];
-    cardEl.querySelector(".masterlist-card-img").alt = item[config.nameField];
-    cardEl.querySelector(".masterlist-card-name").textContent = item[config.nameField];
+    const card = cardTemplate.content.cloneNode(true);
+    const imgEl = card.querySelector("img");
+    const nameEl = card.querySelector(".narapedia-card-name");
 
-    // Click → show detail
-    cardEl.addEventListener("click", () => {
-      listView.style.display = "none";
-      const detailCard = document.querySelector(config.detailTemplate);
-      if (!detailCard) return;
+    if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
+    if (nameEl) nameEl.textContent = hasName ? row[config.nameField] : "Unnamed";
 
-      const detailContent = detailCard.content.cloneNode(true);
-      detailContent.querySelector(".nara-detail-img").src = item[config.imageField];
-      detailContent.querySelector(".nara-detail-img").alt = item[config.nameField];
-      detailContent.querySelector(".nara-detail-name").textContent = item[config.nameField];
-
-      // Fill extra fields dynamically
-      config.extraFields.forEach(f => {
-        const span = detailContent.querySelector(`.${f.className}`);
-        if (span) span.textContent = item[f.field] || "—";
-      });
-
-      detailView.innerHTML = "";
-      detailView.appendChild(detailContent);
-      detailView.style.display = "block";
+    card.querySelector(".narapedia-card").addEventListener("click", () => {
+      renderDetail(row, config);
+      history.pushState({ view: "detail", name: row[config.nameField] }, "", `?${config.queryParam}=${encodeURIComponent(row[config.nameField])}`);
     });
 
-    listView.appendChild(card);
+    listEl.appendChild(card);
   });
-}    
+
+  // --- Handle URL param for detail view ---
+  const params = new URLSearchParams(window.location.search);
+  const target = params.get(config.queryParam);
+  if (target) {
+    const match = data.find(row => row[config.nameField] === target);
+    if (match) renderDetail(match, config);
+  }
+
+  // --- Render Detail Function ---
+  function renderDetail(row, config) {
+    hideSpinner(config.listId);
+
+    listEl.style.display = "none";
+    detailEl.style.display = "block";
+    if (pageEl) pageEl.style.display = "none"; // hide header section
+    detailEl.innerHTML = "";
+
+    window.scrollTo(0, 0);
+
+    const detail = detailTemplate.content.cloneNode(true);
+    const imgEl = detail.querySelector("img");
+    const nameEl = detail.querySelector("h2");
+
+    if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
+    if (nameEl) nameEl.textContent = row[config.nameField] || "Unnamed";
+
+    if (config.extraFields) {
+      config.extraFields.forEach(fieldConf => {
+        const el = detail.querySelector(`.${fieldConf.className}`);
+        if (el) el.textContent = row[fieldConf.field] || "";
+      });
+    }
+
+    const backBtn = detail.querySelector(".back-btn");
+    if (backBtn) {
+      backBtn.addEventListener("click", () => {
+        showGrid();
+        history.pushState({ view: "grid" }, "", window.location.pathname);
+      });
+    }
+
+    detailEl.appendChild(detail);
+  }
+
+  // --- Show Grid Function ---
+  function showGrid() {
+    detailEl.style.display = "none";
+    listEl.style.display = "grid";
+    if (pageEl) pageEl.style.display = pageDefaultDisplay; // restore header
+  }
+
+  // --- Handle Browser Back/Forward ---
+  window.addEventListener("popstate", event => {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get(config.queryParam);
+
+    if (target) {
+      const match = data.find(row => row[config.nameField] === target);
+      if (match) {
+        renderDetail(match, config);
+      }
+    } else {
+      showGrid();
+    }
+  });
+}
+
+// ==============================
+// Universal Init Function
+// ==============================
+async function initSheet(sheetName, config) {
+  try {
+    showSpinner(config.listId, `Loading ${sheetName}...`);
+    const data = await fetchSheetData(sheetName);
+    renderSheets(data, config);
+  } catch (err) {
+    console.error(`Error loading ${sheetName}:`, err);
+    const container = document.getElementById(config.listId);
+    if (container) {
+      container.insertAdjacentHTML("beforebegin", `<div class="loading-spinner">⚠️ Failed to load ${sheetName}.</div>`);
+    }
+  } finally {
+    hideSpinner(config.listId);
+  }
+}
+
+// ==============================
+// Universal Spinner Helpers
+// ==============================
+function showSpinner(containerId, message = "Loading...") {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Hide container while loading
+  container.style.display = "none";
+
+  // Reuse spinner if it exists
+  let spinner = container.previousElementSibling;
+  if (!spinner || !spinner.classList.contains("loading-spinner")) {
+    spinner = document.createElement("div");
+    spinner.className = "loading-spinner";
+    spinner.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${message}`;
+    container.insertAdjacentElement("beforebegin", spinner);
+  }
+  spinner.style.display = "block";
+}
+
+function hideSpinner(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const spinner = container.previousElementSibling;
+  if (spinner && spinner.classList.contains("loading-spinner")) {
+    spinner.style.display = "none";
+  }
+  container.style.display = "grid"; // or "block" for detail views
+}
 
 // ==============================
 // ====== Transitions & Top =====
@@ -523,11 +450,6 @@ function setupBackToTop() {
   const button = document.getElementById("top");
   if (!button) return;
 
-  window.onscroll = scrollFunction;
-  window.topFunction = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
       button.style.display = "block";
@@ -535,6 +457,12 @@ function setupBackToTop() {
       button.style.display = "none";
     }
   }
+
+  window.addEventListener("scroll", scrollFunction);
+
+  button.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 }
 
 // ==============================
@@ -556,7 +484,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const mainContent = document.querySelector("#smooth-load, .wrapper");
+    const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
   } catch (err) {
     console.error("Error during page initialization:", err);
@@ -564,5 +492,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 window.addEventListener("load", () => {
-  document.querySelector(".smoothLoad").classList.add("loaded");
+  const smooth = document.querySelector(".smoothLoad");
+  if (smooth) smooth.classList.add("loaded");
 });
