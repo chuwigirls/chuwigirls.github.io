@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+<!--
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+    
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
+-->
+
+    <!-- Meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent AI scraping -->
+    <meta name="robots" content="noai">
+    <meta name="robots" content="noimageai">
+    <meta property="og:title" content="Naras Nature" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://narasnature.netlify.app" />
+    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
+    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+
+    <!-- Your site -->
+    <title>FAQ | Naras Nature</title>
+    <link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+     <!-- Fontawesome v6 icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles/narasnature.css" />
+    
+</head>
+<body>
+    
+<!-- Page load -->
+<div class="smoothLoad"> 
+
+    <!-- Header -->
+    <div class="includes" id="header" data-source="../includes/header.html"></div>
+
+    <!-- Sidebar -->
+    <div class="includes" id="sidebar" data-source="../includes/sidebar.html"></div>
+
+    <!-- Content -->
+    <div class="wrapper">
+      <div class="page">
+      <h1>Frequently Asked Questions</h1>
+      </div>
+
+    <!-- Grid List -->
+    <div id="narapedia-view" class="narapedia-grid"></div>
+
+      <!-- Detail View -->
+      <div id="faq-detail-view" class="detail-view" style="display:none;"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="includes" id="footer" data-source="../includes/footer.html"></div>
+</div>
+
+  <!-- Templates -->
+  <template id="narapedia-card-template">
+    <div class="narapedia-card">
+      <img class="narapedia-card-img" src="" alt="">
+      <div class="narapedia-card-name"></div>
+    </div>
+  </template>
+
+  <template id="faq-detail-template">
+    <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to faq</button>
+    <div class="detail-card">
+      <img class="faq-detail-img" src="" alt="">
+      <h2 class="detail-name"></h2>
+      <div class="row">
+        <div class="col-sm-6">
+            <p><strong>Owner:</strong> <span class="faq-detail-owner"></span></p>
+            <p><strong>Designer:</strong> <span class="faq-detail-designer"></span></p>
+            <p><strong>Artist:</strong> <span class="faq-detail-artist"></span></p>
+        </div>
+        <div class="col-sm-6">
+            <p><strong>Status:</strong> <span class="faq-detail-status"></span></p>
+            <p><strong>Value:</strong> <span class="faq-detail-value"></span></p>
+        </div>
+      </div>
+      
+      <p><strong>Region:</strong> <span class="faq-detail-region"></span></p>
+      <p><strong>Calling:</strong> <span class="faq-detail-calling"></span></p>
+      <p><strong>Build:</strong> <span class="faq-detail-build"></span></p>
+      
+      <p class="faq-detail-description"></p>
+    </div>
+  </template>
+
+  <!-- Scripts -->
+  <script src="../styles/config.js"></script>
+  <script src="../styles/narasnature.js"></script>
+</body>
+</html>
