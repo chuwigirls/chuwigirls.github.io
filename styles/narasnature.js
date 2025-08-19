@@ -572,6 +572,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
+
+    // ================================
+    // ✅ Universal Sheet Loader
+    // ================================
+    if (document.querySelector("#narapedia-view")) {
+      const data = await fetchSheetData("Masterlist");
+      renderSheets(data, MASTERLIST_CONFIG);
+    }
+
+    if (document.querySelector("#artifacts-view")) {
+      const data = await fetchSheetData("Artifacts");
+      renderSheets(data, ARTIFACTS_CONFIG);
+    }
+
+    if (document.querySelector("#features-view")) {
+      const data = await fetchSheetData("Features");
+      renderSheets(data, FEATURES_CONFIG);
+    }
+
+    if (document.querySelector("#palcharms-view")) {
+      const data = await fetchSheetData("Palcharms");
+      renderSheets(data, PALCHARMS_CONFIG);
+    }
+
+    if (document.querySelector("#trials-view")) {
+      const data = await fetchSheetData("trials");
+      renderSheets(data, TRIALS_CONFIG);
+    }
+
+    if (document.querySelector("#emblems-view")) {
+      const data = await fetchSheetData("Emblems");
+      renderSheets(data, EMBLEMS_CONFIG);
+    }
+          
   } catch (err) {
     console.error("Error during page initialization:", err);
   }
@@ -581,3 +615,4 @@ window.addEventListener("load", () => {
   const smooth = document.querySelector(".smoothLoad");
   if (smooth) smooth.classList.add("loaded");
 });
+
