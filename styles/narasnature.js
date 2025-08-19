@@ -584,10 +584,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // map page names → configs
     const SHEET_CONFIGS = {
       masterlist: { sheet: "Masterlist", config: MASTERLIST_CONFIG },
+      features: { sheet: "Features", config: FEATURES_CONFIG },
       artifacts: { sheet: "Artifacts", config: ARTIFACTS_CONFIG },
-      // 🔮 you can just add more like:
-      // civilians: { sheet: "Civilians", config: CIVILIANS_CONFIG },
-      // palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG }
+      palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG },
+      trials: { sheet: "Trials", config: TRIALS_CONFIG },
+      emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
+      civilians: { sheet: "Civilians", config: CIVILIANS_CONFIG }
     };
 
     if (SHEET_CONFIGS[pageName]) {
