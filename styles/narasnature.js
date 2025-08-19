@@ -536,7 +536,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    // Auth routing
+    // ================================
+    // ✅ Auth routing
+    // ================================
     const path = window.location.pathname;
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
@@ -570,42 +572,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupPageTransitions();
     setupBackToTop();
 
+    // Fade-in animation
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
 
     // ================================
     // ✅ Universal Sheet Loader
     // ================================
-    if (document.querySelector("#narapedia-view")) {
-      const data = await fetchSheetData("Masterlist");
-      renderSheets(data, MASTERLIST_CONFIG);
+    const pageName = path.split("/").pop().replace(".html", "");
+
+    // map page names → configs
+    const SHEET_CONFIGS = {
+      masterlist: { sheet: "Masterlist", config: MASTERLIST_CONFIG },
+      artifacts: { sheet: "Artifacts", config: ARTIFACTS_CONFIG },
+      // 🔮 you can just add more like:
+      // civilians: { sheet: "Civilians", config: CIVILIANS_CONFIG },
+      // palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG }
+    };
+
+    if (SHEET_CONFIGS[pageName]) {
+      const { sheet, config } = SHEET_CONFIGS[pageName];
+      const data = await fetchSheetData(sheet);
+      renderSheets(data, config);
     }
 
-    if (document.querySelector("#artifacts-view")) {
-      const data = await fetchSheetData("Artifacts");
-      renderSheets(data, ARTIFACTS_CONFIG);
-    }
-
-    if (document.querySelector("#features-view")) {
-      const data = await fetchSheetData("Features");
-      renderSheets(data, FEATURES_CONFIG);
-    }
-
-    if (document.querySelector("#palcharms-view")) {
-      const data = await fetchSheetData("Palcharms");
-      renderSheets(data, PALCHARMS_CONFIG);
-    }
-
-    if (document.querySelector("#trials-view")) {
-      const data = await fetchSheetData("trials");
-      renderSheets(data, TRIALS_CONFIG);
-    }
-
-    if (document.querySelector("#emblems-view")) {
-      const data = await fetchSheetData("Emblems");
-      renderSheets(data, EMBLEMS_CONFIG);
-    }
-          
   } catch (err) {
     console.error("Error during page initialization:", err);
   }
@@ -615,4 +605,3 @@ window.addEventListener("load", () => {
   const smooth = document.querySelector(".smoothLoad");
   if (smooth) smooth.classList.add("loaded");
 });
-
