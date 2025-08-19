@@ -9,8 +9,8 @@
      (____.'.-_\____)
       (_/ _)__(_ \_)\_
     mrf(_..)--(.._)'--'
-        
-    if you're looking at this page to learn about coding,
+    
+    hif you're looking at this page to learn about coding,
     you can ask chuwigirls for help!
 -->
 
@@ -27,7 +27,7 @@
     <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
 
     <!-- Your site -->
-    <title>Naras Nature - Features</title>
+    <title>Naras Nature</title>
     <link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
 
     <!-- Google Fonts -->
@@ -45,9 +45,9 @@
     
 </head>
 <body>
-  
-  <!-- Page load -->
-  <div class="smoothLoad"> 
+    
+<!-- Page load -->
+<div class="smoothLoad"> 
 
     <!-- Header -->
     <div class="includes" id="header" data-source="../includes/header.html"></div>
@@ -58,16 +58,54 @@
     <!-- Content -->
     <div class="wrapper">
       <div class="page">
-        <h1>Features</h1>
-        <p>The FitnessGram™ Pacer Test is a multistage aerobic capacity test that progressively gets more difficult as it continues. The 20 meter pacer test will begin in 30 seconds. Line up at the start. The running speed starts slowly, but gets faster each minute after you hear this signal. [beep] A single lap should be completed each time you hear this sound. [ding] Remember to run in a straight line, and run as long as possible. The second time you fail to complete a lap before the sound, your test is over. The test will begin on the word start. On your mark, get ready, start.</p>
+      <h1>Features</h1>
       </div>
+
+    <!-- Grid List -->
+    <div id="narapedia-view" class="narapedia-grid"></div>
+
+      <!-- Detail View -->
+      <div id="feature-detail-view" class="detail-view" style="display:none;"></div>
     </div>
 
     <!-- Footer -->
     <div class="includes" id="footer" data-source="../includes/footer.html"></div>
+</div>
 
-  </div>
+  <!-- Templates -->
+  <template id="narapedia-card-template">
+    <div class="narapedia-card">
+      <img class="narapedia-card-img" src="" alt="">
+      <div class="narapedia-card-name"></div>
+    </div>
+  </template>
 
+  <template id="feature-detail-template">
+    <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Features</button>
+    <div class="detail-card">
+      <img class="detail-img" src="" alt="">
+      <h2 class="detail-name"></h2>
+      <div class="row">
+        <div class="col-sm-6">
+            <p><strong>Owner:</strong> <span class="feature-detail-owner"></span></p>
+            <p><strong>Designer:</strong> <span class="feature-detail-designer"></span></p>
+            <p><strong>Artist:</strong> <span class="feature-detail-artist"></span></p>
+        </div>
+        <div class="col-sm-6">
+            <p><strong>Status:</strong> <span class="feature-detail-status"></span></p>
+            <p><strong>Value:</strong> <span class="feature-detail-value"></span></p>
+        </div>
+      </div>
+      
+      <p><strong>Region:</strong> <span class="feature-detail-region"></span></p>
+      <p><strong>Calling:</strong> <span class="feature-detail-calling"></span></p>
+      <p><strong>Build:</strong> <span class="feature-detail-build"></span></p>
+      
+      <p class="feature-detail-description"></p>
+    </div>
+  </template>
+
+  <!-- Scripts -->
   <script src="../styles/config.js"></script>
   <script src="../styles/narasnature.js"></script>
 </body>
