@@ -1,3 +1,14 @@
+/*
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+    
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help! */
+
 // ==============================
 // ===== Discord OAuth Config ====
 // ==============================
