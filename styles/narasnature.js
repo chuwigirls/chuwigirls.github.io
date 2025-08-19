@@ -1,17 +1,18 @@
-/*
+/* 
         _..---.--.
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
       (_/ _)__(_ \_)\_
     mrf(_..)--(.._)'--'
-    
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! */
 
-// ==============================
-// ===== Discord OAuth Config ====
-// ==============================
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help! 
+*/
+
+/* ==============================
+   ===== Discord OAuth Config ===
+   ============================== */
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
@@ -21,9 +22,9 @@ function getDiscordOAuthURL() {
   return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
 }
 
-// ==============================
-// ===== Navbar =========
-// ==============================
+/* ==============================
+   ===== Navbar =================
+   ============================== */
 function updateNavbarUI(userDataParam) {
   const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
@@ -42,9 +43,9 @@ function updateNavbarUI(userDataParam) {
   }
 }
 
-// ==============================
-// ===== Header Auth Spinner ====
-// ==============================
+/* ==============================
+   ===== Header Auth Spinner ====
+   ============================== */
 function showHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
@@ -71,9 +72,9 @@ function hideHeaderAuthSpinner() {
   }
 }
 
-// ==============================
-// ===== OAuth =========
-// ==============================
+/* ==============================
+   ===== OAuth ==================
+   ============================== */
 async function handleOAuthCallback() {
   const params = new URLSearchParams(window.location.hash.substring(1));
   const accessToken = params.get("access_token");
@@ -129,9 +130,9 @@ function setupLogoutButton() {
   }
 }
 
-// ==============================
-// ===== Sidebar, Header ========
-// ==============================
+/* ==============================
+   ===== Sidebar, Header ========
+   ============================== */
 function updateHeaderHeightCSSVar() {
   const header = document.getElementById('siteHeader');
   if (header) {
@@ -217,15 +218,15 @@ function initNavbarToggler() {
 window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
-// ==========================
-// Load Header & Footer
-// ==========================
+/* ==========================
+   Load Header & Footer
+   ========================== */
 function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
   let loadCount = 0;
 
-  return new Promise((resolve, reject) => {
-    if (!includes.length) resolve();
+  return new Promise((resolve) => {
+    if (!includes.length) return resolve();
     includes.forEach(el => {
       const source = el.getAttribute("data-source");
       if (source) {
@@ -249,19 +250,22 @@ function loadHeaderFooter() {
   });
 }
 
-// ==========================
-// Fetch Google Sheets Data
-// ==========================
+/* ==========================
+   Fetch Sheets (New System)
+   ========================== */
 async function fetchSheetData(sheetName) {
-  const url = `${SHEET_BASE_URL}/${sheetName}`;
-  const response = await fetch(url);
+  if (!SHEET_BASE_URL) {
+    throw new Error("SHEET_BASE_URL is not defined. Set it at the top of this file or on window.SHEET_BASE_URL.");
+  }
+  const url = `${SHEET_BASE_URL}/${encodeURIComponent(sheetName)}`;
+  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Error fetching sheet: ${sheetName}`);
   return await response.json();
 }
 
-// ==========================
-// Universal Renderer
-// ==========================
+/* ==========================
+   Universal Renderer
+   ========================== */
 function renderSheets(data, config) {
   const listEl = document.getElementById(config.listId);
   const detailEl = document.getElementById(config.detailId);
@@ -274,19 +278,18 @@ function renderSheets(data, config) {
     return;
   }
 
-  // Store default display type for page wrapper
   const pageDefaultDisplay = pageEl ? getComputedStyle(pageEl).display : "block";
 
-  // Clear any previous content
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
-  // --- Render Cards ---
+  // Render Cards
   data.forEach(row => {
-    if (row.Hide && row.Hide.toLowerCase() === "true") return;
+    const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
+    if (isHidden) return;
 
-    const hasName = row[config.nameField] && row[config.nameField].trim() !== "";
-    const hasImage = row[config.imageField] && row[config.imageField].trim() !== "";
+    const hasName = row[config.nameField] && String(row[config.nameField]).trim() !== "";
+    const hasImage = row[config.imageField] && String(row[config.imageField]).trim() !== "";
     if (!hasName && !hasImage) return;
 
     const card = cardTemplate.content.cloneNode(true);
@@ -296,29 +299,32 @@ function renderSheets(data, config) {
     if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
     if (nameEl) nameEl.textContent = hasName ? row[config.nameField] : "Unnamed";
 
-    card.querySelector(".narapedia-card").addEventListener("click", () => {
-      renderDetail(row, config);
-      history.pushState({ view: "detail", name: row[config.nameField] }, "", `?${config.queryParam}=${encodeURIComponent(row[config.nameField])}`);
-    });
+    const clickable = card.querySelector(".narapedia-card") || card.firstElementChild;
+    if (clickable) {
+      clickable.addEventListener("click", () => {
+        renderDetail(row, config);
+        const qp = config.queryParam || "id";
+        history.pushState({ view: "detail", name: row[config.nameField] }, "", `?${qp}=${encodeURIComponent(row[config.nameField] || "")}`);
+      });
+    }
 
     listEl.appendChild(card);
   });
 
-  // --- Handle URL param for detail view ---
+  // URL param → open detail
   const params = new URLSearchParams(window.location.search);
-  const target = params.get(config.queryParam);
+  const target = params.get(config.queryParam || "id");
   if (target) {
-    const match = data.find(row => row[config.nameField] === target);
+    const match = data.find(row => String(row[config.nameField]) === target);
     if (match) renderDetail(match, config);
   }
 
-  // --- Render Detail Function ---
   function renderDetail(row, config) {
     hideSpinner(config.listId);
 
     listEl.style.display = "none";
     detailEl.style.display = "block";
-    if (pageEl) pageEl.style.display = "none"; // hide header section
+    if (pageEl) pageEl.style.display = "none";
     detailEl.innerHTML = "";
 
     window.scrollTo(0, 0);
@@ -337,7 +343,7 @@ function renderSheets(data, config) {
       });
     }
 
-    const backBtn = detail.querySelector(".back-btn");
+    const backBtn = detail.querySelector(".back-btn") || detail.querySelector("button");
     if (backBtn) {
       backBtn.addEventListener("click", () => {
         showGrid();
@@ -348,20 +354,17 @@ function renderSheets(data, config) {
     detailEl.appendChild(detail);
   }
 
-  // --- Show Grid Function ---
   function showGrid() {
     detailEl.style.display = "none";
     listEl.style.display = "grid";
-    if (pageEl) pageEl.style.display = pageDefaultDisplay; // restore header
+    if (pageEl) pageEl.style.display = pageDefaultDisplay;
   }
 
-  // --- Handle Browser Back/Forward ---
-  window.addEventListener("popstate", event => {
+  window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);
-    const target = params.get(config.queryParam);
-
+    const target = params.get(config.queryParam || "id");
     if (target) {
-      const match = data.find(row => row[config.nameField] === target);
+      const match = data.find(row => String(row[config.nameField]) === target);
       if (match) {
         renderDetail(match, config);
       }
@@ -371,9 +374,9 @@ function renderSheets(data, config) {
   });
 }
 
-// ==============================
-// Universal Init Function
-// ==============================
+/* ==============================
+   Universal Init Function
+   ============================== */
 async function initSheet(sheetName, config) {
   try {
     showSpinner(config.listId, `Loading ${sheetName}...`);
@@ -390,17 +393,15 @@ async function initSheet(sheetName, config) {
   }
 }
 
-// ==============================
-// Universal Spinner Helpers
-// ==============================
+/* ==============================
+   Universal Spinner Helpers
+   ============================== */
 function showSpinner(containerId, message = "Loading...") {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // Hide container while loading
   container.style.display = "none";
 
-  // Reuse spinner if it exists
   let spinner = container.previousElementSibling;
   if (!spinner || !spinner.classList.contains("loading-spinner")) {
     spinner = document.createElement("div");
@@ -419,12 +420,64 @@ function hideSpinner(containerId) {
   if (spinner && spinner.classList.contains("loading-spinner")) {
     spinner.style.display = "none";
   }
-  container.style.display = "grid"; // or "block" for detail views
+  container.style.display = "grid"; // Use CSS to override per-container if needed
 }
 
-// ==============================
-// ====== Transitions & Top =====
-// ==============================
+/* ==============================
+   Featured Nara (Monthly Seeded)
+   ============================== */
+/**
+ * Deterministically pick one visible Nara per month from Masterlist.
+ * Uses UTC year-month to avoid TZ edge cases.
+ */
+function getMonthlySeededNara(data) {
+  const now = new Date();
+  const seed = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const visible = data.filter(row => {
+    const hidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
+    const hasImg = typeof row["Image URL"] === "string" && row["Image URL"].trim() !== "";
+    const hasName = typeof row["Nara"] === "string" && row["Nara"].trim() !== "";
+    return !hidden && hasImg && hasName;
+  });
+
+  if (!visible.length) return null;
+  const index = Math.abs(hash) % visible.length;
+  return visible[index];
+}
+
+async function loadFeaturedNaraSidebar() {
+  const sidebar = document.getElementById("featured-nara-sidebar");
+  if (!sidebar) return;
+
+  try {
+    const data = await fetchSheetData("Masterlist");
+    const nara = getMonthlySeededNara(data);
+    if (!nara) return;
+
+    const img = nara["Image URL"] || "";
+    const name = nara["Nara"] || "Unnamed Nara";
+    const design = nara["Design"] || name; // fallback if Design missing
+
+    sidebar.innerHTML = `
+      <a href="/narapedia/masterlist.html?design=${encodeURIComponent(design)}" class="featured-nara-link" style="text-decoration:none;">
+        <img src="${img}" alt="${name}" class="featured-nara-img" />
+        <div class="featured-nara-name">${name}</div>
+      </a>
+    `;
+  } catch (err) {
+    console.error("Error loading featured Nara:", err);
+  }
+}
+
+/* ==============================
+   Transitions & Back To Top
+   ============================== */
 function setupPageTransitions() {
   const wrapper = document.querySelector(".wrapper");
   if (!wrapper) return;
@@ -476,13 +529,14 @@ function setupBackToTop() {
   });
 }
 
-// ==============================
-// ====== Centralized Load =====
-// ==============================
+/* ==============================
+   Centralized Load
+   ============================== */
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
+    // Auth routing
     const path = window.location.pathname;
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
@@ -494,6 +548,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "/login.html";
       return;
     }
+
+    // Navbar login button
+    const loginBtn = document.getElementById("loginBtn");
+    if (loginBtn) loginBtn.addEventListener("click", () => {
+      window.location.href = getDiscordOAuthURL();
+    });
+
+    await handleOAuthCallback();
+    updateNavbarUI();
+    setupLogoutButton();
+
+    initDropdowns();
+    initNavbarToggler();
+    initSidebar();
+    updateHeaderHeightCSSVar();
+
+    // Featured Nara (monthly, from Masterlist via new system)
+    loadFeaturedNaraSidebar();
+
+    setupPageTransitions();
+    setupBackToTop();
 
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
