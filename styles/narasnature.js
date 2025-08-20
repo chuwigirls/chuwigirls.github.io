@@ -533,6 +533,53 @@ async function loadFeaturedNaraSidebar() {
 }
 
 /* ==============================
+   Recent Naras Renderer (No MYOs)
+   ============================== */
+async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
+  try {
+    const container = document.getElementById(targetId);
+    if (!container) return console.error(`Container #${targetId} not found`);
+
+    // Fetch full masterlist
+    const data = await fetchSheetData("Masterlist");
+
+    // Filter out hidden Naras and MYOs
+    const visibleNaras = data.filter(row => {
+      const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
+      const isMYO = String(row.Type || "").toLowerCase() === "myo";
+      return !isHidden && !isMYO && row.Nara && row.URL;
+    });
+
+    // Sort by most recently added (assuming last rows are newest)
+    const recentNaras = visibleNaras.slice(-limit).reverse(); // last 'limit' rows
+
+    // Clear container
+    container.innerHTML = "";
+
+    // Create cards
+    recentNaras.forEach(row => {
+      const card = document.createElement("div");
+      card.className = "narapedia-card recent-card";
+      card.innerHTML = `
+        <img src="${row.URL || '../assets/placeholder.png'}" alt="${row.Nara}">
+        <div class="narapedia-card-name">${row.Nara}</div>
+      `;
+
+      // Link to detail page
+      card.addEventListener("click", () => {
+        const url = `narapedia/masterlist.html?design=${encodeURIComponent(row.Nara)}`;
+        window.location.href = url;
+      });
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("Error rendering recent Naras:", err);
+  }
+}
+
+/* ==============================
    Transitions & Back To Top
    ============================== */
 function setupPageTransitions() {
@@ -627,6 +674,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       sidebar.innerHTML = `<div class="featured-nara-placeholder">⏳ Loading featured Nara...</div>`;
       loadFeaturedNaraSidebar();
     }
+
+    renderRecentNaras("recent-naras", 8);
 
     setupPageTransitions();
     setupBackToTop();
