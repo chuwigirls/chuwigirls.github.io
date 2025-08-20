@@ -860,11 +860,21 @@ body.sidebar-fixed #openNav {
   text-align: left;
 }
 
-.recent-naras {
-  display: flex;
-  justify-content: center;
+.recent-naras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
-  margin-top: 0.5rem;
+}
+
+.narapedia-card.recent-card {
+  cursor: pointer;
+  text-align: center;
+  border: none;
+}
+
+.narapedia-card.recent-card img {
+  width: 100%;
+  border-radius: 8px;
 }
 
 /* --------------------------- */
@@ -912,6 +922,10 @@ body.sidebar-fixed #openNav {
   height: auto;
   max-width: 500px;
   border-radius: 8px;
+}
+
+.back-btn {
+  margin-bottom: 1%;
 }
 
 .detail-card {
