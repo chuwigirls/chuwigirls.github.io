@@ -1,15 +1,14 @@
-/* 
-        _..---.--.
+/*       _..---.--.
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
-      (_/ _)__(_ \_)\_
+      (_/ _)__(_ \_ )_
     mrf(_..)--(.._)'--'
 
     if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! */
+    you can ask chuwigirls for help!
 
-/* ==============================
+   ==============================
    ===== Discord OAuth Config ===
    ============================== */
 const CLIENT_ID = "1319474218550689863";
@@ -96,7 +95,7 @@ async function handleOAuthCallback() {
       fetch(`${GAS_ENDPOINT}?id=${userData.id}&username=${encodeURIComponent(userData.username)}`)
         .then(res => res.json())
         .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
-        .catch(() => {}); // ignore GAS errors
+        .catch(() => {});
     }
 
     if (!window.location.pathname.endsWith("/user.html")) {
@@ -129,9 +128,9 @@ function setupLogoutButton() {
   }
 }
 
-/* ==============================
-   ===== Sidebar, Header ========
-   ============================== */
+// ==============================
+// ===== Sidebar, Header ========
+// ==============================
 function updateHeaderHeightCSSVar() {
   const header = document.getElementById('siteHeader');
   if (header) {
@@ -153,29 +152,51 @@ function handleSidebarDisplay() {
   }
 }
 
-function handleSidebarScrollPosition() {
-  const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0;
-  if (window.scrollY > headerHeight) {
-    document.body.classList.add("sidebar-fixed");
-  } else {
-    document.body.classList.remove("sidebar-fixed");
+// ==============================
+// ===== Sidebar, Header ========
+// ==============================
+
+function updateHeaderHeightCSSVar() {
+  const header = document.getElementById('siteHeader');
+  if (header) {
+    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
   }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle("sidebar-open");
+}
+
+function handleSidebarDisplay() {
+  if (window.innerWidth >= 1275) {
+    if (!document.body.classList.contains("sidebar-closed")) {
+      document.body.classList.add("sidebar-open");
+    }
+  } else {
+    document.body.classList.remove("sidebar-open");
+  }
+}
+
+// No sticky/fixed behavior, sidebar stays under header
+function handleSidebarScrollPosition() {
+  // empty, sidebar does not move on scroll
 }
 
 function initSidebar() {
   const toggleBtn = document.getElementById("openNav");
-  if (toggleBtn) toggleBtn.addEventListener("click", toggleSidebar);
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", toggleSidebar);
+  }
 
   handleSidebarDisplay();
   handleSidebarScrollPosition();
 
   window.addEventListener("resize", () => {
-    handleSidebarDisplay();
     updateHeaderHeightCSSVar();
-    handleSidebarScrollPosition();
+    handleSidebarDisplay();
   });
 
-  window.addEventListener("scroll", handleSidebarScrollPosition);
+  // No scroll listener needed since sidebar stays under header
 }
 
 function initDropdowns() {
@@ -217,36 +238,41 @@ function initNavbarToggler() {
 window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
 
-/* ==========================
-   Load Header & Footer
-   ========================== */
-function loadHeaderFooter() {
+// ==============================
+// ===== Load Includes & Initialize Page ====
+// ==============================
+async function loadHeaderFooter() {
   const includes = document.querySelectorAll(".includes");
-  let loadCount = 0;
 
-  return new Promise((resolve) => {
-    if (!includes.length) return resolve();
-    includes.forEach(el => {
-      const source = el.getAttribute("data-source");
-      if (source) {
-        fetch(source)
-          .then(res => res.text())
-          .then(data => {
-            el.innerHTML = data;
-            loadCount++;
-            if (loadCount === includes.length) resolve();
-          })
-          .catch(err => {
-            console.error("Error loading include:", err);
-            loadCount++;
-            if (loadCount === includes.length) resolve();
-          });
-      } else {
-        loadCount++;
-        if (loadCount === includes.length) resolve();
-      }
-    });
+  for (const el of includes) {
+    const source = el.getAttribute("data-source");
+    if (!source) continue;
+    try {
+      const res = await fetch(source);
+      const html = await res.text();
+      el.innerHTML = html;
+    } catch (err) {
+      console.error("Failed to load include:", source, err);
+    }
+  }
+
+  // Now header exists
+  await handleOAuthCallback(); 
+  updateNavbarUI();
+  setupLogoutButton();
+
+  initDropdowns();
+  initNavbarToggler();
+  initSidebar();
+  updateHeaderHeightCSSVar();
+
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) loginBtn.addEventListener("click", () => {
+    window.location.href = getDiscordOAuthURL();
   });
+
+  setupPageTransitions();
+  setupBackToTop();
 }
 
 /* ==========================
@@ -254,7 +280,7 @@ function loadHeaderFooter() {
    ========================== */
 async function fetchSheetData(sheetName) {
   if (!SHEET_BASE_URL) {
-    throw new Error("SHEET_BASE_URL is not defined. Set it at the top of this file or on window.SHEET_BASE_URL.");
+    throw new Error("SHEET_BASE_URL is not defined.");
   }
   const url = `${SHEET_BASE_URL}/${encodeURIComponent(sheetName)}`;
   const response = await fetch(url, { cache: "no-store" });
@@ -273,7 +299,7 @@ function renderSheets(data, config) {
   const detailTemplate = document.querySelector(config.detailTemplate);
 
   if (!listEl || !detailEl || !cardTemplate || !detailTemplate) {
-    console.error("Missing required DOM elements for rendering:", config);
+    console.error("Missing DOM elements for rendering:", config);
     return;
   }
 
@@ -282,7 +308,6 @@ function renderSheets(data, config) {
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
-  // Render Cards
   data.forEach(row => {
     const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
     if (isHidden) return;
@@ -310,7 +335,6 @@ function renderSheets(data, config) {
     listEl.appendChild(card);
   });
 
-  // URL param → open detail
   const params = new URLSearchParams(window.location.search);
   const target = params.get(config.queryParam || "id");
   if (target) {
@@ -419,16 +443,12 @@ function hideSpinner(containerId) {
   if (spinner && spinner.classList.contains("loading-spinner")) {
     spinner.style.display = "none";
   }
-  container.style.display = "grid"; // Use CSS to override per-container if needed
+  container.style.display = "grid";
 }
 
 /* ==============================
-   Featured Nara (Monthly Seeded)
+   Featured Nara (Monthly Seeded, JS-driven)
    ============================== */
-/**
- * Deterministically pick one visible Nara per month from Masterlist.
- * Uses UTC year-month to avoid TZ edge cases.
- */
 function getMonthlySeededNara(data) {
   const now = new Date();
   const seed = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
@@ -440,7 +460,7 @@ function getMonthlySeededNara(data) {
 
   const visible = data.filter(row => {
     const hidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
-    const hasImg = typeof row["Image URL"] === "string" && row["Image URL"].trim() !== "";
+    const hasImg = typeof row["URL"] === "string" && row["URL"].trim() !== "";
     const hasName = typeof row["Nara"] === "string" && row["Nara"].trim() !== "";
     return !hidden && hasImg && hasName;
   });
@@ -450,27 +470,65 @@ function getMonthlySeededNara(data) {
   return visible[index];
 }
 
+/* ==============================
+   Load Featured Nara Sidebar (JS DOM only)
+   ============================== */
 async function loadFeaturedNaraSidebar() {
   const sidebar = document.getElementById("featured-nara-sidebar");
   if (!sidebar) return;
 
   try {
+    // Fetch the sheet (make sure spreadsheetId + sheetName are correct)
     const data = await fetchSheetData("Masterlist");
+
+
     const nara = getMonthlySeededNara(data);
-    if (!nara) return;
+    if (!nara) {
+      sidebar.innerHTML = "";
+      const placeholder = document.createElement("div");
+      placeholder.className = "featured-nara-placeholder";
+      placeholder.textContent = "No featured Nara available";
+      sidebar.appendChild(placeholder);
+      return;
+    }
 
-    const img = nara["Image URL"] || "";
-    const name = nara["Nara"] || "Unnamed Nara";
-    const design = nara["Design"] || name; // fallback if Design missing
+    // Create container
+    const container = document.createElement("div");
+    container.className = "random-nara-preview";
 
-    sidebar.innerHTML = `
-      <a href="/narapedia/masterlist.html?design=${encodeURIComponent(design)}" class="featured-nara-link" style="text-decoration:none;">
-        <img src="${img}" alt="${name}" class="featured-nara-img" />
-        <div class="featured-nara-name">${name}</div>
-      </a>
-    `;
+    // Link to masterlist detail
+    const link = document.createElement("a");
+    link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(nara.Nara)}`;
+    link.className = "featured-nara-link";
+    link.style.textDecoration = "none";
+
+    // Image
+    const img = document.createElement("img");
+    img.src = nara.URL;
+    img.alt = nara.Nara;
+    img.className = "random-nara-img";
+
+    // Name
+    const name = document.createElement("div");
+    name.textContent = nara.Nara;
+    name.className = "random-nara-name";
+
+    // Assemble
+    link.appendChild(img);
+    link.appendChild(name);
+    container.appendChild(link);
+
+    // Render into sidebar
+    sidebar.innerHTML = "";
+    sidebar.appendChild(container);
+
   } catch (err) {
     console.error("Error loading featured Nara:", err);
+    sidebar.innerHTML = "";
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "featured-nara-placeholder";
+    errorDiv.textContent = "⚠️ Failed to load Featured Nara";
+    sidebar.appendChild(errorDiv);
   }
 }
 
@@ -535,9 +593,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    // ================================
-    // ✅ Auth routing
-    // ================================
+    // Auth routing
     const path = window.location.pathname;
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
@@ -550,7 +606,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Navbar login button
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) loginBtn.addEventListener("click", () => {
       window.location.href = getDiscordOAuthURL();
@@ -565,22 +620,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     initSidebar();
     updateHeaderHeightCSSVar();
 
-    // Featured Nara (monthly, from Masterlist via new system)
-    loadFeaturedNaraSidebar();
+    // ✅ Featured Nara (monthly) — run only if sidebar exists
+    const sidebar = document.getElementById("featured-nara-sidebar");
+    if (sidebar) {
+      // Show loading state first
+      sidebar.innerHTML = `<div class="featured-nara-placeholder">⏳ Loading featured Nara...</div>`;
+      loadFeaturedNaraSidebar();
+    }
 
     setupPageTransitions();
     setupBackToTop();
 
-    // Fade-in animation
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
 
-    // ================================
-    // ✅ Universal Sheet Loader
-    // ================================
+    // Universal Sheet Loader
     const pageName = path.split("/").pop().replace(".html", "");
 
-    // map page names → configs
     const SHEET_CONFIGS = {
       masterlist: { sheet: "Masterlist", config: MASTERLIST_CONFIG },
       features: { sheet: "Features", config: FEATURES_CONFIG },
@@ -589,7 +645,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       trials: { sheet: "Trials", config: TRIALS_CONFIG },
       emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
       civilians: { sheet: "Staff", config: STAFF_CONFIG },
-      civilians: { sheet: "FAQ", config: FAQ_CONFIG }
+      faq: { sheet: "FAQ", config: FAQ_CONFIG }
     };
 
     if (SHEET_CONFIGS[pageName]) {
@@ -597,7 +653,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await fetchSheetData(sheet);
       renderSheets(data, config);
     }
-
   } catch (err) {
     console.error("Error during page initialization:", err);
   }
@@ -607,3 +662,4 @@ window.addEventListener("load", () => {
   const smooth = document.querySelector(".smoothLoad");
   if (smooth) smooth.classList.add("loaded");
 });
+
