@@ -483,6 +483,24 @@ hr.dropdown-div {
     z-index: 2100;
     box-sizing: border-box;
   }
+
+  .navbar-toggler {
+    display: inline-flex !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 20px 0 0 20px;
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    border: 1px solid var(--blueb);
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+    box-sizing: border-box;
+  }
 }
 
 @media (min-width: 981px) {
@@ -495,8 +513,8 @@ hr.dropdown-div {
 /* -----------Side bar--------- */
 /* --------------------------- */
 #mySidebar {
-  position: fixed;
-  top: calc(var(--header-height, 200px) + 9%);
+  position: absolute;
+  top: calc(var(--header-height, 200px) + 48px);
   left: 0;
   width: 200px;
   height: calc(100vh - var(--header-height, 200px) - 9%);
@@ -535,8 +553,8 @@ body.sidebar-open #mySidebar {
 }
 
 #openNav {
-  position: fixed;
-  top: var(--header-height, 200px);
+  position: absolute;
+  top: var(--header-height, 00px);
   left: 0;
   width: 48px;
   height: 48px;
@@ -548,8 +566,9 @@ body.sidebar-open #mySidebar {
   justify-content: center;
   z-index: 2100;
   transition: top 0.4s cubic-bezier(.77,0,.18,1),
-              transform 0.4s cubic-bezier(.77,0,.18,1),
-              height 0.3s ease;
+            transform 0.4s cubic-bezier(.77,0,.18,1),
+            height 0.3s ease,
+            background-color 0.4s ease;
 }
 
 #openNav:hover {
@@ -603,6 +622,11 @@ body.sidebar-fixed #openNav {
     justify-content: center;
     z-index: 2100;
     box-sizing: border-box;
+  }
+
+  #mySidebar {
+    
+  top: calc(var(--header-height, 200px));
   }
 
   #openNav {
