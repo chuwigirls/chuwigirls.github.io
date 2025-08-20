@@ -517,7 +517,7 @@ hr.dropdown-div {
   top: calc(var(--header-height, 200px) + 48px);
   left: 0;
   width: 200px;
-  height: calc(100vh - var(--header-height, 200px) - 9%);
+  height: calc(100vh - var(--header-height, 200px));
   background-color: var(--tan);
   border-radius: 0 5px 5px 0;
   border: 1px solid var(--tanb);
