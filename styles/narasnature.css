@@ -883,6 +883,20 @@ random-nara-preview {
   z-index: 1;
 }
 
+.fp-trial .featured-trial-card img {
+  width: 50%;
+  margin-top: 25%;
+  box-shadow: none;
+}
+
+.fp-trial .featured-trial-card img:hover {
+  background-color: transparent;
+}
+
+.fp-trial .featured-trial-name {
+  font-size: 200%;
+}
+
 /* Responsive scaling */
 @media (max-width: 768px) {
   .frontpage-intro {
