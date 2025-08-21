@@ -526,36 +526,44 @@ async function loadFeaturedNaraSidebar() {
 }
 
 /* =======================================
-   Featured Trial - Sidebar
+   Featured Trials - Sidebar & Frontpage
    ======================================= */
+let cachedEligibleTrials = null;
+
+async function getEligibleTrials() {
+  if (cachedEligibleTrials) return cachedEligibleTrials;
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0); // normalize to UTC midnight
+
+  const trials = await fetchSheetData("Trials");
+
+  cachedEligibleTrials = trials.filter(row => {
+    const start = row.Start ? new Date(row.Start) : null;
+    const end = row.End ? new Date(row.End) : null;
+    const tags = (row.Tags || "").toLowerCase();
+    const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
+
+    if (isHidden) return false;
+    if (!tags.includes("ephemeral")) return false;
+    if (start && start > today) return false;
+    if (end && end < today) return false;
+
+    return true;
+  });
+
+  return cachedEligibleTrials;
+}
+
 async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
   try {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0); // normalize to UTC midnight
-
-    // Fetch Trials
-    const trials = await fetchSheetData("Trials");
-
-    // Filter for ongoing Ephemeral Trials (and not hidden)
-    const eligible = trials.filter(row => {
-      const start = row.Start ? new Date(row.Start) : null;
-      const end = row.End ? new Date(row.End) : null;
-      const tags = (row.Tags || "").toLowerCase();
-      const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
-
-      if (isHidden) return false;
-      if (!tags.includes("ephemeral")) return false;
-      if (start && start > today) return false;
-      if (end && end < today) return false;
-
-      return true;
-    });
+    const eligible = await getEligibleTrials();
 
     const container = document.getElementById(targetId);
     if (!container) return;
     container.innerHTML = "";
 
-    if (eligible.length === 0) {
+    if (!eligible || eligible.length === 0) {
       // No Trials available → show placeholder
       const placeholder = document.createElement("div");
       placeholder.className = "featured-trial-placeholder";
@@ -608,7 +616,7 @@ async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
 }
 
 /* ==============================
-   Recent Naras - Front Page
+   Recent Naras - Frontpaage
    ============================== */
 async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   try {
@@ -751,7 +759,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     renderRecentNaras("recent-naras", 8);
-    renderSidebarFeaturedTrial();
+    renderSidebarFeaturedTrial("featured-trial-frontpage");
+    renderSidebarFeaturedTrial("featured-trial-sidebar");
 
     setupPageTransitions();
     setupBackToTop();
