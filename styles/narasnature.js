@@ -256,7 +256,6 @@ async function loadHeaderFooter() {
     }
   }
 
-  // Now header exists
   await handleOAuthCallback(); 
   updateNavbarUI();
   setupLogoutButton();
@@ -276,7 +275,7 @@ async function loadHeaderFooter() {
 }
 
 /* ==========================
-   Fetch Sheets (New System)
+   Fetch Sheets
    ========================== */
 async function fetchSheetData(sheetName) {
   if (!SHEET_BASE_URL) {
@@ -289,7 +288,7 @@ async function fetchSheetData(sheetName) {
 }
 
 /* ==========================
-   Universal Renderer
+   Render Sheets
    ========================== */
 function renderSheets(data, config) {
   const listEl = document.getElementById(config.listId);
@@ -397,9 +396,6 @@ function renderSheets(data, config) {
   });
 }
 
-/* ==============================
-   Universal Init Function
-   ============================== */
 async function initSheet(sheetName, config) {
   try {
     showSpinner(config.listId, `Loading ${sheetName}...`);
@@ -417,7 +413,7 @@ async function initSheet(sheetName, config) {
 }
 
 /* ==============================
-   Universal Spinner Helpers
+   Sheet Rendering Spinners
    ============================== */
 function showSpinner(containerId, message = "Loading...") {
   const container = document.getElementById(containerId);
@@ -447,7 +443,7 @@ function hideSpinner(containerId) {
 }
 
 /* ==============================
-   Featured Nara (Monthly Seeded, JS-driven)
+   Featured Nara - Sidebar
    ============================== */
 function getMonthlySeededNara(data) {
   const now = new Date();
@@ -470,9 +466,6 @@ function getMonthlySeededNara(data) {
   return visible[index];
 }
 
-/* ==============================
-   Load Featured Nara Sidebar (JS DOM only)
-   ============================== */
 async function loadFeaturedNaraSidebar() {
   const sidebar = document.getElementById("featured-nara-sidebar");
   if (!sidebar) return;
@@ -487,7 +480,7 @@ async function loadFeaturedNaraSidebar() {
       sidebar.innerHTML = "";
       const placeholder = document.createElement("div");
       placeholder.className = "featured-nara-placeholder";
-      placeholder.textContent = "No featured Nara available";
+      placeholder.textContent = "Where'd all the Naras go?";
       sidebar.appendChild(placeholder);
       return;
     }
@@ -532,8 +525,90 @@ async function loadFeaturedNaraSidebar() {
   }
 }
 
+/* =======================================
+   Featured Trial - Sidebar
+   ======================================= */
+async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
+  try {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0); // normalize to UTC midnight
+
+    // Fetch Trials
+    const trials = await fetchSheetData("Trials");
+
+    // Filter for ongoing Ephemeral Trials (and not hidden)
+    const eligible = trials.filter(row => {
+      const start = row.Start ? new Date(row.Start) : null;
+      const end = row.End ? new Date(row.End) : null;
+      const tags = (row.Tags || "").toLowerCase();
+      const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
+
+      if (isHidden) return false;
+      if (!tags.includes("ephemeral")) return false;
+      if (start && start > today) return false;
+      if (end && end < today) return false;
+
+      return true;
+    });
+
+    const container = document.getElementById(targetId);
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (eligible.length === 0) {
+      // No Trials available → show placeholder
+      const placeholder = document.createElement("div");
+      placeholder.className = "featured-trial-placeholder";
+      placeholder.textContent = "Looks like there's no current event...";
+      container.appendChild(placeholder);
+      return;
+    }
+
+    // Pick one randomly
+    const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+
+    // Create wrapper
+    const wrapper = document.createElement("div");
+    wrapper.className = "featured-trial-card";
+
+    // Create link
+    const link = document.createElement("a");
+    link.href = `trials.html?trial=${encodeURIComponent(chosen.Trial)}`;
+    link.className = "featured-trial-link";
+    link.style.textDecoration = "none";
+
+    // Create image
+    const img = document.createElement("img");
+    img.src = chosen.URL || "../assets/placeholder.png";
+    img.alt = chosen.Trial;
+    img.className = "featured-trial-img";
+
+    // Create name
+    const name = document.createElement("div");
+    name.textContent = chosen.Trial;
+    name.className = "featured-trial-name";
+
+    // Assemble
+    link.appendChild(img);
+    link.appendChild(name);
+    wrapper.appendChild(link);
+    container.appendChild(wrapper);
+
+  } catch (err) {
+    console.error("Error rendering sidebar featured trial:", err);
+    const container = document.getElementById(targetId);
+    if (container) {
+      container.innerHTML = "";
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "featured-trial-placeholder";
+      errorDiv.textContent = "⚠️ Failed to load Featured Trial";
+      container.appendChild(errorDiv);
+    }
+  }
+}
+
 /* ==============================
-   Recent Naras Renderer (No MYOs)
+   Recent Naras - Front Page
    ============================== */
 async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   try {
@@ -676,6 +751,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     renderRecentNaras("recent-naras", 8);
+    renderSidebarFeaturedTrial();
 
     setupPageTransitions();
     setupBackToTop();
