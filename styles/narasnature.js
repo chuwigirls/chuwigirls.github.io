@@ -529,22 +529,28 @@ async function loadFeaturedNaraSidebar() {
    Featured Trials - Sidebar & Frontpage
    ======================================= */
 let cachedEligibleTrials = null;
+let cachedAllTrials = null;
 
 async function getEligibleTrials() {
-  if (cachedEligibleTrials) return cachedEligibleTrials;
+  if (cachedEligibleTrials && cachedAllTrials) return { eligible: cachedEligibleTrials, all: cachedAllTrials };
 
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0); // normalize to UTC midnight
 
   const trials = await fetchSheetData("Trials");
 
-  cachedEligibleTrials = trials.filter(row => {
+  // Cache all unhidden trials
+  cachedAllTrials = trials.filter(row => {
+    const hideVal = String(row.Hide || "").trim().toLowerCase();
+    return !(hideVal === "true" || row.Hide === true);
+  });
+
+  // Filter eligible trials (ephemeral + ongoing)
+  cachedEligibleTrials = cachedAllTrials.filter(row => {
     const start = row.Start ? new Date(row.Start) : null;
     const end = row.End ? new Date(row.End) : null;
     const tags = (row.Tags || "").toLowerCase();
-    const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
 
-    if (isHidden) return false;
     if (!tags.includes("ephemeral")) return false;
     if (start && start > today) return false;
     if (end && end < today) return false;
@@ -552,55 +558,97 @@ async function getEligibleTrials() {
     return true;
   });
 
-  return cachedEligibleTrials;
+  return { eligible: cachedEligibleTrials, all: cachedAllTrials };
 }
 
+/* ===== Helper: format "August 22, 2025" ===== */
+function formatDateLong(d) {
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+/* ===== Helper: format date or fallback text ===== */
+function formatDateOrText(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? value : formatDateLong(date);
+}
+
+// ==============================
+// Build Trial Card
+// ==============================
+function makeTrialCard(trial, showDates = false) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "featured-trial-card";
+
+  const link = document.createElement("a");
+  link.href = `/recreation/trials.html?trial=${encodeURIComponent(trial.Trial)}`;
+  link.className = "featured-trial-link";
+  link.style.textDecoration = "none";
+
+  const img = document.createElement("img");
+  img.src = trial.URL || "../assets/placeholder.png";
+  img.alt = trial.Trial;
+  img.className = "featured-trial-img";
+
+  const name = document.createElement("div");
+  name.textContent = trial.Trial;
+  name.className = "featured-trial-name";
+
+  link.appendChild(img);
+  link.appendChild(name);
+
+  if (showDates) {
+    const dates = document.createElement("div");
+    dates.className = "featured-trial-dates";
+
+    if (trial.Start) {
+      const startSpan = document.createElement("span");
+      startSpan.className = "featured-trial-start";
+      startSpan.textContent = `${formatDateOrText(trial.Start)} - `;
+      dates.appendChild(startSpan);
+    }
+
+    if (trial.End) {
+      const endSpan = document.createElement("span");
+      endSpan.className = "featured-trial-end";
+      endSpan.textContent = `${formatDateOrText(trial.End)}`;
+      dates.appendChild(endSpan);
+    }
+
+    link.appendChild(dates);
+  }
+
+  wrapper.appendChild(link);
+  return wrapper;
+}
+
+// ==============================
+// Featured Trial - Sidebar
+// ==============================
 async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
   try {
-    const eligible = await getEligibleTrials();
-
+    const { eligible, all } = await getEligibleTrials();
     const container = document.getElementById(targetId);
     if (!container) return;
     container.innerHTML = "";
 
-    if (!eligible || eligible.length === 0) {
-      // No Trials available → show placeholder
+    // Use eligible pool, else fallback to any unhidden trial with a name
+    let pool = (eligible && eligible.length > 0) ? eligible : all.filter(t => t.Trial && t.Trial.trim());
+    console.log("Trial pool used (non-empty names only):", pool);
+
+    if (!pool || pool.length === 0) {
       const placeholder = document.createElement("div");
       placeholder.className = "featured-trial-placeholder";
-      placeholder.textContent = "Looks like there's no current event...";
+      placeholder.textContent = "No Trials available.";
       container.appendChild(placeholder);
       return;
     }
 
-    // Pick one randomly
-    const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    console.log("Chosen trial:", chosen);
 
-    // Create wrapper
-    const wrapper = document.createElement("div");
-    wrapper.className = "featured-trial-card";
+    container.appendChild(makeTrialCard(chosen, false));
 
-    // Create link
-    const link = document.createElement("a");
-    link.href = `trials.html?trial=${encodeURIComponent(chosen.Trial)}`;
-    link.className = "featured-trial-link";
-    link.style.textDecoration = "none";
-
-    // Create image
-    const img = document.createElement("img");
-    img.src = chosen.URL || "../assets/placeholder.png";
-    img.alt = chosen.Trial;
-    img.className = "featured-trial-img";
-
-    // Create name
-    const name = document.createElement("div");
-    name.textContent = chosen.Trial;
-    name.className = "featured-trial-name";
-
-    // Assemble
-    link.appendChild(img);
-    link.appendChild(name);
-    wrapper.appendChild(link);
-    container.appendChild(wrapper);
 
   } catch (err) {
     console.error("Error rendering sidebar featured trial:", err);
@@ -614,6 +662,113 @@ async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
     }
   }
 }
+
+/* ===== Helper: format "August 22, 2025" ===== */
+function formatDateLong(d) {
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+/* ===== Helper: format date or fallback text ===== */
+function formatDateOrText(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? value : formatDateLong(date);
+}
+
+// ==============================
+// Build Trial Card
+// ==============================
+function makeTrialCard(trial, showDates = false) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "featured-trial-card";
+
+  const link = document.createElement("a");
+  link.href = `/recreation/trials.html?trial=${encodeURIComponent(trial.Trial)}`;
+  link.className = "featured-trial-link";
+  link.style.textDecoration = "none";
+
+  const img = document.createElement("img");
+  img.src = trial.URL || "../assets/placeholder.png";
+  img.alt = trial.Trial;
+  img.className = "featured-trial-img";
+
+  const name = document.createElement("div");
+  name.textContent = trial.Trial;
+  name.className = "featured-trial-name";
+
+  link.appendChild(img);
+  link.appendChild(name);
+
+  // Show dates on frontpage
+  if (showDates) {
+    const dates = document.createElement("div");
+    dates.className = "featured-trial-dates";
+
+    if (trial.Start) {
+      const startSpan = document.createElement("span");
+      startSpan.className = "featured-trial-start";
+      startSpan.textContent = `${formatDateOrText(trial.Start)} - `;
+      dates.appendChild(startSpan);
+    }
+
+    if (trial.End) {
+      const endSpan = document.createElement("span");
+      endSpan.className = "featured-trial-end";
+      endSpan.textContent = `${formatDateOrText(trial.End)}`;
+      dates.appendChild(endSpan);
+    }
+
+    link.appendChild(dates);
+  }
+
+  wrapper.appendChild(link);
+  return wrapper;
+}
+
+// ==============================
+// Featured Trials - Frontpage (1 random trial) with debug logs
+// ==============================
+async function renderFrontpageFeaturedTrials(targetId = "featured-trial-frontpage") {
+  try {
+    const { eligible, all } = await getEligibleTrials();
+    const container = document.getElementById(targetId);
+    if (!container) return;
+    container.innerHTML = "";
+
+    console.log("=== Frontpage Featured Trials Debug ===");
+    console.log("Eligible trials:", eligible);
+    console.log("All visible trials:", all);
+
+    // Use eligible pool, else fallback to any unhidden trial with a name
+    let pool = (eligible && eligible.length > 0) ? eligible : all.filter(t => t.Trial && t.Trial.trim());
+    console.log("Trial pool used (non-empty names only):", pool);
+
+    if (!pool || pool.length === 0) {
+      const placeholder = document.createElement("div");
+      placeholder.className = "featured-trial-placeholder";
+      placeholder.textContent = "No Trials available.";
+      container.appendChild(placeholder);
+      return;
+    }
+
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    console.log("Chosen trial:", chosen);
+
+    container.appendChild(makeTrialCard(chosen, true));
+
+  } catch (err) {
+    console.error("Error rendering frontpage featured trials:", err);
+    const container = document.getElementById(targetId);
+    if (container) {
+      container.innerHTML = "";
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "featured-trial-placeholder";
+      errorDiv.textContent = "⚠️ Failed to load Featured Trials";
+      container.appendChild(errorDiv);
+    }
+  }
+}
+
 
 /* ==============================
    Recent Naras - Frontpaage
@@ -759,8 +914,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     renderRecentNaras("recent-naras", 8);
-    renderSidebarFeaturedTrial("featured-trial-frontpage");
-    renderSidebarFeaturedTrial("featured-trial-sidebar");
+    renderFrontpageFeaturedTrials("featured-trial-frontpage");
+  renderSidebarFeaturedTrial("featured-trial-sidebar");  
 
     setupPageTransitions();
     setupBackToTop();
