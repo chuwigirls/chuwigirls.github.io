@@ -12,7 +12,7 @@
 // ==========================
 // Google Sheets Config
 // ==========================
-const SHEET_ID = "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms"; // <-- replace with your actual sheet ID
+const SHEET_ID = "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms";
 const SHEET_BASE_URL = `https://opensheet.elk.sh/${SHEET_ID}`;
 
 // ==========================
@@ -111,11 +111,14 @@ const TRIALS_CONFIG = {
   nameField: "Trial",
   queryParam: "trial",
   extraFields: [
-    { field: "Type", className: "trial-detail-type" },
-    { field: "Price", className: "trial-detail-price" },
-    { field: "Rarity", className: "trial-detail-rarity" },
-    { field: "Found", className: "trial-detail-found" },
-    { field: "Description", className: "trial-detail-description" }
+    { field: "Status", className: "trial-detail-status" },
+    { field: "Start", className: "trial-detail-start" },
+    { field: "End", className: "trial-detail-end" },
+    { field: "Flavor text", className: "trial-detail-flavor" },
+    { field: "Description", className: "trial-detail-description" },
+    { field: "Requirements", className: "trial-detail-reqs" },
+    { field: "Rewards", className: "trial-detail-rewards" },
+    { field: "Tags", className: "trial-detail-tags" }
   ]
 };
 
