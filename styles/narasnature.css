@@ -243,6 +243,12 @@ button:hover {
   text-decoration: none;
 }
 
+@media (max-width: 980px) {
+  .site-title {
+    font-size: 9vh;
+  }
+}
+
 .navbar {
   display: flex;
   position: relative;
@@ -743,8 +749,13 @@ random-nara-preview {
 
 .featured-trial-card img {
   width: 100%;
+  max-width: 150px;
+  height: auto;
   border-radius: 12px;
   box-shadow: 0 0 10px var(--tanb);
+  display: block;
+  margin: 0 auto;
+  padding: 5px;
 }
 
 .featured-trial-card img:hover {
@@ -849,18 +860,20 @@ random-nara-preview {
 
 #fp-button {
   background-color: var(--light-blue);
+  border: 1px solid var(--blueb);
   color: var(--dark-blue);
   font-family: var(--bubbly);
+  text-decoration: none;
   border-radius: 20px;
   padding: 8px;
   cursor: pointer;
+  transition-duration: 0.4s;
 }
 
 #fp-button:hover {
   background-color: var(--light-pink);
   border: 1px solid var(--pinkb);
   color: var(--pink);
-  transition-duration: 0.4s;
 }
 
 .frontpage-intro {
@@ -881,20 +894,6 @@ random-nara-preview {
   right: -50px; 
   top: -60px;
   z-index: 1;
-}
-
-.fp-trial .featured-trial-card img {
-  width: 50%;
-  margin-top: 25%;
-  box-shadow: none;
-}
-
-.fp-trial .featured-trial-card img:hover {
-  background-color: transparent;
-}
-
-.fp-trial .featured-trial-name {
-  font-size: 200%;
 }
 
 /* Responsive scaling */
@@ -949,6 +948,37 @@ random-nara-preview {
   width: 100%;
   border-radius: 8px;
 }
+
+.imgCol {
+  max-width: 75%;
+  height: auto;
+  display: block;
+  margin: auto;
+  margin-top: 5%;
+}
+
+#fp-heading h1 {
+  margin-top: 5%;
+}
+
+.fp-trial .featured-trial-card img {
+  max-width: 50%;
+  height: auto;
+  display: block;
+  box-shadow: none;
+}
+
+.fp-trial .featured-trial-card img:hover {
+  background-color: transparent;
+  transition: 0.4s;
+}
+
+.fp-trial .featured-trial-name {
+  font-size: 200%;
+  font-family: var(--cyber);
+}
+
+.featured-trial-dates { color: var(--dark-blue); }
 
 /* --------------------------- */
 /* ----------Narapedia-------- */
