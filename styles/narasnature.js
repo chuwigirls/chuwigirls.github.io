@@ -152,10 +152,6 @@ function handleSidebarDisplay() {
   }
 }
 
-// ==============================
-// ===== Sidebar, Header ========
-// ==============================
-
 function updateHeaderHeightCSSVar() {
   const header = document.getElementById('siteHeader');
   if (header) {
@@ -177,11 +173,6 @@ function handleSidebarDisplay() {
   }
 }
 
-// No sticky/fixed behavior, sidebar stays under header
-function handleSidebarScrollPosition() {
-  // empty, sidebar does not move on scroll
-}
-
 function initSidebar() {
   const toggleBtn = document.getElementById("openNav");
   if (toggleBtn) {
@@ -195,8 +186,6 @@ function initSidebar() {
     updateHeaderHeightCSSVar();
     handleSidebarDisplay();
   });
-
-  // No scroll listener needed since sidebar stays under header
 }
 
 function initDropdowns() {
@@ -769,7 +758,6 @@ async function renderFrontpageFeaturedTrials(targetId = "featured-trial-frontpag
   }
 }
 
-
 /* ==============================
    Recent Naras - Frontpaage
    ============================== */
@@ -815,6 +803,83 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   } catch (err) {
     console.error("Error rendering recent Naras:", err);
   }
+}
+
+// ===============================
+// Fetch user profile from GAS
+// ===============================
+async function fetchUserProfile(discordId, username) {
+  if (!discordId) {
+    console.error("Missing Discord ID");
+    return null;
+  }
+
+  try {
+    const url = `https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?id=${encodeURIComponent(discordId)}&username=${encodeURIComponent(username || "")}`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const data = await response.json();
+    console.log("✅ User profile loaded:", data);
+    return data;
+  } catch (err) {
+    console.error("❌ Failed to fetch user profile:", err);
+    return null;
+  }
+}
+
+// ===============================
+// Example usage in user.html
+// ===============================
+document.addEventListener("DOMContentLoaded", async () => {
+  // assume you already stored login info from Discord OAuth
+  const discordId = sessionStorage.getItem("discordId");
+  const username = sessionStorage.getItem("username");
+
+  const profile = await fetchUserProfile(discordId, username);
+  if (profile) {
+    renderUserProfile(profile);
+  }
+});
+
+// ===============================
+// Render profile (stub, you fill UI)
+// ===============================
+function renderUserProfile(data) {
+  const container = document.getElementById("userProfile");
+  if (!container) return;
+
+  container.innerHTML = `
+    <h2>${data.username || "Unknown"}</h2>
+    <p>💎 Balance: ${data.inventory?.balance || 0}</p>
+
+    <h3>Inventory</h3>
+    <ul>
+      ${Object.entries(data.inventory || {})
+        .filter(([k]) => k !== "balance")
+        .map(([key, val]) => `<li>${key}: ${val}</li>`)
+        .join("")}
+    </ul>
+
+    <h3>Palcharms</h3>
+    <ul>
+      ${Object.entries(data.palcharms || {})
+        .map(([key, val]) => `<li>${key}: ${val}</li>`)
+        .join("")}
+    </ul>
+
+    <h3>Characters</h3>
+    <div class="char-grid">
+      ${(data.characters || [])
+        .map(c => `
+          <div class="char-card">
+            <img src="${c.image}" alt="${c.design}" />
+            <p>${c.design}</p>
+          </div>
+        `).join("")}
+    </div>
+  `;
 }
 
 /* ==============================
