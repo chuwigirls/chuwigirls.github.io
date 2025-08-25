@@ -180,7 +180,6 @@ function initSidebar() {
   }
 
   handleSidebarDisplay();
-  handleSidebarScrollPosition();
 
   window.addEventListener("resize", () => {
     updateHeaderHeightCSSVar();
@@ -980,7 +979,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderRecentNaras("recent-naras", 8);
     renderFrontpageFeaturedTrials("featured-trial-frontpage");
-  renderSidebarFeaturedTrial("featured-trial-sidebar");  
+    renderSidebarFeaturedTrial("featured-trial-sidebar");  
 
     setupPageTransitions();
     setupBackToTop();
