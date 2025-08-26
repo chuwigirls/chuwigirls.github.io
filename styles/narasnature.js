@@ -49,7 +49,12 @@ function updateNavbarUI(userDataParam) {
    ============================== */
 async function fetchUserProfile() {
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
-  if (!discordUser.id) return; // not logged in; nothing to do
+  console.log("🔍 Discord user from localStorage:", discordUser);
+
+  if (!discordUser.id) {
+    console.warn("⚠️ No Discord ID found. User not logged in.");
+    return; // stop early if not logged in
+  }
 
   try {
     // Show spinner, hide others
@@ -61,13 +66,15 @@ async function fetchUserProfile() {
     if (err) err.style.display = "none";
 
     const url = `${GAS_ENDPOINT}?id=${encodeURIComponent(discordUser.id)}&username=${encodeURIComponent(discordUser.username || "")}`;
-    console.log("Fetching user profile from:", url);
+    console.log("🌐 Fetching user profile from:", url);
 
     const res = await fetch(url);
+    console.log("📡 Fetch response status:", res.status);
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
-    console.log("✅ GAS Response:", data);
+    console.log("✅ GAS Response JSON:", data);
 
     renderUserProfile(data);
 
@@ -84,12 +91,6 @@ async function fetchUserProfile() {
     if (err) err.style.display = "block";
   }
 }
-
-// Attach retry button event on DOM load
-document.addEventListener("DOMContentLoaded", () => {
-  const retryBtn = document.getElementById("retryProfileBtn");
-  if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
-});
 
 /* ==============================
    ===== Page Guard =============
@@ -880,17 +881,13 @@ function renderUserProfile(data) {
   }
 
   // Inventory
-  const inventoryList = document.getElementById("inventory-list");
-  if (inventoryList && data.inventory) {
-    inventoryList.innerHTML = "";
-    Object.entries(data.inventory).forEach(([key, value]) => {
-      if (key !== "balance") {
-        const li = document.createElement("li");
-        li.textContent = `${key}: ${value}`;
-        inventoryList.appendChild(li);
-      }
-    });
-  }
+  const inventoryList = document.getElementById("inventory");
+  inventoryList.innerHTML = "";
+  Object.entries(data.inventory).forEach(([item, qty]) => {
+    const li = document.createElement("li");
+    li.textContent = `${item}: ${qty}`;
+    inventoryList.appendChild(li);
+  });
 
   // Palcharms
   const palcharmsList = document.getElementById("palcharms-list");
@@ -1056,6 +1053,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const username = sessionStorage.getItem("username");
     const profile = await fetchUserProfile(discordId, username);
     if (profile) renderUserProfile(profile);
+
+    const retryBtn = document.getElementById("retryProfileBtn");
+    if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
 
   } catch (err) {
     console.error("Error during page initialization:", err);
