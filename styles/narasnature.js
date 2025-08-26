@@ -49,15 +49,19 @@ function updateNavbarUI(userDataParam) {
    ===== Fetch Profile ========== 
    ============================== */
 async function fetchUserProfile() {
+  if (window.__profileLoading) return;
+  window.__profileLoading = true;
+
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  console.log("🔍 Discord user from localStorage:", discordUser);
 
   if (!discordUser.id) {
     console.warn("⚠️ No Discord ID found. User not logged in.");
-    return; // stop early if not logged in
+    window.__profileLoading = false;
+    return;
   }
 
   try {
-    // Show spinner, hide others
     const spin = document.getElementById("profile-spinner");
     const cont = document.getElementById("profile-content");
     const err = document.getElementById("profile-error");
@@ -70,7 +74,6 @@ async function fetchUserProfile() {
 
     const res = await fetch(url);
     console.log("📡 Fetch response status:", res.status);
-
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
@@ -81,6 +84,9 @@ async function fetchUserProfile() {
     if (spin) spin.style.display = "none";
     if (cont) cont.style.display = "block";
     if (err) err.style.display = "none";
+
+    window.__profileLoading = false;
+    return data;
   } catch (e) {
     console.error("❌ Error fetching user profile:", e);
     const spin = document.getElementById("profile-spinner");
@@ -89,6 +95,9 @@ async function fetchUserProfile() {
     if (spin) spin.style.display = "none";
     if (cont) cont.style.display = "none";
     if (err) err.style.display = "block";
+
+    window.__profileLoading = false;
+    return;
   }
 }
 
@@ -1049,8 +1058,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       
     }
 
-    const profile = await fetchUserProfile();
-    if (profile) renderUserProfile(profile);
+    /* const profile = await fetchUserProfile();
+    if (profile) renderUserProfile(profile); */
 
     const retryBtn = document.getElementById("retryProfileBtn");
     if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
