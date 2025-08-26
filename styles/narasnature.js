@@ -817,50 +817,68 @@ async function fetchUserProfile(discordId, username) {
   }
 }
 
+// ===============================
+// Render user profile into existing HTML
+// ===============================
 function renderUserProfile(data) {
-  // username + balance
-  document.getElementById("username").textContent = data.username || "Unknown";
-  document.getElementById("balance").textContent = data.inventory?.balance || 0;
+  console.log("=== User Profile Data ===", data);
 
-  // inventory list
-  const invList = document.getElementById("inventory");
-  invList.innerHTML = "";
-  Object.entries(data.inventory || {})
-    .filter(([k]) => k !== "balance")
-    .forEach(([key, val]) => {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${val}`;
-      invList.appendChild(li);
+  // Username
+  const usernameEl = document.getElementById("username");
+  if (usernameEl && data.username) {
+    usernameEl.textContent = data.username;
+  }
+
+  // Balance
+  const balanceEl = document.getElementById("balance");
+  if (balanceEl && data.inventory?.balance !== undefined) {
+    balanceEl.textContent = data.inventory.balance;
+  }
+
+  // Inventory
+  const inventoryList = document.getElementById("inventory-list");
+  if (inventoryList && data.inventory) {
+    inventoryList.innerHTML = "";
+    Object.entries(data.inventory).forEach(([key, value]) => {
+      if (key !== "balance") {
+        const li = document.createElement("li");
+        li.textContent = `${key}: ${value}`;
+        inventoryList.appendChild(li);
+      }
     });
+  }
 
-  // palcharms list
-  const palList = document.getElementById("palcharms");
-  palList.innerHTML = "";
-  Object.entries(data.palcharms || {})
-    .forEach(([key, val]) => {
+  // Palcharms
+  const palcharmsList = document.getElementById("palcharms-list");
+  if (palcharmsList && data.palcharms) {
+    palcharmsList.innerHTML = "";
+    Object.entries(data.palcharms).forEach(([key, value]) => {
       const li = document.createElement("li");
-      li.textContent = `${key}: ${val}`;
-      palList.appendChild(li);
+      li.textContent = `${key}: ${value}`;
+      palcharmsList.appendChild(li);
     });
+  }
 
-  // characters grid
-  const charGrid = document.getElementById("characters");
-  charGrid.innerHTML = "";
-  (data.characters || []).forEach(c => {
-    const card = document.createElement("div");
-    card.className = "char-card";
+  // Characters
+  const charactersContainer = document.getElementById("characters");
+  if (charactersContainer && data.characters) {
+    charactersContainer.innerHTML = "";
+    data.characters.forEach(c => {
+      const div = document.createElement("div");
+      div.classList.add("char-card");
 
-    const img = document.createElement("img");
-    img.src = c.image;
-    img.alt = c.design;
+      const img = document.createElement("img");
+      img.src = c.image;
+      img.alt = c.design;
 
-    const label = document.createElement("p");
-    label.textContent = c.design;
+      const p = document.createElement("p");
+      p.textContent = c.design;
 
-    card.appendChild(img);
-    card.appendChild(label);
-    charGrid.appendChild(card);
-  });
+      div.appendChild(img);
+      div.appendChild(p);
+      charactersContainer.appendChild(div);
+    });
+  }
 }
 
 /* ==============================
