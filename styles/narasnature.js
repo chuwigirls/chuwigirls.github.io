@@ -622,7 +622,6 @@ async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
 
     // Use eligible pool, else fallback to any unhidden trial with a name
     let pool = (eligible && eligible.length > 0) ? eligible : all.filter(t => t.Trial && t.Trial.trim());
-    console.log("Trial pool used (non-empty names only):", pool);
 
     if (!pool || pool.length === 0) {
       const placeholder = document.createElement("div");
@@ -633,8 +632,6 @@ async function renderSidebarFeaturedTrial(targetId = "featured-trial-sidebar") {
     }
 
     const chosen = pool[Math.floor(Math.random() * pool.length)];
-    console.log("Chosen trial:", chosen);
-
     container.appendChild(makeTrialCard(chosen, false));
 
 
@@ -723,13 +720,8 @@ async function renderFrontpageFeaturedTrials(targetId = "featured-trial-frontpag
     if (!container) return;
     container.innerHTML = "";
 
-    console.log("=== Frontpage Featured Trials Debug ===");
-    console.log("Eligible trials:", eligible);
-    console.log("All visible trials:", all);
-
     // Use eligible pool, else fallback to any unhidden trial with a name
     let pool = (eligible && eligible.length > 0) ? eligible : all.filter(t => t.Trial && t.Trial.trim());
-    console.log("Trial pool used (non-empty names only):", pool);
 
     if (!pool || pool.length === 0) {
       const placeholder = document.createElement("div");
@@ -740,7 +732,6 @@ async function renderFrontpageFeaturedTrials(targetId = "featured-trial-frontpag
     }
 
     const chosen = pool[Math.floor(Math.random() * pool.length)];
-    console.log("Chosen trial:", chosen);
 
     container.appendChild(makeTrialCard(chosen, true));
 
@@ -804,9 +795,6 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   }
 }
 
-// ===============================
-// Fetch user profile from GAS
-// ===============================
 async function fetchUserProfile(discordId, username) {
   if (!discordId) {
     console.error("Missing Discord ID");
@@ -819,66 +807,57 @@ async function fetchUserProfile(discordId, username) {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-    const data = await response.json();
-    console.log("✅ User profile loaded:", data);
-    return data;
+    return await response.json();
   } catch (err) {
     console.error("❌ Failed to fetch user profile:", err);
     return null;
   }
 }
 
-// ===============================
-// Example usage in user.html
-// ===============================
-document.addEventListener("DOMContentLoaded", async () => {
-  // assume you already stored login info from Discord OAuth
-  const discordId = sessionStorage.getItem("discordId");
-  const username = sessionStorage.getItem("username");
-
-  const profile = await fetchUserProfile(discordId, username);
-  if (profile) {
-    renderUserProfile(profile);
-  }
-});
-
-// ===============================
-// Render profile (stub, you fill UI)
-// ===============================
 function renderUserProfile(data) {
-  const container = document.getElementById("userProfile");
-  if (!container) return;
+  // username + balance
+  document.getElementById("username").textContent = data.username || "Unknown";
+  document.getElementById("balance").textContent = data.inventory?.balance || 0;
 
-  container.innerHTML = `
-    <h2>${data.username || "Unknown"}</h2>
-    <p>💎 Balance: ${data.inventory?.balance || 0}</p>
+  // inventory list
+  const invList = document.getElementById("inventory");
+  invList.innerHTML = "";
+  Object.entries(data.inventory || {})
+    .filter(([k]) => k !== "balance")
+    .forEach(([key, val]) => {
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${val}`;
+      invList.appendChild(li);
+    });
 
-    <h3>Inventory</h3>
-    <ul>
-      ${Object.entries(data.inventory || {})
-        .filter(([k]) => k !== "balance")
-        .map(([key, val]) => `<li>${key}: ${val}</li>`)
-        .join("")}
-    </ul>
+  // palcharms list
+  const palList = document.getElementById("palcharms");
+  palList.innerHTML = "";
+  Object.entries(data.palcharms || {})
+    .forEach(([key, val]) => {
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${val}`;
+      palList.appendChild(li);
+    });
 
-    <h3>Palcharms</h3>
-    <ul>
-      ${Object.entries(data.palcharms || {})
-        .map(([key, val]) => `<li>${key}: ${val}</li>`)
-        .join("")}
-    </ul>
+  // characters grid
+  const charGrid = document.getElementById("characters");
+  charGrid.innerHTML = "";
+  (data.characters || []).forEach(c => {
+    const card = document.createElement("div");
+    card.className = "char-card";
 
-    <h3>Characters</h3>
-    <div class="char-grid">
-      ${(data.characters || [])
-        .map(c => `
-          <div class="char-card">
-            <img src="${c.image}" alt="${c.design}" />
-            <p>${c.design}</p>
-          </div>
-        `).join("")}
-    </div>
-  `;
+    const img = document.createElement("img");
+    img.src = c.image;
+    img.alt = c.design;
+
+    const label = document.createElement("p");
+    label.textContent = c.design;
+
+    card.appendChild(img);
+    card.appendChild(label);
+    charGrid.appendChild(card);
+  });
 }
 
 /* ==============================
@@ -1005,7 +984,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const { sheet, config } = SHEET_CONFIGS[pageName];
       const data = await fetchSheetData(sheet);
       renderSheets(data, config);
+      
     }
+
+    const discordId = sessionStorage.getItem("discordId");
+    const username = sessionStorage.getItem("username");
+    const profile = await fetchUserProfile(discordId, username);
+    if (profile) renderUserProfile(profile);
+
   } catch (err) {
     console.error("Error during page initialization:", err);
   }
