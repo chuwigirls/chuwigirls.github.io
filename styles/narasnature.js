@@ -883,10 +883,10 @@ function renderUserProfile(data) {
     usernameEl.textContent = data.username;
   }
 
-  // Balance
-  const balanceEl = document.getElementById("balance");
-  if (balanceEl && data.inventory?.balance !== undefined) {
-    balanceEl.textContent = data.inventory.balance;
+  // Crystals
+  const crystalsEl = document.getElementById("crystals");
+  if (crystalsEl && data.currencies?.crystals !== undefined) {
+    crystalsEl.textContent = data.currencies.crystals;
   }
 
   // Inventory
@@ -1057,9 +1057,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSheets(data, config);
       
     }
-
-    /* const profile = await fetchUserProfile();
-    if (profile) renderUserProfile(profile); */
 
     const retryBtn = document.getElementById("retryProfileBtn");
     if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
