@@ -24,6 +24,8 @@ function getDiscordOAuthURL() {
    ===== Navbar =================
    ============================== */
 function updateNavbarUI(userDataParam) {
+  console.trace("⚡ fetchUserProfile called");
+
   const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
@@ -45,11 +47,9 @@ function updateNavbarUI(userDataParam) {
 
 /* ==============================
    ===== Fetch Profile ========== 
-   (uses GAS ?id=&username= per your doGet)
    ============================== */
 async function fetchUserProfile() {
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
-  console.log("🔍 Discord user from localStorage:", discordUser);
 
   if (!discordUser.id) {
     console.warn("⚠️ No Discord ID found. User not logged in.");
@@ -1049,9 +1049,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       
     }
 
-    const discordId = sessionStorage.getItem("discordId");
-    const username = sessionStorage.getItem("username");
-    const profile = await fetchUserProfile(discordId, username);
+    const profile = await fetchUserProfile();
     if (profile) renderUserProfile(profile);
 
     const retryBtn = document.getElementById("retryProfileBtn");
