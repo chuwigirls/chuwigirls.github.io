@@ -17,9 +17,7 @@ const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYY
 
 function getDiscordOAuthURL() {
   const scope = "identify";
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    REDIRECT_URI
-  )}&response_type=token&scope=${scope}`;
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
 }
 
 /* ==============================
@@ -31,39 +29,38 @@ function updateNavbarUI(userDataParam) {
   const userDropdown = document.getElementById("userDropdown");
 
   if (userData && userData.id && userData.username) {
-    // Logged in
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
       userDropdown.style.display = "flex";
       const usernameSpan = userDropdown.querySelector(".username");
       if (usernameSpan) usernameSpan.textContent = userData.username;
     }
-
-    // ✅ Only fetch profile if user is logged in
+    // ensure profile loads when logged in
     fetchUserProfile();
   } else {
-    // Logged out
     if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
   }
 }
 
 /* ==============================
-   ===== Fetch Profile ==========
+   ===== Fetch Profile ========== 
+   (uses GAS ?id=&username= per your doGet)
    ============================== */
 async function fetchUserProfile() {
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  if (!discordUser.id) return; // not logged in; nothing to do
+
   try {
-    const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
-    if (!discordUser.id) return; // Guard: don’t run if logged out
-
-    console.log("Discord user from localStorage:", discordUser);
-
     // Show spinner, hide others
-    document.getElementById("profile-spinner").style.display = "block";
-    document.getElementById("profile-content").style.display = "none";
-    document.getElementById("profile-error").style.display = "none";
+    const spin = document.getElementById("profile-spinner");
+    const cont = document.getElementById("profile-content");
+    const err = document.getElementById("profile-error");
+    if (spin) spin.style.display = "block";
+    if (cont) cont.style.display = "none";
+    if (err) err.style.display = "none";
 
-    const url = `${GAS_ENDPOINT}?action=getUserProfile&discordId=${encodeURIComponent(discordUser.id)}`;
+    const url = `${GAS_ENDPOINT}?id=${encodeURIComponent(discordUser.id)}&username=${encodeURIComponent(discordUser.username || "")}`;
     console.log("Fetching user profile from:", url);
 
     const res = await fetch(url);
@@ -74,17 +71,17 @@ async function fetchUserProfile() {
 
     renderUserProfile(data);
 
-    // Success → show profile
-    document.getElementById("profile-spinner").style.display = "none";
-    document.getElementById("profile-content").style.display = "block";
-    document.getElementById("profile-error").style.display = "none";
-  } catch (err) {
-    console.error("❌ Error fetching user profile:", err);
-
-    // Error → show fallback
-    document.getElementById("profile-spinner").style.display = "none";
-    document.getElementById("profile-content").style.display = "none";
-    document.getElementById("profile-error").style.display = "block";
+    if (spin) spin.style.display = "none";
+    if (cont) cont.style.display = "block";
+    if (err) err.style.display = "none";
+  } catch (e) {
+    console.error("❌ Error fetching user profile:", e);
+    const spin = document.getElementById("profile-spinner");
+    const cont = document.getElementById("profile-content");
+    const err = document.getElementById("profile-error");
+    if (spin) spin.style.display = "none";
+    if (cont) cont.style.display = "none";
+    if (err) err.style.display = "block";
   }
 }
 
@@ -96,12 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ==============================
    ===== Page Guard =============
+   - Allow OAuth callback to run on /user.html if #access_token is present
    ============================== */
 document.addEventListener("DOMContentLoaded", () => {
   const isUserPage = window.location.pathname.endsWith("/user.html");
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  const hasOAuthHash = window.location.hash.includes("access_token=");
 
-  if (isUserPage && !discordUser.id) {
+  if (isUserPage && !discordUser.id && !hasOAuthHash) {
     console.warn("🚫 No user logged in — redirecting to login.html");
     window.location.href = "login.html";
   }
@@ -113,19 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
 function showHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
-
   if (!loginNav.dataset.prevHtml) {
     loginNav.dataset.prevHtml = loginNav.innerHTML;
   }
-
   loginNav.innerHTML = '<div class="spinner" id="authSpinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
   loginNav.style.display = "flex";
 }
-
 function hideHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
-
   const prev = loginNav.dataset.prevHtml;
   if (prev) {
     loginNav.innerHTML = prev;
@@ -140,6 +135,7 @@ function hideHeaderAuthSpinner() {
    ===== OAuth ==================
    ============================== */
 async function handleOAuthCallback() {
+  // Handle only when URL hash has the token
   const params = new URLSearchParams(window.location.hash.substring(1));
   const accessToken = params.get("access_token");
   if (!accessToken) return;
@@ -147,8 +143,10 @@ async function handleOAuthCallback() {
   showHeaderAuthSpinner();
 
   try {
+    // Save token
     localStorage.setItem("access_token", accessToken);
 
+    // Fetch Discord user
     const userResponse = await fetch("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
@@ -157,17 +155,20 @@ async function handleOAuthCallback() {
     const userData = await userResponse.json();
     localStorage.setItem("discordUser", JSON.stringify(userData));
 
+    // Warm the GAS (optional) to create/update rows
     if (userData.id) {
-      fetch(`${GAS_ENDPOINT}?id=${userData.id}&username=${encodeURIComponent(userData.username)}`)
+      fetch(`${GAS_ENDPOINT}?id=${encodeURIComponent(userData.id)}&username=${encodeURIComponent(userData.username || "")}`)
         .then(res => res.json())
         .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
         .catch(() => {});
     }
 
+    // If not on /user.html, go there; otherwise clean hash + update UI
     if (!window.location.pathname.endsWith("/user.html")) {
       window.location.replace("/user.html");
-      return;
+      return; // stop here; the next page load will init UI
     } else {
+      // Clean the #access_token from URL
       history.replaceState(null, "", window.location.pathname);
       updateNavbarUI();
       hideHeaderAuthSpinner();
@@ -181,17 +182,16 @@ async function handleOAuthCallback() {
 
 function setupLogoutButton() {
   const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", e => {
-      e.preventDefault();
-      localStorage.removeItem("discordUser");
-      localStorage.removeItem("userData");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("discordAccessToken");
-      updateNavbarUI();
-      window.location.href = "/index.html";
-    });
-  }
+  if (!logoutBtn) return;
+  logoutBtn.addEventListener("click", e => {
+    e.preventDefault();
+    localStorage.removeItem("discordUser");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("discordAccessToken");
+    updateNavbarUI();
+    window.location.href = "/index.html";
+  });
 }
 
 // ==============================
