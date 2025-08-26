@@ -66,7 +66,21 @@
       <div class="page">
       <h1>Welcome to Naras Nature</h1>
 
-      <div id="userProfile">
+      <div id="user-profile">
+      <div id="profile-spinner" style="display: none; text-align: center; margin-top: 2rem;">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+
+      <!-- ❌ Error / fallback message -->
+      <div id="profile-error" style="display: none; text-align: center; margin-top: 2rem; color: var(--dark-blue);">
+        <p>⚠️ Couldn’t load profile. Please refresh or try again later.</p>
+        <button id="retryProfileBtn" style="margin-top: 1rem; padding: 0.5rem 1rem; border: none; background: var(--dark-blue); color: white; border-radius: 6px; cursor: pointer;">
+          Retry
+        </button>
+      </div>
+
+      <!-- Profile content will render here -->
+      <div id="profile-content" style="display: none;">
         <h2 id="username"></h2>
         <p>💎 Crystals: <span id="balance"></span></p>
 
@@ -79,6 +93,7 @@
         <h3>Naras</h3>
         <div id="characters" class="char-grid"></div>
       </div>
+    </div>
 
       </div>
     </div>
