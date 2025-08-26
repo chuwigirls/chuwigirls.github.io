@@ -795,6 +795,9 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   }
 }
 
+/* ==============================
+   User profile
+   ============================== */
 async function fetchUserProfile(discordId, username) {
   if (!discordId) {
     console.error("Missing Discord ID");
