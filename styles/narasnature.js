@@ -17,7 +17,9 @@ const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYY
 
 function getDiscordOAuthURL() {
   const scope = "identify";
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&response_type=token&scope=${scope}`;
 }
 
 /* ==============================
@@ -28,18 +30,82 @@ function updateNavbarUI(userDataParam) {
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
-  if (userData && userData.username) {
+  if (userData && userData.id && userData.username) {
+    // Logged in
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
       userDropdown.style.display = "flex";
       const usernameSpan = userDropdown.querySelector(".username");
       if (usernameSpan) usernameSpan.textContent = userData.username;
     }
+
+    // ✅ Only fetch profile if user is logged in
+    fetchUserProfile();
   } else {
+    // Logged out
     if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
   }
 }
+
+/* ==============================
+   ===== Fetch Profile ==========
+   ============================== */
+async function fetchUserProfile() {
+  try {
+    const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+    if (!discordUser.id) return; // Guard: don’t run if logged out
+
+    console.log("Discord user from localStorage:", discordUser);
+
+    // Show spinner, hide others
+    document.getElementById("profile-spinner").style.display = "block";
+    document.getElementById("profile-content").style.display = "none";
+    document.getElementById("profile-error").style.display = "none";
+
+    const url = `${GAS_ENDPOINT}?action=getUserProfile&discordId=${encodeURIComponent(discordUser.id)}`;
+    console.log("Fetching user profile from:", url);
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    console.log("✅ GAS Response:", data);
+
+    renderUserProfile(data);
+
+    // Success → show profile
+    document.getElementById("profile-spinner").style.display = "none";
+    document.getElementById("profile-content").style.display = "block";
+    document.getElementById("profile-error").style.display = "none";
+  } catch (err) {
+    console.error("❌ Error fetching user profile:", err);
+
+    // Error → show fallback
+    document.getElementById("profile-spinner").style.display = "none";
+    document.getElementById("profile-content").style.display = "none";
+    document.getElementById("profile-error").style.display = "block";
+  }
+}
+
+// Attach retry button event on DOM load
+document.addEventListener("DOMContentLoaded", () => {
+  const retryBtn = document.getElementById("retryProfileBtn");
+  if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+});
+
+/* ==============================
+   ===== Page Guard =============
+   ============================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const isUserPage = window.location.pathname.endsWith("/user.html");
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+
+  if (isUserPage && !discordUser.id) {
+    console.warn("🚫 No user logged in — redirecting to login.html");
+    window.location.href = "login.html";
+  }
+});
 
 /* ==============================
    ===== Header Auth Spinner ====
@@ -792,28 +858,6 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 
   } catch (err) {
     console.error("Error rendering recent Naras:", err);
-  }
-}
-
-/* ==============================
-   User profile
-   ============================== */
-async function fetchUserProfile(discordId, username) {
-  if (!discordId) {
-    console.error("Missing Discord ID");
-    return null;
-  }
-
-  try {
-    const url = `https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?id=${encodeURIComponent(discordId)}&username=${encodeURIComponent(username || "")}`;
-
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-    return await response.json();
-  } catch (err) {
-    console.error("❌ Failed to fetch user profile:", err);
-    return null;
   }
 }
 
