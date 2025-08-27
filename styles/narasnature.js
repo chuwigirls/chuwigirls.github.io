@@ -1054,11 +1054,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const { sheet, config } = SHEET_CONFIGS[pageName];
       const data = await fetchSheetData(sheet);
       renderSheets(data, config);
-      
     }
 
-    const retryBtn = document.getElementById("retryProfileBtn");
-    if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+    if (path.endsWith("/user.html")) {
+      await fetchUserProfile();
+      const retryBtn = document.getElementById("retryProfileBtn");
+      if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+    }
 
   } catch (err) {
     console.error("Error during page initialization:", err);
