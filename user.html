@@ -73,16 +73,16 @@
 
       <!-- ❌ Error / fallback message -->
       <div id="profile-error" style="display: none; text-align: center; margin-top: 2rem; color: var(--dark-blue);">
-        <p>⚠️ Couldn’t load profile. Please refresh or try again later.</p>
+        <p>⚠️ Uh-oh... looks like your Civilian profile couldn't be loaded. Can you refresh or try again?</p>
         <button id="retryProfileBtn" style="margin-top: 1rem; padding: 0.5rem 1rem; border: none; background: var(--dark-blue); color: white; border-radius: 6px; cursor: pointer;">
-          Retry
+          Refresh
         </button>
       </div>
 
       <!-- Profile content will render here -->
       <div id="profile-content" style="display: none;">
-        <h2 id="username"></h2>
-        <p>💎 Crystals: <span id="balance"></span></p>
+        <i class="fa-brands fa-discord"></i><h2 id="username"></h2>
+        <strong>💎 Crystals: <span id="crystals"></span></strong>
 
         <h3>Inventory</h3>
         <ul id="inventory"></ul>
