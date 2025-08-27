@@ -142,6 +142,16 @@ h1 {
   color: var(--dark-blue);
 }
 
+h2 {
+  font-family: var(--cyber);
+  color: var(--dark-blue);
+}
+
+h3 {
+  font-family: var(--cyber);
+  color: var(--dark-blue);
+}
+
 h4 {
   font-family: var(--bubbly);
   color: var(--dark-blue);
