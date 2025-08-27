@@ -885,8 +885,8 @@ function renderUserProfile(data) {
 
   // Crystals
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.crystals !== undefined) {
-    crystalsEl.textContent = data.crystals;
+  if (crystalsEl && data.currencies && data.currencies.crystals !== undefined) {
+    crystalsEl.textContent = data.currencies.crystals;
   }
 
   // Inventory
