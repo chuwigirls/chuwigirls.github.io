@@ -1019,16 +1019,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     initSidebar();
     updateHeaderHeightCSSVar();
 
-    // ✅ Featured Nara (monthly) — run only if sidebar exists
     const sidebar = document.getElementById("featured-nara-sidebar");
     if (sidebar) {
-      // Show loading state first
       sidebar.innerHTML = `<div class="featured-nara-placeholder">⏳ Loading featured Nara...</div>`;
       loadFeaturedNaraSidebar();
     }
 
-    renderRecentNaras("recent-naras", 8);
-    renderFrontpageFeaturedTrials("featured-trial-frontpage");
+   if (path.endsWith("/") || path.endsWith("/index.html")) {
+      renderRecentNaras("recent-naras", 8);
+      renderFrontpageFeaturedTrials("featured-trial-frontpage");
+    }
     renderSidebarFeaturedTrial("featured-trial-sidebar");  
 
     setupPageTransitions();
@@ -1037,7 +1037,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
 
-    // Universal Sheet Loader
     const pageName = path.split("/").pop().replace(".html", "");
 
     const SHEET_CONFIGS = {
