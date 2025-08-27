@@ -8,9 +8,9 @@
     if you're looking at this page to learn about coding,
     you can ask chuwigirls for help!
 
-   ==============================
-   ===== Discord OAuth Config ===
-   ============================== */
+==============================
+===== Discord OAuth Config ===
+============================== */
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
@@ -37,7 +37,7 @@ function updateNavbarUI(userDataParam) {
       const usernameSpan = userDropdown.querySelector(".username");
       if (usernameSpan) usernameSpan.textContent = userData.username;
     }
-    // ensure profile loads when logged in
+
     fetchUserProfile();
   } else {
     if (loginNav) loginNav.style.display = "flex";
@@ -885,8 +885,8 @@ function renderUserProfile(data) {
 
   // Crystals
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies?.crystals !== undefined) {
-    crystalsEl.textContent = data.currencies.crystals;
+  if (crystalsEl && data.crystals !== undefined) {
+    crystalsEl.textContent = data.crystals;
   }
 
   // Inventory
