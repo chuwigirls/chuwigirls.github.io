@@ -23,21 +23,22 @@ function getDiscordOAuthURL() {
 /* ==============================
    ===== Navbar =================
    ============================== */
-function updateNavbarUI() {
-  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+function updateNavbarUI(userDataParam) {
+  console.trace("⚡ fetchUserProfile called");
+
+  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
-  if (discordUser.id && discordUser.username) {
+  if (userData && userData.id && userData.username) {
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
       userDropdown.style.display = "flex";
       const usernameSpan = userDropdown.querySelector(".username");
-      if (usernameSpan) usernameSpan.textContent = discordUser.username;
+      if (usernameSpan) usernameSpan.textContent = userData.username;
     }
 
-    fetchUserProfile(discordUser.id, discordUser.username);
-
+    fetchUserProfile();
   } else {
     if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
@@ -45,26 +46,62 @@ function updateNavbarUI() {
 }
 
 /* ==============================
-   ===== Fetch User Data ==========
+   ===== Fetch Profile ========== 
    ============================== */
-async function fetchUserProfile(discordId, username) {
-  const url = `${GAS_ENDPOINT}?id=${discordId}&username=${encodeURIComponent(username)}`;
+async function fetchUserProfile() { 
+  if (window.__profileLoading) return;
+  window.__profileLoading = true;
+
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  console.log("🔍 Discord user from localStorage:", discordUser);
+
+  if (!discordUser.id) {
+    console.warn("⚠️ No Discord ID found. User not logged in.");
+    window.__profileLoading = false;
+    return;
+  }
 
   try {
+    const spin = document.getElementById("profile-spinner");
+    const cont = document.getElementById("profile-content");
+    const err = document.getElementById("profile-error");
+    if (spin) spin.style.display = "block";
+    if (cont) cont.style.display = "none";
+    if (err) err.style.display = "none";
+
+    const url = `${GAS_ENDPOINT}?id=${encodeURIComponent(discordUser.id)}&username=${encodeURIComponent(discordUser.username || "")}`;
+    console.log("🌐 Fetching user profile from:", url);
+
     const res = await fetch(url);
+    console.log("📡 Fetch response status:", res.status);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const result = await res.json();
 
-    // Store in sessionStorage for caching
-    sessionStorage.setItem("userData", JSON.stringify(result));
+    const data = await res.json();
+    console.log("✅ GAS Response JSON:", data);
 
-    // Render everything
-    renderUserProfile(result);
+    // ⬇️ Only render if on user.html
+    const path = window.location.pathname;
+    if (path.endsWith("/user.html")) {
+      renderUserProfile(data);
+    }
 
-  } catch (err) {
-    console.error("Error fetching user data:", err);
-    const userBox = document.getElementById('user');
-    if (userBox) userBox.innerHTML = `<p class="text-danger">Error loading profile. Please try again later.</p>`;
+    if (spin) spin.style.display = "none";
+    if (cont) cont.style.display = "block";
+    if (err) err.style.display = "none";
+
+    window.__profileLoading = false;
+    return data;
+  } catch (e) {
+    console.error("❌ Error fetching user profile:", e);
+    const spin = document.getElementById("profile-spinner");
+    const cont = document.getElementById("profile-content");
+    const err = document.getElementById("profile-error");
+    if (spin) spin.style.display = "none";
+    if (cont) cont.style.display = "none";
+    if (err) err.style.display = "block";
+
+    window.__profileLoading = false;
+    return;
   }
 }
 
@@ -839,78 +876,76 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 }
 
 // ===============================
-// Render User Data
+// Render user profile into existing HTML
 // ===============================
 function renderUserProfile(data) {
   // Username
   const usernameEl = document.getElementById("username");
-  if (usernameEl) usernameEl.textContent = data.username || "Unknown";
+  if (usernameEl && data.username) {
+    usernameEl.textContent = data.username;
+  }
 
   // Crystals
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl) crystalsEl.textContent = data.currencies?.Crystals ?? 0;
+  if (crystalsEl && data.currencies) {
+    const crystals = data.currencies.Crystals ?? data.currencies.crystals ?? 0;
+    crystalsEl.textContent = crystals;
+  }
 
-  // Other Currencies
+  // Other currencies
   const otherCurrenciesEl = document.getElementById("other-currencies");
   if (otherCurrenciesEl) {
     otherCurrenciesEl.innerHTML = "";
-    Object.entries(data.currencies || {}).forEach(([name, amount]) => {
-      if (name !== "Crystals" && parseFloat(amount) > 0) {
-        const li = document.createElement("li");
-        li.textContent = `${name}: ${amount}`;
-        otherCurrenciesEl.appendChild(li);
-      }
-    });
+    if (data.currencies) {
+      Object.entries(data.currencies).forEach(([name, amount]) => {
+        const key = name.toLowerCase();
+        if (key !== "crystals" && amount > 0) {
+          const li = document.createElement("li");
+          li.textContent = `${name}: ${amount}`;
+          otherCurrenciesEl.appendChild(li);
+        }
+      });
+    }
   }
 
   // Inventory
-  const inventoryEl = document.getElementById("inventory");
-  if (inventoryEl) {
-    inventoryEl.innerHTML = "";
-    (data.inventory || []).forEach(itemObj => {
-      Object.entries(itemObj).forEach(([item, qty]) => {
-        if (item !== "Civilian" && item !== "Discord ID") {
-          const li = document.createElement("li");
-          li.textContent = `${item}: ${qty}`;
-          inventoryEl.appendChild(li);
-        }
-      });
-    });
-  }
+  const inventoryList = document.getElementById("inventory");
+  inventoryList.innerHTML = "";
+  Object.entries(data.inventory).forEach(([item, qty]) => {
+    const li = document.createElement("li");
+    li.textContent = `${item}: ${qty}`;
+    inventoryList.appendChild(li);
+  });
 
   // Palcharms
-  const palEl = document.getElementById("palcharms-list");
-  if (palEl) {
-    palEl.innerHTML = "";
-    (data.palcharms || []).forEach(palObj => {
-      Object.entries(palObj).forEach(([pal, qty]) => {
-        if (pal !== "Civilian" && pal !== "Discord ID") {
-          const li = document.createElement("li");
-          li.textContent = `${pal}: ${qty}`;
-          palEl.appendChild(li);
-        }
-      });
+  const palcharmsList = document.getElementById("palcharms-list");
+  if (palcharmsList && data.palcharms) {
+    palcharmsList.innerHTML = "";
+    Object.entries(data.palcharms).forEach(([key, value]) => {
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${value}`;
+      palcharmsList.appendChild(li);
     });
   }
 
   // Characters
-  const charEl = document.getElementById("characters");
-  if (charEl) {
-    charEl.innerHTML = "";
-    (data.characters || []).forEach(c => {
+  const charactersContainer = document.getElementById("characters");
+  if (charactersContainer && data.characters) {
+    charactersContainer.innerHTML = "";
+    data.characters.forEach(c => {
       const div = document.createElement("div");
       div.classList.add("char-card");
 
       const img = document.createElement("img");
-      img.src = c.image || "";
-      img.alt = c.design || "Character";
+      img.src = c.image;
+      img.alt = c.design;
 
       const p = document.createElement("p");
-      p.textContent = c.design || "N/A";
+      p.textContent = c.design;
 
       div.appendChild(img);
       div.appendChild(p);
-      charEl.appendChild(div);
+      charactersContainer.appendChild(div);
     });
   }
 }
@@ -1040,11 +1075,66 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSheets(data, config);
     }
 
-      if (path.endsWith("/user.html")) {
-        await fetchUserProfile();
-        const retryBtn = document.getElementById("retryProfileBtn");
-        if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+        if (path.endsWith("/user.html")) {
+      async function renderUserProfile(data) {
+        console.log("=== User Profile Data ===", data);
+
+        const usernameEl = document.getElementById("username");
+        if (usernameEl && data.username) {
+          usernameEl.textContent = data.username;
+        }
+
+        const crystalsEl = document.getElementById("crystals");
+        if (crystalsEl && data.currencies?.crystals !== undefined) {
+          crystalsEl.textContent = data.currencies.crystals;
+        }
+
+        const inventoryList = document.getElementById("inventory");
+        if (inventoryList && data.inventory) {
+          inventoryList.innerHTML = "";
+          Object.entries(data.inventory).forEach(([item, qty]) => {
+            const li = document.createElement("li");
+            li.textContent = `${item}: ${qty}`;
+            inventoryList.appendChild(li);
+          });
+        }
+
+        const palcharmsList = document.getElementById("palcharms-list");
+        if (palcharmsList && data.palcharms) {
+          palcharmsList.innerHTML = "";
+          Object.entries(data.palcharms).forEach(([key, value]) => {
+            const li = document.createElement("li");
+            li.textContent = `${key}: ${value}`;
+            palcharmsList.appendChild(li);
+          });
+        }
+
+        const charactersContainer = document.getElementById("characters");
+        if (charactersContainer && data.characters) {
+          charactersContainer.innerHTML = "";
+          data.characters.forEach(c => {
+            const div = document.createElement("div");
+            div.classList.add("char-card");
+
+            const img = document.createElement("img");
+            img.src = c.image;
+            img.alt = c.design;
+
+            const p = document.createElement("p");
+            p.textContent = c.design;
+
+            div.appendChild(img);
+            div.appendChild(p);
+            charactersContainer.appendChild(div);
+          });
+        }
       }
+
+      await fetchUserProfile();
+
+      const retryBtn = document.getElementById("retryProfileBtn");
+      if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+    }
 
   } catch (err) {
     console.error("Error during page initialization:", err);
@@ -1055,4 +1145,3 @@ window.addEventListener("load", () => {
   const smooth = document.querySelector(".smoothLoad");
   if (smooth) smooth.classList.add("loaded");
 });
-
