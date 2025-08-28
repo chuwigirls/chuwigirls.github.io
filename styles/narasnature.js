@@ -48,7 +48,7 @@ function updateNavbarUI(userDataParam) {
 /* ==============================
    ===== Fetch Profile ========== 
    ============================== */
-async function fetchUserProfile() {
+async function fetchUserProfile() { 
   if (window.__profileLoading) return;
   window.__profileLoading = true;
 
@@ -79,7 +79,11 @@ async function fetchUserProfile() {
     const data = await res.json();
     console.log("✅ GAS Response JSON:", data);
 
-    renderUserProfile(data);
+    // ⬇️ Only render if on user.html
+    const path = window.location.pathname;
+    if (path.endsWith("/user.html")) {
+      renderUserProfile(data);
+    }
 
     if (spin) spin.style.display = "none";
     if (cont) cont.style.display = "block";
