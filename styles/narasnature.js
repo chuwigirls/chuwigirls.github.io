@@ -36,7 +36,7 @@ function updateNavbarUI() {
       if (usernameSpan) usernameSpan.textContent = discordUser.username;
     }
 
-    fetchUserData(discordUser.id, discordUser.username);
+    fetchUserProfile(discordUser.id, discordUser.username);
 
   } else {
     if (loginNav) loginNav.style.display = "flex";
@@ -47,7 +47,7 @@ function updateNavbarUI() {
 /* ==============================
    ===== Fetch User Data ==========
    ============================== */
-async function fetchUserData(discordId, username) {
+async function fetchUserProfile(discordId, username) {
   const url = `${GAS_ENDPOINT}?id=${discordId}&username=${encodeURIComponent(username)}`;
 
   try {
@@ -59,7 +59,7 @@ async function fetchUserData(discordId, username) {
     sessionStorage.setItem("userData", JSON.stringify(result));
 
     // Render everything
-    renderUserData(result);
+    renderUserProfile(result);
 
   } catch (err) {
     console.error("Error fetching user data:", err);
@@ -841,7 +841,7 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // ===============================
 // Render User Data
 // ===============================
-function renderUserData(data) {
+function renderUserProfile(data) {
   // Username
   const usernameEl = document.getElementById("username");
   if (usernameEl) usernameEl.textContent = data.username || "Unknown";
