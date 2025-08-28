@@ -878,77 +878,6 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // ===============================
 // Render user profile into existing HTML
 // ===============================
-function renderUserProfile(data) {
-  // === Username ===
-  const usernameEl = document.getElementById("username");
-  if (usernameEl && data.username) {
-    usernameEl.textContent = data.username;
-  }
-
-  // === Crystals ===
-  const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
-    crystalsEl.textContent = data.currencies["Crystals"];
-  }
-
-  // === Other Currencies ===
-  const otherCurrenciesEl = document.getElementById("other-currencies");
-  if (otherCurrenciesEl) {
-    otherCurrenciesEl.innerHTML = "";
-    if (data.currencies) {
-      Object.entries(data.currencies).forEach(([name, amount]) => {
-        if (name !== "Crystals" && Number(amount) > 0) {
-          const li = document.createElement("li");
-          li.textContent = `${name}: ${amount}`;
-          otherCurrenciesEl.appendChild(li);
-        }
-      });
-    }
-  }
-
-  // === Inventory ===
-  const inventoryList = document.getElementById("inventory");
-  if (inventoryList && data.inventory) {
-    inventoryList.innerHTML = "";
-    Object.entries(data.inventory).forEach(([item, qty]) => {
-      const li = document.createElement("li");
-      li.textContent = `${item}: ${qty}`;
-      inventoryList.appendChild(li);
-    });
-  }
-
-  // === Palcharms ===
-  const palcharmsList = document.getElementById("palcharms-list");
-  if (palcharmsList && data.palcharms) {
-    palcharmsList.innerHTML = "";
-    Object.entries(data.palcharms).forEach(([key, value]) => {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${value}`;
-      palcharmsList.appendChild(li);
-    });
-  }
-
-  // === Characters ===
-  const charactersContainer = document.getElementById("characters");
-  if (charactersContainer && data.characters) {
-    charactersContainer.innerHTML = "";
-    data.characters.forEach(c => {
-      const div = document.createElement("div");
-      div.classList.add("char-card");
-
-      const img = document.createElement("img");
-      img.src = c.image;
-      img.alt = c.design;
-
-      const p = document.createElement("p");
-      p.textContent = c.design;
-
-      div.appendChild(img);
-      div.appendChild(p);
-      charactersContainer.appendChild(div);
-    });
-  }
-}
 
 /* ==============================
    Transitions & Back To Top
@@ -1075,20 +1004,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSheets(data, config);
     }
 
-        if (path.endsWith("/user.html")) {
-      async function renderUserProfile(data) {
+      if (path.endsWith("/user.html")) {
+      function renderUserProfile(data) {
         console.log("=== User Profile Data ===", data);
 
+        // === Username ===
         const usernameEl = document.getElementById("username");
         if (usernameEl && data.username) {
           usernameEl.textContent = data.username;
         }
 
+        // === Crystals ===
         const crystalsEl = document.getElementById("crystals");
-        if (crystalsEl && data.currencies?.crystals !== undefined) {
-          crystalsEl.textContent = data.currencies.crystals;
+        if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
+          crystalsEl.textContent = data.currencies["Crystals"];
         }
 
+        // === Other Currencies ===
+        const otherCurrenciesEl = document.getElementById("other-currencies");
+        if (otherCurrenciesEl) {
+          otherCurrenciesEl.innerHTML = "";
+          if (data.currencies) {
+            Object.entries(data.currencies).forEach(([name, amount]) => {
+              if (name !== "Crystals" && Number(amount) > 0) {
+                const li = document.createElement("li");
+                li.textContent = `${name}: ${amount}`;
+                otherCurrenciesEl.appendChild(li);
+              }
+            });
+          }
+        }
+
+        // === Inventory ===
         const inventoryList = document.getElementById("inventory");
         if (inventoryList && data.inventory) {
           inventoryList.innerHTML = "";
@@ -1099,6 +1046,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
         }
 
+        // === Palcharms ===
         const palcharmsList = document.getElementById("palcharms-list");
         if (palcharmsList && data.palcharms) {
           palcharmsList.innerHTML = "";
@@ -1109,6 +1057,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
         }
 
+        // === Characters ===
         const charactersContainer = document.getElementById("characters");
         if (charactersContainer && data.characters) {
           charactersContainer.innerHTML = "";
