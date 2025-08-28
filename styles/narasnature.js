@@ -48,6 +48,9 @@ function updateNavbarUI(userDataParam) {
 /* ==============================
    ===== Fetch Profile ========== 
    ============================== */
+/* ==============================
+   ===== Fetch Profile ==========
+   ============================== */
 async function fetchUserProfile() { 
   if (window.__profileLoading) return;
   window.__profileLoading = true;
@@ -65,6 +68,7 @@ async function fetchUserProfile() {
     const spin = document.getElementById("profile-spinner");
     const cont = document.getElementById("profile-content");
     const err = document.getElementById("profile-error");
+
     if (spin) spin.style.display = "block";
     if (cont) cont.style.display = "none";
     if (err) err.style.display = "none";
@@ -79,9 +83,8 @@ async function fetchUserProfile() {
     const data = await res.json();
     console.log("✅ GAS Response JSON:", data);
 
-    // ⬇️ Only render if on user.html
-    const path = window.location.pathname;
-    if (path.endsWith("/user.html")) {
+    // Only render if renderUserProfile exists and we're on user.html
+    if (typeof renderUserProfile === "function" && window.location.pathname.endsWith("/user.html")) {
       renderUserProfile(data);
     }
 
@@ -91,6 +94,7 @@ async function fetchUserProfile() {
 
     window.__profileLoading = false;
     return data;
+
   } catch (e) {
     console.error("❌ Error fetching user profile:", e);
     const spin = document.getElementById("profile-spinner");
@@ -878,6 +882,77 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // ===============================
 // Render user profile into existing HTML
 // ===============================
+function renderUserProfile(data) {
+  // === Username ===
+  const usernameEl = document.getElementById("username");
+  if (usernameEl && data.username) {
+    usernameEl.textContent = data.username;
+  }
+
+  // === Crystals ===
+  const crystalsEl = document.getElementById("crystals");
+  if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
+    crystalsEl.textContent = data.currencies["Crystals"];
+  }
+
+  // === Other Currencies ===
+  const otherCurrenciesEl = document.getElementById("other-currencies");
+  if (otherCurrenciesEl) {
+    otherCurrenciesEl.innerHTML = "";
+    if (data.currencies) {
+      Object.entries(data.currencies).forEach(([name, amount]) => {
+        if (name !== "Crystals" && Number(amount) > 0) {
+          const li = document.createElement("li");
+          li.textContent = `${name}: ${amount}`;
+          otherCurrenciesEl.appendChild(li);
+        }
+      });
+    }
+  }
+
+  // === Inventory ===
+  const inventoryList = document.getElementById("inventory");
+  if (inventoryList && data.inventory) {
+    inventoryList.innerHTML = "";
+    Object.entries(data.inventory).forEach(([item, qty]) => {
+      const li = document.createElement("li");
+      li.textContent = `${item}: ${qty}`;
+      inventoryList.appendChild(li);
+    });
+  }
+
+  // === Palcharms ===
+  const palcharmsList = document.getElementById("palcharms-list");
+  if (palcharmsList && data.palcharms) {
+    palcharmsList.innerHTML = "";
+    Object.entries(data.palcharms).forEach(([key, value]) => {
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${value}`;
+      palcharmsList.appendChild(li);
+    });
+  }
+
+  // === Characters ===
+  const charactersContainer = document.getElementById("characters");
+  if (charactersContainer && data.characters) {
+    charactersContainer.innerHTML = "";
+    data.characters.forEach(c => {
+      const div = document.createElement("div");
+      div.classList.add("char-card");
+
+      const img = document.createElement("img");
+      img.src = c.image;
+      img.alt = c.design;
+
+      const p = document.createElement("p");
+      p.textContent = c.design;
+
+      div.appendChild(img);
+      div.appendChild(p);
+      charactersContainer.appendChild(div);
+    });
+  }
+}
 
 /* ==============================
    Transitions & Back To Top
@@ -1005,85 +1080,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
       if (path.endsWith("/user.html")) {
-      function renderUserProfile(data) {
-        console.log("=== User Profile Data ===", data);
-
-        // === Username ===
-        const usernameEl = document.getElementById("username");
-        if (usernameEl && data.username) {
-          usernameEl.textContent = data.username;
-        }
-
-        // === Crystals ===
-        const crystalsEl = document.getElementById("crystals");
-        if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
-          crystalsEl.textContent = data.currencies["Crystals"];
-        }
-
-        // === Other Currencies ===
-        const otherCurrenciesEl = document.getElementById("other-currencies");
-        if (otherCurrenciesEl) {
-          otherCurrenciesEl.innerHTML = "";
-          if (data.currencies) {
-            Object.entries(data.currencies).forEach(([name, amount]) => {
-              if (name !== "Crystals" && Number(amount) > 0) {
-                const li = document.createElement("li");
-                li.textContent = `${name}: ${amount}`;
-                otherCurrenciesEl.appendChild(li);
-              }
-            });
-          }
-        }
-
-        // === Inventory ===
-        const inventoryList = document.getElementById("inventory");
-        if (inventoryList && data.inventory) {
-          inventoryList.innerHTML = "";
-          Object.entries(data.inventory).forEach(([item, qty]) => {
-            const li = document.createElement("li");
-            li.textContent = `${item}: ${qty}`;
-            inventoryList.appendChild(li);
-          });
-        }
-
-        // === Palcharms ===
-        const palcharmsList = document.getElementById("palcharms-list");
-        if (palcharmsList && data.palcharms) {
-          palcharmsList.innerHTML = "";
-          Object.entries(data.palcharms).forEach(([key, value]) => {
-            const li = document.createElement("li");
-            li.textContent = `${key}: ${value}`;
-            palcharmsList.appendChild(li);
-          });
-        }
-
-        // === Characters ===
-        const charactersContainer = document.getElementById("characters");
-        if (charactersContainer && data.characters) {
-          charactersContainer.innerHTML = "";
-          data.characters.forEach(c => {
-            const div = document.createElement("div");
-            div.classList.add("char-card");
-
-            const img = document.createElement("img");
-            img.src = c.image;
-            img.alt = c.design;
-
-            const p = document.createElement("p");
-            p.textContent = c.design;
-
-            div.appendChild(img);
-            div.appendChild(p);
-            charactersContainer.appendChild(div);
-          });
-        }
+        await fetchUserProfile();
+        const retryBtn = document.getElementById("retryProfileBtn");
+        if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
       }
-
-      await fetchUserProfile();
-
-      const retryBtn = document.getElementById("retryProfileBtn");
-      if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
-    }
 
   } catch (err) {
     console.error("Error during page initialization:", err);
