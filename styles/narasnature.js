@@ -1056,8 +1056,63 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSheets(data, config);
     }
 
-    if (path.endsWith("/user.html")) {
+        if (path.endsWith("/user.html")) {
+      async function renderUserProfile(data) {
+        console.log("=== User Profile Data ===", data);
+
+        const usernameEl = document.getElementById("username");
+        if (usernameEl && data.username) {
+          usernameEl.textContent = data.username;
+        }
+
+        const crystalsEl = document.getElementById("crystals");
+        if (crystalsEl && data.currencies?.crystals !== undefined) {
+          crystalsEl.textContent = data.currencies.crystals;
+        }
+
+        const inventoryList = document.getElementById("inventory");
+        if (inventoryList && data.inventory) {
+          inventoryList.innerHTML = "";
+          Object.entries(data.inventory).forEach(([item, qty]) => {
+            const li = document.createElement("li");
+            li.textContent = `${item}: ${qty}`;
+            inventoryList.appendChild(li);
+          });
+        }
+
+        const palcharmsList = document.getElementById("palcharms-list");
+        if (palcharmsList && data.palcharms) {
+          palcharmsList.innerHTML = "";
+          Object.entries(data.palcharms).forEach(([key, value]) => {
+            const li = document.createElement("li");
+            li.textContent = `${key}: ${value}`;
+            palcharmsList.appendChild(li);
+          });
+        }
+
+        const charactersContainer = document.getElementById("characters");
+        if (charactersContainer && data.characters) {
+          charactersContainer.innerHTML = "";
+          data.characters.forEach(c => {
+            const div = document.createElement("div");
+            div.classList.add("char-card");
+
+            const img = document.createElement("img");
+            img.src = c.image;
+            img.alt = c.design;
+
+            const p = document.createElement("p");
+            p.textContent = c.design;
+
+            div.appendChild(img);
+            div.appendChild(p);
+            charactersContainer.appendChild(div);
+          });
+        }
+      }
+
       await fetchUserProfile();
+
       const retryBtn = document.getElementById("retryProfileBtn");
       if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
     }
