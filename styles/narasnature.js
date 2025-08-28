@@ -879,8 +879,6 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // Render user profile into existing HTML
 // ===============================
 function renderUserProfile(data) {
-  // console.log("=== User Profile Data ===", data);
-
   // Username
   const usernameEl = document.getElementById("username");
   if (usernameEl && data.username) {
@@ -889,23 +887,26 @@ function renderUserProfile(data) {
 
   // Crystals
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies && data.currencies.crystals !== undefined) {
-    crystalsEl.textContent = data.currencies.crystals;
+  if (crystalsEl && data.currencies) {
+    const crystals = data.currencies.Crystals ?? data.currencies.crystals ?? 0;
+    crystalsEl.textContent = crystals;
   }
 
+  // Other currencies
   const otherCurrenciesEl = document.getElementById("other-currencies");
-    if (otherCurrenciesEl) {
-      otherCurrenciesEl.innerHTML = "";
-      if (data.currencies) {
-        Object.entries(data.currencies).forEach(([name, amount]) => {
-          if (name !== "Crystals" && amount > 0) {
-            const li = document.createElement("li");
-            li.textContent = `${name}: ${amount}`;
-            otherCurrenciesEl.appendChild(li);
-          }
-        });
-      }
+  if (otherCurrenciesEl) {
+    otherCurrenciesEl.innerHTML = "";
+    if (data.currencies) {
+      Object.entries(data.currencies).forEach(([name, amount]) => {
+        const key = name.toLowerCase();
+        if (key !== "crystals" && amount > 0) {
+          const li = document.createElement("li");
+          li.textContent = `${name}: ${amount}`;
+          otherCurrenciesEl.appendChild(li);
+        }
+      });
     }
+  }
 
   // Inventory
   const inventoryList = document.getElementById("inventory");
