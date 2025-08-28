@@ -888,7 +888,7 @@ function renderUserProfile(data) {
   // Crystals
   const crystalsEl = document.getElementById("crystals");
   if (crystalsEl && data.currencies) {
-    const crystals = data.currencies.Crystals ?? data.currencies.crystals ?? 0;
+    const crystals = data.currencies["Crystals"] ?? 0;
     crystalsEl.textContent = crystals;
   }
 
@@ -898,8 +898,7 @@ function renderUserProfile(data) {
     otherCurrenciesEl.innerHTML = "";
     if (data.currencies) {
       Object.entries(data.currencies).forEach(([name, amount]) => {
-        const key = name.toLowerCase();
-        if (key !== "crystals" && amount > 0) {
+        if (name !== "Crystals" && Number(amount) > 0) {
           const li = document.createElement("li");
           li.textContent = `${name}: ${amount}`;
           otherCurrenciesEl.appendChild(li);
