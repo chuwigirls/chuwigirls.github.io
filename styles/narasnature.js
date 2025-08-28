@@ -879,20 +879,19 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // Render user profile into existing HTML
 // ===============================
 function renderUserProfile(data) {
-  // Username
+  // === Username ===
   const usernameEl = document.getElementById("username");
   if (usernameEl && data.username) {
     usernameEl.textContent = data.username;
   }
 
-  // Crystals
+  // === Crystals ===
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies) {
-    const crystals = data.currencies["Crystals"] ?? 0;
-    crystalsEl.textContent = crystals;
+  if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
+    crystalsEl.textContent = data.currencies["Crystals"];
   }
 
-  // Other currencies
+  // === Other Currencies ===
   const otherCurrenciesEl = document.getElementById("other-currencies");
   if (otherCurrenciesEl) {
     otherCurrenciesEl.innerHTML = "";
@@ -907,16 +906,18 @@ function renderUserProfile(data) {
     }
   }
 
-  // Inventory
+  // === Inventory ===
   const inventoryList = document.getElementById("inventory");
-  inventoryList.innerHTML = "";
-  Object.entries(data.inventory).forEach(([item, qty]) => {
-    const li = document.createElement("li");
-    li.textContent = `${item}: ${qty}`;
-    inventoryList.appendChild(li);
-  });
+  if (inventoryList && data.inventory) {
+    inventoryList.innerHTML = "";
+    Object.entries(data.inventory).forEach(([item, qty]) => {
+      const li = document.createElement("li");
+      li.textContent = `${item}: ${qty}`;
+      inventoryList.appendChild(li);
+    });
+  }
 
-  // Palcharms
+  // === Palcharms ===
   const palcharmsList = document.getElementById("palcharms-list");
   if (palcharmsList && data.palcharms) {
     palcharmsList.innerHTML = "";
@@ -927,7 +928,7 @@ function renderUserProfile(data) {
     });
   }
 
-  // Characters
+  // === Characters ===
   const charactersContainer = document.getElementById("characters");
   if (charactersContainer && data.characters) {
     charactersContainer.innerHTML = "";
