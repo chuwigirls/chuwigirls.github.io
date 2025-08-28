@@ -23,22 +23,21 @@ function getDiscordOAuthURL() {
 /* ==============================
    ===== Navbar =================
    ============================== */
-function updateNavbarUI(userDataParam) {
-  console.trace("⚡ fetchUserProfile called");
-
-  const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
+function updateNavbarUI() {
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
 
-  if (userData && userData.id && userData.username) {
+  if (discordUser.id && discordUser.username) {
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
       userDropdown.style.display = "flex";
       const usernameSpan = userDropdown.querySelector(".username");
-      if (usernameSpan) usernameSpan.textContent = userData.username;
+      if (usernameSpan) usernameSpan.textContent = discordUser.username;
     }
 
-    fetchUserProfile();
+    fetchUserData(discordUser.id, discordUser.username);
+
   } else {
     if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
@@ -46,66 +45,26 @@ function updateNavbarUI(userDataParam) {
 }
 
 /* ==============================
-   ===== Fetch Profile ========== 
+   ===== Fetch User Data ==========
    ============================== */
-/* ==============================
-   ===== Fetch Profile ==========
-   ============================== */
-async function fetchUserProfile() { 
-  if (window.__profileLoading) return;
-  window.__profileLoading = true;
-
-  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
-  console.log("🔍 Discord user from localStorage:", discordUser);
-
-  if (!discordUser.id) {
-    console.warn("⚠️ No Discord ID found. User not logged in.");
-    window.__profileLoading = false;
-    return;
-  }
+async function fetchUserData(discordId, username) {
+  const url = `${GAS_ENDPOINT}?id=${discordId}&username=${encodeURIComponent(username)}`;
 
   try {
-    const spin = document.getElementById("profile-spinner");
-    const cont = document.getElementById("profile-content");
-    const err = document.getElementById("profile-error");
-
-    if (spin) spin.style.display = "block";
-    if (cont) cont.style.display = "none";
-    if (err) err.style.display = "none";
-
-    const url = `${GAS_ENDPOINT}?id=${encodeURIComponent(discordUser.id)}&username=${encodeURIComponent(discordUser.username || "")}`;
-    console.log("🌐 Fetching user profile from:", url);
-
     const res = await fetch(url);
-    console.log("📡 Fetch response status:", res.status);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const result = await res.json();
 
-    const data = await res.json();
-    console.log("✅ GAS Response JSON:", data);
+    // Store in sessionStorage for caching
+    sessionStorage.setItem("userData", JSON.stringify(result));
 
-    // Only render if renderUserProfile exists and we're on user.html
-    if (typeof renderUserProfile === "function" && window.location.pathname.endsWith("/user.html")) {
-      renderUserProfile(data);
-    }
+    // Render everything
+    renderUserData(result);
 
-    if (spin) spin.style.display = "none";
-    if (cont) cont.style.display = "block";
-    if (err) err.style.display = "none";
-
-    window.__profileLoading = false;
-    return data;
-
-  } catch (e) {
-    console.error("❌ Error fetching user profile:", e);
-    const spin = document.getElementById("profile-spinner");
-    const cont = document.getElementById("profile-content");
-    const err = document.getElementById("profile-error");
-    if (spin) spin.style.display = "none";
-    if (cont) cont.style.display = "none";
-    if (err) err.style.display = "block";
-
-    window.__profileLoading = false;
-    return;
+  } catch (err) {
+    console.error("Error fetching user data:", err);
+    const userBox = document.getElementById('user');
+    if (userBox) userBox.innerHTML = `<p class="text-danger">Error loading profile. Please try again later.</p>`;
   }
 }
 
@@ -880,26 +839,22 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 }
 
 // ===============================
-// Render user profile into existing HTML
+// Render User Data
 // ===============================
-function renderUserProfile(data) {
-  // === Username ===
+function renderUserData(data) {
+  // Username
   const usernameEl = document.getElementById("username");
-  if (usernameEl && data.username) {
-    usernameEl.textContent = data.username;
-  }
+  if (usernameEl) usernameEl.textContent = data.username || "Unknown";
 
-  // === Crystals ===
+  // Crystals
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies && data.currencies["Crystals"] !== undefined) {
-    crystalsEl.textContent = data.currencies["Crystals"];
-  }
+  if (crystalsEl) crystalsEl.textContent = data.currencies?.Crystals ?? 0;
 
-  // === Other Currencies ===
+  // Other Currencies
   const otherCurrenciesEl = document.getElementById("other-currencies");
-  if (otherCurrenciesEl && data.currencies) {
+  if (otherCurrenciesEl) {
     otherCurrenciesEl.innerHTML = "";
-    Object.entries(data.currencies).forEach(([name, amount]) => {
+    Object.entries(data.currencies || {}).forEach(([name, amount]) => {
       if (name !== "Crystals" && parseFloat(amount) > 0) {
         const li = document.createElement("li");
         li.textContent = `${name}: ${amount}`;
@@ -908,46 +863,54 @@ function renderUserProfile(data) {
     });
   }
 
-  // === Inventory ===
-  const inventoryList = document.getElementById("inventory");
-  if (inventoryList && data.inventory) {
-    inventoryList.innerHTML = "";
-    Object.entries(data.inventory).forEach(([item, qty]) => {
-      const li = document.createElement("li");
-      li.textContent = `${item}: ${qty}`;
-      inventoryList.appendChild(li);
+  // Inventory
+  const inventoryEl = document.getElementById("inventory");
+  if (inventoryEl) {
+    inventoryEl.innerHTML = "";
+    (data.inventory || []).forEach(itemObj => {
+      Object.entries(itemObj).forEach(([item, qty]) => {
+        if (item !== "Civilian" && item !== "Discord ID") {
+          const li = document.createElement("li");
+          li.textContent = `${item}: ${qty}`;
+          inventoryEl.appendChild(li);
+        }
+      });
     });
   }
 
-  // === Palcharms ===
-  const palcharmsList = document.getElementById("palcharms-list");
-  if (palcharmsList && data.palcharms) {
-    palcharmsList.innerHTML = "";
-    Object.entries(data.palcharms).forEach(([key, value]) => {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${value}`;
-      palcharmsList.appendChild(li);
+  // Palcharms
+  const palEl = document.getElementById("palcharms-list");
+  if (palEl) {
+    palEl.innerHTML = "";
+    (data.palcharms || []).forEach(palObj => {
+      Object.entries(palObj).forEach(([pal, qty]) => {
+        if (pal !== "Civilian" && pal !== "Discord ID") {
+          const li = document.createElement("li");
+          li.textContent = `${pal}: ${qty}`;
+          palEl.appendChild(li);
+        }
+      });
     });
   }
 
-  // === Characters ===
-  const charactersContainer = document.getElementById("characters");
-  if (charactersContainer && data.characters) {
-    charactersContainer.innerHTML = "";
-    data.characters.forEach(c => {
+  // Characters
+  const charEl = document.getElementById("characters");
+  if (charEl) {
+    charEl.innerHTML = "";
+    (data.characters || []).forEach(c => {
       const div = document.createElement("div");
       div.classList.add("char-card");
 
       const img = document.createElement("img");
-      img.src = c.image;
-      img.alt = c.design;
+      img.src = c.image || "";
+      img.alt = c.design || "Character";
 
       const p = document.createElement("p");
-      p.textContent = c.design;
+      p.textContent = c.design || "N/A";
 
       div.appendChild(img);
       div.appendChild(p);
-      charactersContainer.appendChild(div);
+      charEl.appendChild(div);
     });
   }
 }
