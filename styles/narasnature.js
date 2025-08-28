@@ -879,73 +879,77 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
 // Render user profile into existing HTML
 // ===============================
 function renderUserProfile(data) {
-  // Username
+  // === Username ===
   const usernameEl = document.getElementById("username");
-  if (usernameEl && data.username) {
-    usernameEl.textContent = data.username;
-  }
+  if (usernameEl) usernameEl.textContent = data.username || "Unknown";
 
-  // Crystals
+  // === Crystals ===
   const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl && data.currencies) {
-    const crystals = data.currencies.Crystals ?? data.currencies.crystals ?? 0;
+  if (crystalsEl) {
+    const crystals = data.currencies?.Crystals ?? data.currencies?.crystals ?? 0;
     crystalsEl.textContent = crystals;
   }
 
-  // Other currencies
-  const otherCurrenciesEl = document.getElementById("other-currencies");
-  if (otherCurrenciesEl) {
-    otherCurrenciesEl.innerHTML = "";
+  // === Other Currencies (all columns after Discord ID with value >= 1) ===
+  const otherEl = document.getElementById("other-currencies");
+  if (otherEl) {
+    otherEl.innerHTML = "";
     if (data.currencies) {
       Object.entries(data.currencies).forEach(([name, amount]) => {
-        const key = name.toLowerCase();
-        if (key !== "crystals" && amount > 0) {
+        if (name.toLowerCase() === "crystals") return;
+        if (amount && Number(amount) >= 1) {
           const li = document.createElement("li");
           li.textContent = `${name}: ${amount}`;
-          otherCurrenciesEl.appendChild(li);
+          otherEl.appendChild(li);
         }
       });
     }
   }
 
-  // Inventory
-  const inventoryList = document.getElementById("inventory");
-  inventoryList.innerHTML = "";
-  Object.entries(data.inventory).forEach(([item, qty]) => {
-    const li = document.createElement("li");
-    li.textContent = `${item}: ${qty}`;
-    inventoryList.appendChild(li);
-  });
-
-  // Palcharms
-  const palcharmsList = document.getElementById("palcharms-list");
-  if (palcharmsList && data.palcharms) {
-    palcharmsList.innerHTML = "";
-    Object.entries(data.palcharms).forEach(([key, value]) => {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${value}`;
-      palcharmsList.appendChild(li);
+  // === Inventory (only items with qty >= 1) ===
+  const inventoryEl = document.getElementById("inventory");
+  if (inventoryEl) {
+    inventoryEl.innerHTML = "";
+    Object.entries(data.inventory || {}).forEach(([item, qty]) => {
+      if (qty && Number(qty) >= 1) {
+        const li = document.createElement("li");
+        li.textContent = `${item}: ${qty}`;
+        inventoryEl.appendChild(li);
+      }
     });
   }
 
-  // Characters
-  const charactersContainer = document.getElementById("characters");
-  if (charactersContainer && data.characters) {
-    charactersContainer.innerHTML = "";
-    data.characters.forEach(c => {
+  // === Palcharms (only qty >= 1) ===
+  const palEl = document.getElementById("palcharms-list");
+  if (palEl) {
+    palEl.innerHTML = "";
+    Object.entries(data.palcharms || {}).forEach(([name, qty]) => {
+      if (qty && Number(qty) >= 1) {
+        const li = document.createElement("li");
+        li.textContent = `${name}: ${qty}`;
+        palEl.appendChild(li);
+      }
+    });
+  }
+
+  // === Characters ===
+  const charEl = document.getElementById("characters");
+  if (charEl) {
+    charEl.innerHTML = "";
+    (data.characters || []).forEach(c => {
       const div = document.createElement("div");
-      div.classList.add("char-card");
+      div.className = "char-card";
 
       const img = document.createElement("img");
-      img.src = c.image;
-      img.alt = c.design;
+      img.src = c.image || "";
+      img.alt = c.design || "";
 
       const p = document.createElement("p");
-      p.textContent = c.design;
+      p.textContent = c.design || "";
 
       div.appendChild(img);
       div.appendChild(p);
-      charactersContainer.appendChild(div);
+      charEl.appendChild(div);
     });
   }
 }
