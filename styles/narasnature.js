@@ -897,17 +897,15 @@ function renderUserProfile(data) {
 
   // === Other Currencies ===
   const otherCurrenciesEl = document.getElementById("other-currencies");
-  if (otherCurrenciesEl) {
+  if (otherCurrenciesEl && data.currencies) {
     otherCurrenciesEl.innerHTML = "";
-    if (data.currencies) {
-      Object.entries(data.currencies).forEach(([name, amount]) => {
-        if (name !== "Crystals" && Number(amount) > 0) {
-          const li = document.createElement("li");
-          li.textContent = `${name}: ${amount}`;
-          otherCurrenciesEl.appendChild(li);
-        }
-      });
-    }
+    Object.entries(data.currencies).forEach(([name, amount]) => {
+      if (name !== "Crystals" && parseFloat(amount) > 0) {
+        const li = document.createElement("li");
+        li.textContent = `${name}: ${amount}`;
+        otherCurrenciesEl.appendChild(li);
+      }
+    });
   }
 
   // === Inventory ===
