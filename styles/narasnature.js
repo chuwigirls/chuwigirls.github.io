@@ -890,23 +890,31 @@ function renderUserProfile(data) {
     crystalsEl.textContent = crystals;
   }
 
-  // === Other Currencies (all columns after Discord ID with value >= 1) ===
-  const otherEl = document.getElementById("other-currencies");
-  if (otherEl) {
-    otherEl.innerHTML = "";
-    if (data.currencies) {
-      Object.entries(data.currencies).forEach(([name, amount]) => {
-        if (name.toLowerCase() === "crystals") return;
-        if (amount && Number(amount) >= 1) {
-          const li = document.createElement("li");
-          li.textContent = `${name}: ${amount}`;
-          otherEl.appendChild(li);
-        }
-      });
-    }
+  // === Other Currencies ===
+const otherEl = document.getElementById("other-currencies");
+if (otherEl) {
+  otherEl.innerHTML = "";
+  if (data.currencies) {
+    Object.entries(data.currencies).forEach(([name, amount]) => {
+      if (name.toLowerCase() === "crystals") return; // skip crystals
+      if (amount && Number(amount) >= 1) {
+        const p = document.createElement("p");
+        p.textContent = `${name}: ${amount}`;
+        otherEl.appendChild(p);
+      }
+    });
   }
 
-  // === Inventory (only items with qty >= 1) ===
+  // apply scroll box
+  const currencyCount = otherEl.querySelectorAll("p").length;
+  if (currencyCount > 4) {
+    otherEl.classList.add("scroll-box");
+  } else {
+    otherEl.classList.remove("scroll-box");
+  }
+}
+
+  // === Inventory ===
   const inventoryEl = document.getElementById("inventory");
   if (inventoryEl) {
     inventoryEl.innerHTML = "";
