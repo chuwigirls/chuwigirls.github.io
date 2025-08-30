@@ -991,6 +991,20 @@ random-nara-preview {
 .featured-trial-dates { color: var(--dark-blue); }
 
 /* --------------------------- */
+/* ----------User profile-------- */
+/* --------------------------- */
+.other-currencies {
+  font-family: var(--bubbly);
+}
+
+#other-currencies.scroll-box {
+  max-height: 8em;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+
+/* --------------------------- */
 /* ----------Narapedia-------- */
 /* --------------------------- */
 .narapedia-grid {
