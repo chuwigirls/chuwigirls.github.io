@@ -12,11 +12,11 @@
 :root {
   --tan: #EFEFE7;
   --tanb: #ccc;
-  --shadow: #f7f7f0;
+  --light: #f7f7ef;
   --dark-blue: #4571b8;
   --bluey: #559DE7;
   --light-blue: #cdedff;
-  --blueb: #c0e2f5;
+  --blueb: #b7dbf0;
   --light-pink: #ffe4e8;
   --pink: #d16273;
   --pinkb: #f5d4d9;
@@ -278,6 +278,7 @@ button:hover {
   display: none;
   background-color: var(--light-blue);
   color: var(--dark-blue);
+  border: 1px solid var(--bluey);
   border-radius: 20px 0 0 20px;
   padding: 10px 16px;
   margin: 0;
@@ -361,6 +362,8 @@ button:hover {
 .dropdown-content {
   position: absolute;
   background-color: var(--light-blue);
+  border: 1px solid var(--blueb);
+  border-top: 0;
   border-radius: 0px 0px 20px 20px;
   min-width: 160px;
   opacity: 0;
@@ -598,6 +601,7 @@ body.sidebar-open #mySidebar {
   border-radius: 0 20px 20px 0;
   background-color: var(--light-blue);
   color: var(--dark-blue);
+  border: 1px solid var(--blueb);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -993,16 +997,122 @@ random-nara-preview {
 /* --------------------------- */
 /* ----------User profile-------- */
 /* --------------------------- */
-.other-currencies {
+.empty-placeholder {
+  color: var(--pink);
   font-family: var(--bubbly);
+  flex-direction: column;
+  text-align: center;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6em;
+  border-radius: 8px;
+  background-color: var(--light);
+  box-shadow: 0 0 5px rgba(204,204,204,1);
 }
 
-#other-currencies.scroll-box {
-  max-height: 8em;
+#crystals .currency-name {
+  color: var(--bluey);
+  font-family: var(--formal);
+}
+
+#crystals .currency-amount {
+  color: var(--dark-blue);
+  font-family: var(--formal);
+  font-weight: bold;
+}
+
+#crystals img {
+  width: 25px;
+  height: 25px;
+}
+
+.currency-name {
+  color: var(--bluey);
+  font-family: var(--bubbly);
+  margin-left: 10px;
+}
+
+.currency-amount {
+  color: var(--dark-blue);
+  font-family: var(--cyber);
+  margin-left: auto;
+  margin-right: 1px;
+}
+
+#other-currencies {
+  width: clamp(250px, 80%, 500px);
+  margin: 0 auto 2rem auto;
+  max-height: 10em; 
+  overflow-y: auto; 
+}
+
+#other-currencies p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 2rem;
+  padding: 8px;
+  background-color: var(--light);
+  box-shadow: 0 0 5px rgba(204,204,204,1);
+  border-radius: 8px;
+  margin: 10px;
+}
+
+#other-currencies p img {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
+
+#other-currencies.scroll-box::-webkit-scrollbar-thumb {
+  background-color: var(--light-blue);
+  box-shadow: 0px 0px 5px var(--light-blue);
+}
+
+#other-currencies.scroll-box::-webkit-scrollbar-track {
+  background-color: var(--light);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  max-height: 10em;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 10px;
+  border-radius: 10px;
 }
 
+.mini-card {
+  text-align: center;
+  font-size: 1em;
+  background: var(--light);
+  box-shadow: 0 0 5px rgba(204,204,204,1);
+  border-radius: 8px;
+  padding: 1px;
+}
+
+.mini-card img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 4px;
+}
+
+.mini-card-name {
+  font-family: var(--bubbly);
+  color: var(--bluey);
+}
+
+.mini-card-qty {
+  font-family: var(--cyber);
+  color: var(--dark-blue);
+}
+
+@media (max-width: 600px) {
+}
 
 /* --------------------------- */
 /* ----------Narapedia-------- */
