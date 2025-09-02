@@ -11,8 +11,6 @@
 ==============================
 ===== Discord OAuth Config ===
 ============================== */
-let artifactIconMap = {};
-
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
@@ -121,6 +119,7 @@ async function fetchUserProfile() {
 // ==============================
 // Build Artifact & Palcharm Icon Maps
 // ==============================
+let artifactIconMap = {};
 async function buildIconMap(sheetName, nameField, urlField) {
   const url = `${SHEET_BASE_URL}/${sheetName}`;
   const res = await fetch(url);
