@@ -11,6 +11,8 @@
 ==============================
 ===== Discord OAuth Config ===
 ============================== */
+let artifactIconMap = {};
+
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
@@ -45,12 +47,24 @@ function updateNavbarUI(userDataParam) {
   }
 }
 
-/* ==============================
-   ===== Fetch Profile ========== 
-   ============================== */
+// ==========================
+// Fetch User Profile
+// ==========================
 async function fetchUserProfile() { 
   if (window.__profileLoading) return;
   window.__profileLoading = true;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const previewMode = urlParams.get("preview") === "true";
+
+  // === Force a Discord ID in preview mode ===
+  if (previewMode) {
+    console.log("👀 Preview mode active — forcing test Discord ID");
+
+    // Replace this with a real Discord ID that exists in your sheet
+    const testUser = { id: "220002294941351947", username: "chuwigirls"};
+    localStorage.setItem("discordUser", JSON.stringify(testUser));
+  }
 
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
   console.log("🔍 Discord user from localStorage:", discordUser);
@@ -73,17 +87,16 @@ async function fetchUserProfile() {
     console.log("🌐 Fetching user profile from:", url);
 
     const res = await fetch(url);
-    console.log("📡 Fetch response status:", res.status);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
     console.log("✅ GAS Response JSON:", data);
 
-    // ⬇️ Only render if on user.html
-    const path = window.location.pathname;
-    if (path.endsWith("/user.html")) {
-      renderUserProfile(data);
-    }
+    // 🔑 make sure discordId is attached (important for masterlist match)
+    data.discordId = discordUser.id;
+
+    // ✅ Render user profile
+    await renderUserProfile(data);
 
     if (spin) spin.style.display = "none";
     if (cont) cont.style.display = "block";
@@ -105,6 +118,249 @@ async function fetchUserProfile() {
   }
 }
 
+// ==============================
+// Build Artifact & Palcharm Icon Maps
+// ==============================
+async function buildIconMap(sheetName, nameField, urlField) {
+  const url = `${SHEET_BASE_URL}/${sheetName}`;
+  const res = await fetch(url);
+  const rows = await res.json();
+  
+  const map = {};
+  rows.forEach(row => {
+    if (row[nameField] && row[urlField] && row.Hide !== "TRUE") {
+      map[row[nameField].trim().toLowerCase()] = row[urlField];
+    }
+  });
+  return map;
+}
+// ===============================
+// Fetch Masterlist from Sheets
+// ===============================
+async function fetchMasterlist() {
+  const url = `${SHEET_BASE_URL}/Masterlist`;
+  const res = await fetch(url);
+  return res.json();
+}
+
+// ===============================
+// Render user profile (with icon maps)
+// ===============================
+async function renderUserProfile(data) {
+  // Ensure data has discordId (for preview mode especially)
+  if (!data.discordId) {
+    const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+    if (discordUser.id) {
+      data.discordId = discordUser.id;
+    }
+  }
+
+  // Build the lookup maps (once per render)
+  const [artifactIconMap, palcharmIconMap] = await Promise.all([
+    buildIconMap("Artifacts", "Artifact", "URL"),
+    buildIconMap("Palcharms", "Palcharm", "URL")
+  ]);
+
+  // === Username ===
+  const usernameEl = document.getElementById("username");
+  if (usernameEl) usernameEl.textContent = data.username || "Unknown";
+
+  // === Crystals ===
+  const crystalsEl = document.getElementById("crystals");
+  if (crystalsEl) {
+    const crystals = data.currencies?.Crystals ?? data.currencies?.crystals ?? 0;
+    crystalsEl.innerHTML = "";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "currency-name";
+    nameSpan.textContent = "Crystals: ";
+    crystalsEl.appendChild(nameSpan);
+
+    const amountSpan = document.createElement("span");
+    amountSpan.className = "currency-amount";
+    amountSpan.textContent = crystals;
+    crystalsEl.appendChild(amountSpan);
+
+    const key = "crystals";
+    if (artifactIconMap[key]) {
+      const img = document.createElement("img");
+      img.src = artifactIconMap[key];
+      img.alt = "Crystals";
+      img.className = "currency-icon";
+      crystalsEl.appendChild(img);
+    }
+  }
+
+  // === Other Currencies ===
+const otherEl = document.getElementById("other-currencies");
+const noOtherEl = document.getElementById("no-other-currencies");
+if (otherEl && noOtherEl) {
+  otherEl.innerHTML = "";
+  noOtherEl.style.display = "none";
+
+  let added = 0;
+  if (data.currencies) {
+    Object.entries(data.currencies).forEach(([name, amount]) => {
+      if (!amount || Number(amount) < 1) return;
+      if (name.toLowerCase() === "crystals") return;
+
+      added++;
+      const p = document.createElement("p");
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "currency-name";
+      nameSpan.textContent = `${name}: `;
+      p.appendChild(nameSpan);
+
+      const amountSpan = document.createElement("span");
+      amountSpan.className = "currency-amount";
+      amountSpan.textContent = amount;
+      p.appendChild(amountSpan);
+
+      const key = name.toLowerCase().trim();
+      if (artifactIconMap[key]) {
+        const img = document.createElement("img");
+        img.src = artifactIconMap[key];
+        img.alt = name;
+        img.className = "currency-icon";
+        p.appendChild(img);
+      }
+
+      otherEl.appendChild(p);
+    });
+  }
+
+  if (added === 0) noOtherEl.style.display = "block";
+}
+
+// === Inventory ===
+const inventoryEl = document.getElementById("inventory");
+const noInventoryEl = document.getElementById("no-inventory");
+if (inventoryEl && noInventoryEl) {
+  inventoryEl.innerHTML = "";
+  inventoryEl.classList.add("card-grid");
+  noInventoryEl.style.display = "none";
+
+  let added = 0;
+  Object.entries(data.inventory || {}).forEach(([item, qty]) => {
+    if (qty && Number(qty) >= 1) {
+      added++;
+      const card = document.createElement("div");
+      card.className = "mini-card";
+
+      const img = document.createElement("img");
+      img.src = artifactIconMap[item.toLowerCase().trim()] || "../assets/narwhal.png";
+      img.alt = item;
+      card.appendChild(img);
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "mini-card-name";
+      nameEl.textContent = item;
+      card.appendChild(nameEl);
+
+      const qtyEl = document.createElement("div");
+      qtyEl.className = "mini-card-qty";
+      qtyEl.textContent = `x${qty}`;
+      card.appendChild(qtyEl);
+
+      inventoryEl.appendChild(card);
+    }
+  });
+
+  if (added === 0) noInventoryEl.style.display = "block";
+}
+
+// === Palcharms ===
+const palEl = document.getElementById("palcharms");
+const noPalEl = document.getElementById("no-palcharms");
+if (palEl && noPalEl) {
+  palEl.innerHTML = "";
+  palEl.classList.add("card-grid");
+  noPalEl.style.display = "none";
+
+  let added = 0;
+  Object.entries(data.palcharms || {}).forEach(([name, qty]) => {
+    if (qty && Number(qty) >= 1) {
+      added++;
+      const card = document.createElement("div");
+      card.className = "mini-card";
+
+      const img = document.createElement("img");
+      img.src = palcharmIconMap[name.toLowerCase().trim()] || "../assets/narwhal.png";
+      img.alt = name;
+      card.appendChild(img);
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "mini-card-name";
+      nameEl.textContent = name;
+      card.appendChild(nameEl);
+
+      const qtyEl = document.createElement("div");
+      qtyEl.className = "mini-card-qty";
+      qtyEl.textContent = `x${qty}`;
+      card.appendChild(qtyEl);
+
+      palEl.appendChild(card);
+    }
+  });
+
+  if (added === 0) noPalEl.style.display = "block";
+}
+
+  // === Characters (first 4 preview) ===
+  const charEl = document.getElementById("characters");
+  const myNarasLink = document.getElementById("myNaras");
+
+  if (charEl) {
+    charEl.innerHTML = "";
+
+    try {
+      const masterlist = await fetchMasterlist();
+
+      // Match user-owned Naras by Discord ID
+      const userNaras = masterlist.filter(
+        row => row["Discord ID"]?.trim() === String(data.discordId).trim()
+      );
+
+      if (userNaras.length) {
+        // Show first 4 as preview
+        const previewNaras = userNaras.slice(0, 4);
+
+        previewNaras.forEach(nara => {
+          const card = document.createElement("div");
+          card.className = "mini-nara-card";
+
+          const img = document.createElement("img");
+          img.src = nara["URL"] || "../assets/default-nara.png";
+          img.alt = nara["Design"] || "";
+
+          const name = document.createElement("p");
+          name.textContent = nara["Design"] || "";
+
+          card.appendChild(img);
+          card.appendChild(name);
+          charEl.appendChild(card);
+        });
+
+        // Link the "All my Naras" span to your full page
+        if (myNarasLink) {
+          myNarasLink.style.cursor = "pointer";
+          myNarasLink.onclick = () => {
+            window.location.href = `myNaras.html?discordId=${encodeURIComponent(data.discordId)}`;
+          };
+        }
+
+      } else {
+        charEl.innerHTML = "<p>No Naras found for this user.</p>";
+        if (myNarasLink) myNarasLink.style.display = "none";
+      }
+    } catch (err) {
+      console.error("❌ Error fetching masterlist:", err);
+      charEl.innerHTML = "<p>Error loading Naras.</p>";
+    }
+  }
+}
+
 /* ==============================
    ===== Page Guard =============
    - Allow OAuth callback to run on /user.html if #access_token is present
@@ -114,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
   const hasOAuthHash = window.location.hash.includes("access_token=");
 
-  if (isUserPage && !discordUser.id && !hasOAuthHash) {
+  if (isUserPage && !discordUser.id && !hasOAuthHash && !previewMode) {
     console.warn("🚫 No user logged in — redirecting to login.html");
     window.location.href = "login.html";
   }
@@ -177,7 +433,7 @@ async function handleOAuthCallback() {
         .catch(() => {});
     }
 
-    // If not on /user.html, go there; otherwise clean hash + update UI
+    /* If not on /user.html, go there; otherwise clean hash + update UI
     if (!window.location.pathname.endsWith("/user.html")) {
       window.location.replace("/user.html");
       return; // stop here; the next page load will init UI
@@ -186,7 +442,7 @@ async function handleOAuthCallback() {
       history.replaceState(null, "", window.location.pathname);
       updateNavbarUI();
       hideHeaderAuthSpinner();
-    }
+    } */
   } catch (err) {
     console.error("OAuth handling error:", err);
     history.replaceState(null, "", window.location.pathname);
@@ -477,6 +733,23 @@ async function initSheet(sheetName, config) {
     }
   } finally {
     hideSpinner(config.listId);
+  }
+}
+
+async function loadArtifacts() {
+  try {
+    const artifacts = await fetchSheetData("Artifacts");
+    artifactIconMap = {};
+
+    artifacts.forEach(row => {
+      if (!row.Hide && row.Artifact && row.URL) {
+        artifactIconMap[row.Artifact.trim()] = row.URL;
+      }
+    });
+
+    console.log("=== Artifact Icon Map ===", artifactIconMap);
+  } catch (err) {
+    console.error("Error loading artifacts:", err);
   }
 }
 
@@ -875,93 +1148,6 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   }
 }
 
-// ===============================
-// Render user profile into existing HTML
-// ===============================
-function renderUserProfile(data) {
-  // === Username ===
-  const usernameEl = document.getElementById("username");
-  if (usernameEl) usernameEl.textContent = data.username || "Unknown";
-
-  // === Crystals ===
-  const crystalsEl = document.getElementById("crystals");
-  if (crystalsEl) {
-    const crystals = data.currencies?.Crystals ?? data.currencies?.crystals ?? 0;
-    crystalsEl.textContent = crystals;
-  }
-
-  // === Other Currencies ===
-const otherEl = document.getElementById("other-currencies");
-if (otherEl) {
-  otherEl.innerHTML = "";
-  if (data.currencies) {
-    Object.entries(data.currencies).forEach(([name, amount]) => {
-      if (name.toLowerCase() === "crystals") return; // skip crystals
-      if (amount && Number(amount) >= 1) {
-        const p = document.createElement("p");
-        p.textContent = `${name}: ${amount}`;
-        otherEl.appendChild(p);
-      }
-    });
-  }
-
-  // apply scroll box
-  const currencyCount = otherEl.querySelectorAll("p").length;
-  if (currencyCount > 4) {
-    otherEl.classList.add("scroll-box");
-  } else {
-    otherEl.classList.remove("scroll-box");
-  }
-}
-
-  // === Inventory ===
-  const inventoryEl = document.getElementById("inventory");
-  if (inventoryEl) {
-    inventoryEl.innerHTML = "";
-    Object.entries(data.inventory || {}).forEach(([item, qty]) => {
-      if (qty && Number(qty) >= 1) {
-        const li = document.createElement("li");
-        li.textContent = `${item}: ${qty}`;
-        inventoryEl.appendChild(li);
-      }
-    });
-  }
-
-  // === Palcharms (only qty >= 1) ===
-  const palEl = document.getElementById("palcharms-list");
-  if (palEl) {
-    palEl.innerHTML = "";
-    Object.entries(data.palcharms || {}).forEach(([name, qty]) => {
-      if (qty && Number(qty) >= 1) {
-        const li = document.createElement("li");
-        li.textContent = `${name}: ${qty}`;
-        palEl.appendChild(li);
-      }
-    });
-  }
-
-  // === Characters ===
-  const charEl = document.getElementById("characters");
-  if (charEl) {
-    charEl.innerHTML = "";
-    (data.characters || []).forEach(c => {
-      const div = document.createElement("div");
-      div.className = "char-card";
-
-      const img = document.createElement("img");
-      img.src = c.image || "";
-      img.alt = c.design || "";
-
-      const p = document.createElement("p");
-      p.textContent = c.design || "";
-
-      div.appendChild(img);
-      div.appendChild(p);
-      charEl.appendChild(div);
-    });
-  }
-}
-
 /* ==============================
    Transitions & Back To Top
    ============================== */
@@ -1023,7 +1209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    // Auth routing
+    /* Auth routing
     const path = window.location.pathname;
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
@@ -1034,7 +1220,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!userData.username && path.endsWith("/user.html")) {
       window.location.href = "/login.html";
       return;
-    }
+    } */
 
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) loginBtn.addEventListener("click", () => {
@@ -1056,7 +1242,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadFeaturedNaraSidebar();
     }
 
-   if (path.endsWith("/") || path.endsWith("/index.html")) {
+    const path = window.location.pathname || "";
+    if (path.endsWith("/") || path.endsWith("/index.html")) {
       renderRecentNaras("recent-naras", 8);
       renderFrontpageFeaturedTrials("featured-trial-frontpage");
     }
@@ -1087,61 +1274,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSheets(data, config);
     }
 
-        if (path.endsWith("/user.html")) {
-      async function renderUserProfile(data) {
-        console.log("=== User Profile Data ===", data);
-
-        const usernameEl = document.getElementById("username");
-        if (usernameEl && data.username) {
-          usernameEl.textContent = data.username;
-        }
-
-        const crystalsEl = document.getElementById("crystals");
-        if (crystalsEl && data.currencies?.crystals !== undefined) {
-          crystalsEl.textContent = data.currencies.crystals;
-        }
-
-        const inventoryList = document.getElementById("inventory");
-        if (inventoryList && data.inventory) {
-          inventoryList.innerHTML = "";
-          Object.entries(data.inventory).forEach(([item, qty]) => {
-            const li = document.createElement("li");
-            li.textContent = `${item}: ${qty}`;
-            inventoryList.appendChild(li);
-          });
-        }
-
-        const palcharmsList = document.getElementById("palcharms-list");
-        if (palcharmsList && data.palcharms) {
-          palcharmsList.innerHTML = "";
-          Object.entries(data.palcharms).forEach(([key, value]) => {
-            const li = document.createElement("li");
-            li.textContent = `${key}: ${value}`;
-            palcharmsList.appendChild(li);
-          });
-        }
-
-        const charactersContainer = document.getElementById("characters");
-        if (charactersContainer && data.characters) {
-          charactersContainer.innerHTML = "";
-          data.characters.forEach(c => {
-            const div = document.createElement("div");
-            div.classList.add("char-card");
-
-            const img = document.createElement("img");
-            img.src = c.image;
-            img.alt = c.design;
-
-            const p = document.createElement("p");
-            p.textContent = c.design;
-
-            div.appendChild(img);
-            div.appendChild(p);
-            charactersContainer.appendChild(div);
-          });
-        }
-      }
-
+    if (path.endsWith("/user.html")) {
+      await loadArtifacts();
       await fetchUserProfile();
 
       const retryBtn = document.getElementById("retryProfileBtn");
