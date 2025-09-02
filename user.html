@@ -64,7 +64,6 @@
     <!-- Content -->
     <div class="wrapper"> 
       <div class="page">
-      <h1>Welcome to Naras Nature</h1>
 
       <div id="user-profile">
       <div id="profile-spinner" style="display: none; text-align: center; margin-top: 2rem;">
@@ -81,22 +80,36 @@
 
       <!-- Profile content will render here -->
       <div id="profile-content" style="display: none;">
-        <h1><i class="fa-brands fa-discord"></i> <span id="username"></span></h1>
+        <div class="row">
+          <div class="col-sm-6">
+            <h1><i class="fa-brands fa-discord"></i> <span id="username"></span></h1>
+          </div>
+          <div class="col-sm-6">
+            <h1><span id="crystals"></span></h1>
+          </div>
+        </div>
         <hr>
 
-        <h2>Crystals:
-          <span id="crystals"></span><img src="https://static.vecteezy.com/system/resources/thumbnails/041/643/035/small_2x/holographic-geomatry-shapes-abstract-gradient-color-icon-png.png?" 
-          style="width:30px;"></h2>
-          <div id="other-currencies"></div>
+        <h2>Pouch</h2>
+        <div id="other-currencies"></div>
+        <p id="no-other-currencies" class="empty-placeholder">Looks like you don't have any other currencies.</p>
 
-        <h2>Inventory</h2>
-        <span id="inventory"></span>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Inventory</h2>
+            <span id="inventory"></span>
+            <p id="no-inventory" class="empty-placeholder">Doesn't look like you have any artifacts.</p>
+          </div>
 
-        <h2>Palcharms</h2>
-        <span id="palcharms"></span>
+          <div class="col-sm-6">
+            <h2>Palcharms</h2>
+            <span id="palcharms"></span>
+            <p id="no-palcharms" class="empty-placeholder">You don't own any Palcharms.</p>
+          </div>
+        </div>
 
-        <h2>Naras</h2>
-        <div id="characters" class="char-grid"></div>
+        <h2>Naras <span id="myNaras">All my Naras</span></h2>
+          <div id="characters" class="char-grid"></div>
       </div>
     </div>
 
