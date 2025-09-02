@@ -171,13 +171,12 @@ const FAQ_CONFIG = {
   detailId: "faq-detail-view",
   cardTemplate: "#narapedia-card-template",
   detailTemplate: "#faq-detail-template",
-  imageField: "URL",
   nameField: "FAQ",
   queryParam: "faq",
   extraFields: [
-    { field: "Role", className: "faq-detail-role" },
-    { field: "Pronouns", className: "faq-detail-pronouns" },
-    { field: "Rarity", className: "faq-detail-rarity" },
+    { field: "Question", className: "faq-detail-question" },
+    { field: "Answer", className: "faq-detail-answer" },
+    { field: "Keywords", className: "faq-detail-keywords" },
     { field: "Duties", className: "faq-detail-duties" },
     { field: "Custom Status", className: "faq-detail-status" },
     { field: "Blurb", className: "faq-detail-blurb" }
