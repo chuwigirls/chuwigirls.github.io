@@ -11,6 +11,8 @@
 ==============================
 ===== Discord OAuth Config ===
 ============================== */
+let artifactIconMap = {};
+
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
@@ -119,7 +121,6 @@ async function fetchUserProfile() {
 // ==============================
 // Build Artifact & Palcharm Icon Maps
 // ==============================
-let artifactIconMap = {};
 async function buildIconMap(sheetName, nameField, urlField) {
   const url = `${SHEET_BASE_URL}/${sheetName}`;
   const res = await fetch(url);
@@ -133,6 +134,7 @@ async function buildIconMap(sheetName, nameField, urlField) {
   });
   return map;
 }
+
 // ===============================
 // Fetch Masterlist from Sheets
 // ===============================
@@ -306,7 +308,7 @@ if (palEl && noPalEl) {
   if (added === 0) noPalEl.style.display = "block";
 }
 
-  // === Characters (first 4 preview) ===
+  // === Characters ===
   const charEl = document.getElementById("characters");
   const myNarasLink = document.getElementById("myNaras");
 
@@ -331,10 +333,9 @@ if (palEl && noPalEl) {
 
           const img = document.createElement("img");
           img.src = nara["URL"] || "../assets/default-nara.png";
-          img.alt = nara["Design"] || "";
 
           const name = document.createElement("p");
-          name.textContent = nara["Design"] || "";
+          name.textContent = nara["Nara"] || "";
 
           card.appendChild(img);
           card.appendChild(name);
