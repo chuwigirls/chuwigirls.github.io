@@ -500,7 +500,7 @@ function toggleSidebar() {
 }
 
 function handleSidebarDisplay() {
-  if (window.innerWidth >= 1275) {
+  if (window.innerWidth >= 1500) {
     if (!document.body.classList.contains("sidebar-closed")) {
       document.body.classList.add("sidebar-open");
     }
@@ -1119,22 +1119,19 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
       return !isHidden && !isMYO && row.Nara && row.URL;
     });
 
-    // Sort by most recently added (assuming last rows are newest)
-    const recentNaras = visibleNaras.slice(-limit).reverse(); // last 'limit' rows
+    // Sort by most recently added
+    const recentNaras = visibleNaras.slice(-limit).reverse();
 
-    // Clear container
     container.innerHTML = "";
 
-    // Create cards
     recentNaras.forEach(row => {
       const card = document.createElement("div");
       card.className = "narapedia-card recent-card";
       card.innerHTML = `
-        <img src="${row.URL || '../assets/placeholder.png'}" alt="${row.Nara}">
+        <img src="${row.URL || '../assets/narwhal.png'}" alt="${row.Nara}">
         <div class="narapedia-card-name">${row.Nara}</div>
       `;
 
-      // Link to detail page
       card.addEventListener("click", () => {
         const url = `narapedia/masterlist.html?design=${encodeURIComponent(row.Nara)}`;
         window.location.href = url;
@@ -1144,7 +1141,7 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
     });
 
   } catch (err) {
-    console.error("Error rendering recent Naras:", err);
+    console.error("⛔ Whoops, who are the newest Naras again? ", err);
   }
 }
 
@@ -1264,7 +1261,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG },
       trials: { sheet: "Trials", config: TRIALS_CONFIG },
       emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
-      civilians: { sheet: "Staff", config: STAFF_CONFIG },
+      staff: { sheet: "Celestials", config: STAFF_CONFIG },
       faq: { sheet: "FAQ", config: FAQ_CONFIG }
     };
 
