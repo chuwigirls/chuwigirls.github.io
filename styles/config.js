@@ -9,13 +9,6 @@
     if you're looking at this page to learn about coding,
     you can ask chuwigirls for help! */
 
-// ==============================
-// ======== Discord OAuth =======
-// ==============================
-const discordClientId = '1319474218550689863';
-const redirectUri = 'https://chuwigirls.github.io/user.html';
-const discordScopes = 'identify';
-
 // ==========================
 // Google Sheets Config
 // ==========================
@@ -153,13 +146,13 @@ const EMBLEMS_CONFIG = {
 // Staff Config
 // ==========================
 const STAFF_CONFIG = {
-  listId: "narapedia-view",
+  listId: "staff-view",
   detailId: "staff-detail-view",
   cardTemplate: "#narapedia-card-template",
   detailTemplate: "#staff-detail-template",
   imageField: "URL",
-  nameField: "Staff",
-  queryParam: "staff",
+  nameField: "Celestial",
+  queryParam: "celestial",
   extraFields: [
     { field: "Role", className: "staff-detail-role" },
     { field: "Pronouns", className: "staff-detail-pronouns" },
@@ -189,3 +182,10 @@ const FAQ_CONFIG = {
     { field: "Blurb", className: "faq-detail-blurb" }
   ]
 };
+
+// ==============================
+// ======== Discord OAuth =======
+// ==============================
+const discordClientId = '1319474218550689863';
+const redirectUri = 'https://chuwigirls.github.io/user.html';
+const discordScopes = 'identify';
