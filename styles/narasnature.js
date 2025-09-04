@@ -334,7 +334,7 @@ if (palEl && noPalEl) {
           const img = document.createElement("img");
           img.src = nara["URL"] || "../assets/default-nara.png";
 
-          const name = document.createElement("p");
+          const name = document.createElement("h4");
           name.textContent = nara["Nara"] || "";
 
           card.appendChild(img);
