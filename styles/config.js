@@ -32,10 +32,12 @@ const MASTERLIST_CONFIG = {
     { field: "Artist", className: "masterlist-detail-artist" },
     { field: "Region", className: "masterlist-detail-region" },
     { field: "Status", className: "masterlist-detail-status" },
-    { field: "Rarity", className: "masterlist-detail-rarty" },
+    { field: "Rarity", className: "masterlist-detail-rarity" },
     { field: "Calling", className: "masterlist-detail-calling" },
     { field: "Value", className: "masterlist-detail-region" },
-    { field: "Build", className: "masterlist-detail-Build" }
+    { field: "Build", className: "masterlist-detail-build" },
+    { field: "Palcharms", className: "masterlist-detail-palcharms" },
+    { field: "Inventory", className: "masterlist-detail-inventory" }
   ]
 };
 
