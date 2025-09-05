@@ -60,6 +60,42 @@ body {
   font-size: 1.5rem;
 }
 
+.tab {
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  background-image: linear-gradient(to bottom, var(--tan), var(--tan), var(--tan), var(--tanb));
+}
+
+.tablink {
+  background-color: var(--light);
+  border-radius: 10px 10px 0 0;
+  border: 0;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.tablink:hover {
+  background-color: var(--light);
+  border-radius: 10px 10px 0 0;
+  border: 0;
+}
+
+.tabcontent {
+  display: none;
+  transition-duration: 0.4s; 
+  background-image: linear-gradient(to bottom, var(--light), var(--tan), var(--tan), var(--tan));
+  height: 250px;
+  padding: 3%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.tabcontent.active {
+  display: block;
+}
+
 /* --------------------------- */
 /* ---- Overall Page Fade ---- */
 /* --------------------------- */
