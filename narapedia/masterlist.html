@@ -83,27 +83,48 @@
   <template id="masterlist-detail-template">
     <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Masterlist</button>
     <div class="detail-card">
+      <h1 class="detail-name"></h1>
       <img class="masterlist-detail-img" src="" alt="">
-      <h2 class="detail-name"></h2>
-      <div class="row">
-        <div class="col-sm-6">
-            <p><strong>Owner:</strong> <span class="masterlist-detail-owner"></span></p>
-            <p><strong>Designer:</strong> <span class="masterlist-detail-designer"></span></p>
-            <p><strong>Artist:</strong> <span class="masterlist-detail-artist"></span></p>
-        </div>
-        <div class="col-sm-6">
-            <p><strong>Status:</strong> <span class="masterlist-detail-status"></span></p>
-            <p><strong>Value:</strong> <span class="masterlist-detail-value"></span></p>
-        </div>
-      </div>
-      
-      <p><strong>Region:</strong> <span class="masterlist-detail-region"></span></p>
-      <p><strong>Calling:</strong> <span class="masterlist-detail-calling"></span></p>
-      <p><strong>Build:</strong> <span class="masterlist-detail-build"></span></p>
-      
-      <p class="masterlist-detail-description"></p>
+
+<!-- Tab links -->
+<div class="tab">
+  <button class="tablink active" data-page="Info">Details</button>
+  <button class="tablink" data-page="Inv">Inventory</button>
+</div>
+
+<!-- Tab content -->
+<div id="Info" class="tabcontent active">
+  <div class="row">
+    <div class="col-sm-6">
+      <p><strong>Owner:</strong> <span class="masterlist-detail-owner"></span></p>
+      <p><strong>Designer:</strong> <span class="masterlist-detail-designer"></span></p>
+      <p><strong>Artist:</strong> <span class="masterlist-detail-artist"></span></p>
     </div>
-  </template>
+    <div class="col-sm-6">
+      <p><strong>Status:</strong> <span class="masterlist-detail-status"></span></p>
+      <p><strong>Value:</strong> <span class="masterlist-detail-value"></span></p>
+    </div>
+  </div>
+
+  <p><strong>Region:</strong> <span class="masterlist-detail-region"></span></p>
+  <p><strong>Calling:</strong> <span class="masterlist-detail-calling"></span></p>
+  <p><strong>Build:</strong> <span class="masterlist-detail-build"></span></p>
+</div>
+
+<div id="Inv" class="tabcontent">
+  <p><strong>Inventory:</strong> <span class="masterlist-detail-inventory"></span></p>
+
+  <h3>Palcharms</h3>
+  <div id="detail-palcharms" class="card-grid"></div>
+  <p id="no-detail-palcharms" style="display:none;">No Palcharms</p>
+
+  <h3>Emblems</h3>
+  <p><strong>Emblems:</strong> <span class="masterlist-detail-emblems"></span></p>
+
+  <h3>Titles</h3>
+  <p><strong>Titles:</strong> <span class="masterlist-detail-titles"></span></p>
+</div>
+</div></template>
 
   <!-- Scripts -->
   <script src="../styles/config.js"></script>
