@@ -1,1305 +1,169 @@
-/* 
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    
+<!--
         _..---.--.
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
       (_/ _)__(_ \_)\_
     mrf(_..)--(.._)'--'
-
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! */
-
-:root {
-  --tan: #EFEFE7;
-  --tanb: #ccc;
-  --light: #f7f7ef;
-  --dark-blue: #4571b8;
-  --bluey: #559DE7;
-  --light-blue: #cdedff;
-  --blueb: #b7dbf0;
-  --light-pink: #ffe4e8;
-  --pink: #d16273;
-  --pinkb: #f5d4d9;
-
-  --calm: "Huninn", sans-serif;
-  --formal: "Bruno Ace", serif;
-  --bubbly: "DynaPuff", serif;
-  --playful: "Rubik Puddles", serif;
-  --cyber: "Righteous", serif;
-  --tropical: "Hanalei", serif;
-
-  /* fallback */
-  --header-height: 200px;
-}
-
-/* --------------------------- */
-/* ---------Main body--------- */
-/* --------------------------- */
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-x: hidden;
-  font-family: var(--calm);
-  background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
-  background-color: var(--light-blue);
-  background-size: cover;
-  background-position: top;
-  background-attachment: fixed;
-}
-
-.loading-spinner {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
-  color: var(--dark-blue);
-}
-
-.loading-spinner i {
-  margin-right: 0.5rem;
-  font-size: 1.5rem;
-}
-
-/* --------------------------- */
-/* ---- Overall Page Fade ---- */
-/* --------------------------- */
-.smoothLoad {
-  opacity: 0;
-  transition: opacity 0.6s ease-in-out;
-}
-
-.smoothLoad.loaded {
-  opacity: 1;
-}
-
-/* --------------------------- */
-/* ---- Inner Content Fade --- */
-/* --------------------------- */
-.wrapper {
-  flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  opacity: 1;
-  transition: opacity 0.4s ease-in-out;
-}
-
-/* Fit sidebar on my screen size */
-@media (max-width: 1280px) {
-  .wrapper {
-    max-width: 850px;
-  }
-}
-
-/* When fading out */
-.wrapper.fade-out {
-  opacity: 0;
-}
-
-/* When fading in */
-.wrapper.fade-in {
-  opacity: 1;
-}
-
-/* --------------------------- */
-/* --- Reduced Motion Safe --- */
-/* --------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* unvisited link */
-a:link {
-  cursor: pointer;
-  color: var(--bluey);
-  text-decoration: underline;
-}
-
-/* visited link */
-a:visited {
-  color: var(--dark-blue);
-}
-
-/* mouse over link */
-a:hover {
-  color: var(--pink);
-  transition-duration: 0.4s;
-}
-
-/* selected link */
-a:active {
-  color: var(--light-blue);
-}
-
-hr {
-  border: 1px solid var(--dark-blue);
-}
-
-h1 {
-  font-family: var(--formal);
-  color: var(--dark-blue);
-}
-
-h2 {
-  font-family: var(--cyber);
-  color: var(--dark-blue);
-}
-
-h3 {
-  font-family: var(--cyber);
-  color: var(--dark-blue);
-}
-
-h4 {
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-}
-
-ul {
-  text-align: left;
-  list-style-image: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/cf2836cb-5893-4a6c-b156-5a89d94fc721/dcajzs5-18e13a23-88ac-4556-8920-eac8f0e12673.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2NmMjgzNmNiLTU4OTMtNGE2Yy1iMTU2LTVhODlkOTRmYzcyMVwvZGNhanpzNS0xOGUxM2EyMy04OGFjLTQ1NTYtODkyMC1lYWM4ZjBlMTI2NzMuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ITsUa1vtqjgSnJfw92CwanM0nZDinqUDy8q1NjY90uY');
-}
-
-li {
-  margin-bottom: 1%;
-}
-
-summary {
-  cursor: pointer;
-  transition: top 0.4s cubic-bezier(.77,0,.18,1),
-              transform 0.4s cubic-bezier(.77,0,.18,1),
-              height 0.3s ease;
-}
-
-.page {
-  background-color: var(--tan);
-  border-radius: 20px;
-  border: 1px solid var(--tanb);
-  padding: 2rem;
-  text-align: center;
-}
-
-.page img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-}
-
-button {
-  background-color: var(--light-blue);
-  color: var(--dark-blue);
-  font-family: var(--bubbly);
-  border-radius: 9999px;
-  border: 1px solid var(--blueb);
-  padding: 1rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: var(--light-pink);
-  border: 1px solid var(--pinkb);
-  color: var(--pink);
-  transition-duration: 0.4s;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  background-color: var(--tan);
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--light-blue);
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--light-pink);
-}
-
-#loadingOverlay {
-  display: none;
-}
-
-
-/* --------------------------- */
-/* -----------Header---------- */
-/* --------------------------- */
-#siteHeader {
-  padding-bottom: 1px;
-}
-
-.site-title {
-  background-image: url("../assets/header.png");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  height: 20vh;
-  text-align: left;
-  padding-left: 6%;
-  padding-top: 2%;
-  font-family: var(--formal);
-  color: var(--dark-blue);
-  letter-spacing: 5px;
-  font-size: 5rem;
-}
-
-.site-title a {
-  text-decoration: none;
-  transition-duration: 0.4s;
-}
-
-@media (max-width: 980px) {
-  .site-title {
-    font-size: 9vh;
-  }
-}
-
-.navbar {
-  display: flex;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  font-family: var(--calm);
-  color: var(--dark-blue);
-  border-radius: 9999px;
-  background: none;
-  z-index: 1000;
-}
-
-.navbar-toggler,
-.sidebar {
-  cursor: pointer;
-  display: none;
-  background-color: var(--light-blue);
-  color: var(--dark-blue);
-  border: 1px solid var(--bluey);
-  border-radius: 20px 0 0 20px;
-  padding: 10px 16px;
-  margin: 0;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  border-radius: 9999px;
-  margin: 2rem;
-  background-color: var(--light-blue);
-  border: 1px solid var(--blueb);
-  gap: 1rem;
-}
-
-.nav-left,
-.nav-center,
-.nav-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-  margin-left: 5rem;
-  margin-right: 5rem;
-}
-
-.nav-center {
-  flex: 1;
-  justify-content: center;
-}
-
-.nav-left {
-  justify-content: flex-start;
-}
-
-.nav-right {
-  justify-content: flex-end;
-}
-
-.nav-right .dropdown-content {
-  left: auto;
-  right: 0;
-}
-
-
-#loginNav {
-  display: flex;
-  justify-content: center;
-  align-items: center; 
-}
-
-.nav-links a,
-.dropbtn {
-  cursor: pointer;
-  padding: 5px;
-  background: none;
-  border: none;
-  border-radius: 9999px;
-  color: var(--dark-blue);
-  font-family: var(--bubbly);
-  text-decoration: none;
-  margin: .8rem;
-  box-sizing: border-box;
-}
-
-.nav-links a:hover,
-.dropbtn:hover {
-  transition-duration: 0.4s;
-  color: var(--pink);
-  background-color: transparent;
-  border: none;
-}
-
-.dropdown {
-  position: relative;
-}
-
-.dropdown-content {
-  position: absolute;
-  background-color: var(--light-blue);
-  border: 1px solid var(--blueb);
-  border-top: 0;
-  border-radius: 0px 0px 20px 20px;
-  min-width: 160px;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.dropdown-content.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.dropdown-content a {
-  padding: 0.75rem 1rem;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  color: var(--pink);
-  box-shadow: 0px 0px 0px var(--bluey);
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-hr.dropdown-div {
-  border-top: 1px solid var(--bluey);
-  margin: 0.1rem 0;
-}
-
-/* --------------------------- */
-/* -----------Responsive------ */
-/* --------------------------- */
-@media (max-width: 980px) {
-  .navbar {
-    position: relative;
-    min-height: 48px;
-  }
-
-  .nav-links {
-    display: flex;
-    position: absolute;
-    left: 0;
-    top: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background: var(--light-blue);
-    border-radius: 20px;
-    z-index: 2000;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    gap: 0;
-
-    max-height: 0;
-    overflow: hidden;
-    transform: scaleY(0);
-    opacity: 0;
-    transform-origin: top;
-    transition: opacity 0.3s ease, transform 0.4s ease, max-height 0.5s ease-in-out;
-  }
-
-  .nav-links.show {
-    max-height: 1000px;
-    padding: 1rem;
-    gap: 1rem;
-    transform: scaleY(1);
-    opacity: 1;
-  }
-
-  .nav-links a,
-  .dropbtn {
-    width: 100%;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    margin: 0.3rem 0;
-  }
-
-  .nav-left,
-  .nav-center,
-  .nav-right {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0;
-    gap: 0.5rem;
-  }
-
-  #loginNav {
-    justify-content: center;
-    align-items: center;
-    width: 100%;  
-    display: none;
-  }
-
-  /* Mobile dropdown wrapper */
-  .dropdown {
-    width: 100%;
-    text-align: center;
-  }
-
-  /* Override default dropdown positioning */
-  .dropdown-content {
-    position: relative;
-    background-color: var(--light-blue);
-    border-radius: 10px;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transform: scaleY(0);
-    transform-origin: top;
-    transition: 
-      max-height 0.4s ease, 
-      opacity 0.3s ease, 
-      transform 0.4s ease;
-    pointer-events: none;
-  }
-
-  /* Show dropdown */
-  .dropdown-content.show {
-    max-height: 500px;
-    opacity: 1;
-    transform: scaleY(1);
-    pointer-events: auto;
-  }
-
-  /* Mobile dropdown links */
-  .dropdown-content a {
-    display: block;
-    text-align: center;
-  }
-
-  .sidebar {
-    display: flex;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 0 10px 10px 0;
-    background-color: var(--tan);
-    color: var(--dark-blue);
-    border: 1px solid var(--tanb);  
-    align-items: center;
-    justify-content: center;
-    z-index: 2100;
-    box-sizing: border-box;
-  }
-
-  .navbar-toggler {
-    display: inline-flex !important;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 20px 0 0 20px;
-    background-color: var(--light-blue);
-    color: var(--dark-blue);
-    border: 1px solid var(--blueb);
-    align-items: center;
-    justify-content: center;
-    z-index: 2100;
-    box-sizing: border-box;
-  }
-}
-
-@media (min-width: 981px) {
-  .dropdown-content {
-    top: 100%;
-  }
-}
-
-/* --------------------------- */
-/* -----------Side bar--------- */
-/* --------------------------- */
-/* ===== Sidebar Base ===== */
-#mySidebar {
-  position: absolute;
-  top: calc(var(--header-height, 200px) + 48px);
-  left: 0;
-  width: 200px;
-  height: calc(100vh - var(--header-height, 200px));
-  background-color: var(--tan);
-  border-radius: 0 5px 5px 0;
-  border: 1px solid var(--tanb);
-  text-align: center;
-  z-index: 900;
-  transform: translateX(-100%);
-  transition: top 0.4s cubic-bezier(.77,0,.18,1),
-              transform 0.4s cubic-bezier(.77,0,.18,1),
-              height 0.3s ease;
-  overflow-y: scroll;
-  box-sizing: border-box;
-  padding: 1rem;
-}
-
-#mySidebar h4 {
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-}
-
-#mySidebar h5 {
-  font-family: var(--cyber);
-  color: var(--dark-blue);
-}
-
-body.sidebar-fixed #mySidebar { position: fixed; top: 50px; }
-body.sidebar-open #mySidebar { transform: translateX(0); }
-
-/* ===== Sidebar Toggle Button ===== */
-#openNav {
-  position: fixed;
-  left: 0;
-  top: var(--header-height, 00px);
-  width: 48px;
-  height: 48px;
-  border-radius: 0 20px 20px 0;
-  background-color: var(--light-blue);
-  color: var(--dark-blue);
-  border: 1px solid var(--blueb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2100;
-  cursor: pointer;
-}
-
-#openNav:hover {
-  background-color: var(--light-pink);
-  border: 1px solid var(--pinkb);
-  color: var(--pink);
-}
-
-body.sidebar-fixed #openNav { top: 0; }
-
-/* Desktop: show sidebar + toggle */
-@media (min-width: 981px) {
-  #mySidebar,
-  #openNav {
-    display: block !important;
     
-  }
-}
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
+-->
+
+    <!-- Meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="title" content="Naras Nature" />
+    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures.">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://narasnature.netlify.app" />
+    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
+    <!-- Prevent AI scraping -->
+    <meta name="robots" content="noai" />
+    <meta name="robots" content="noimageai" />
+
+    <!-- Your site -->
+    <title>Naras Nature</title>
+    <link rel="shortcut icon" href="assets/narwhal.png" />
+
+    <!-- Scripts -->
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+     <!-- Fontawesome v6 icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles/narasnature.css" />
+    
+</head>
+<body>
+
+  <!-- Page load -->
+  <div class="smoothLoad">  
+
+    <!-- Header -->
+    <div class="includes" id="header" data-source="includes/header.html"></div>
+
+    <!-- Sidebar -->
+    <div class="includes" id="sidebar" data-source="includes/sidebar.html"></div>
+
+    <!-- Content -->
+    <div class="wrapper">
+
+    <!-- Navigation links -->
+      <!-- Columns row -->
+      <div class="columns">
+        <div class="column">
+          <img class="imgArch" src="https://f2.toyhou.se/file/f2-toyhou-se/images/25240754_cJMsg4gAq1b8QSb.png?1621099950" alt="Guild icon" />
+          <h2><i class="fa-solid fa-cubes-stacked"></i> Guild</h2>
+          <hr>
+          <a id="fp-button" href="/recreation/trials.html">Trials</a>
+          <a id="fp-button" href="/recreation/magic.html">Magic Training</a>
+          <a id="fp-button" href="/shops.html">Bazaar Shops</a>
+        </div>
+
+        <div class="column">
+          <img class="imgArch" src="https://f2.toyhou.se/file/f2-toyhou-se/images/28281981_FI8LOSrCPHrUqYw.png?1621099957" alt="Town Hall icon" />
+          <h2><i class="fa-solid fa-people-roof"></i> Town Hall</h2>
+          <hr>
+          <a id="fp-button" href="/help/newcomer.html">Newcomer Guide</a>
+          <a id="fp-button" href="/help/summon.html">Summoning</a>
+          <a id="fp-button" href="/recreation/daily.html">Dailies</a>
+        </div>
+
+        <div class="column">
+          <img class="imgArch" src="https://f2.toyhou.se/file/f2-toyhou-se/images/26896366_k7TyFdK4DX7eJyA.gif?1735068910" alt="Archives icon" />
+          <h2><i class="fa-solid fa-scroll"></i> Archives</h2>
+          <hr>
+          <a id="fp-button" href="/help/rules.html">Rules</a>
+          <a id="fp-button" href="/help/tos.html">Terms of Service</a>
+          <a id="fp-button" href="/help/faq.html">FAQ</a>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="frontpage-intro">
+        <img src="https://f2.toyhou.se/file/f2-toyhou-se/images/29371504_ebfpMxNv7oKRSGG.png">
+        <h1 class="title">Wander in Nature</h1>
+
+        <!-- Links -->
+        <div class="icon-row">
+          <a href="https://toyhou.se/~world/57896.narasnature" class="icon-link">
+            <i class="fa-solid fa-house"></i> Toyhouse World 
+          </a>
+          |
+          <a href="#" class="">
+            <i class="fa-brands fa-discord"></i> Discord
+          </a>
+        </div>
+
+        <!-- Description -->
+        <p>NARAS NATURE is a freeform private ARPG species about magical creatures that sport long fur and magical vessels atop their heads. Naras are the main focus of this group, resembling fluffy carnivora with unicorn-like attributes.</p>
 
-/* Mobile: navbar toggler replaces openNav */
-@media (max-width: 980px) {
-  .navbar-toggler {
-    display: inline-flex !important;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 20px 0 0 20px;
-    background-color: var(--light-blue);
-    color: var(--dark-blue);
-    border: 1px solid var(--blueb);
-    align-items: center;
-    justify-content: center;
-    z-index: 2100;
-    box-sizing: border-box;
-  }
+        <p>We are a low-energy species group that focuses on personal character and community growth through art and designs.</p>
 
-  #openNav {
-    display: inline-flex !important;
-    position: absolute;
-    top: 0;
-  }
+        <p>The group is currently in development and operates on an invite-only basis.</p>
+      </div>
 
-  #mySidebar { top: var(--header-height, 200px); }
-}
+      <!-- Newest Designs -->
+      <div class="newest-designs">
+        <h1>Recent Naras</h1>
+        <section id="recent-naras" class="narapedia-grid"></section>
+      </div>
 
-/* --------------------------- */
-/* --------- Featured -------- */
-/* --------------------------- */
-#featured-nara-sidebar {
-  font-family: var(--bubbly);
-  transition-duration: 0.4s;
-  cursor: pointer;
-}
+      <div class="columns">
 
-#featured-nara-sidebar:hover {
-  color: var(--pink);
-  border-radius: 10px;
-}
+        <!-- Events -->
+        <div class="column">
+          <img class="imgCol" src="https://f2.toyhou.se/file/f2-toyhou-se/images/29250834_P8yYnRqrJGDgEGy.png" alt="Bulletin Board icon" />
+          <h1 class="fp-heading">Bulletin Board</h1>
+          <p>Extra! Extra! Stay up to date on the latest in the Nature.</p>
+          <div id="featured-trial-frontpage" class="fp-trial"></div>
+        </div>
 
-.random-nara-img {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
-  transition: 0.4s;
-}
+        <!-- Staff -->
+        <div class="column">
+          <h1>Celestials</h1>
+        </div>
 
-.random-nara-img:hover {
-  box-shadow: 0 3px 10px var(--tanb);
-}
+      </div>
+    </div>
 
-.random-nara-name {
-  transition: 0.4s;
-  padding-top: 1vh;
-}
+    <!-- Footer -->
+    <div class="includes" id="footer" data-source="includes/footer.html"></div>
 
-#featured-trial-sidebar {
-  font-family: var(--bubbly);
-  transition-duration: 0.4s;
-  cursor: pointer;
-}
+  </div>
 
-#featured-trial-sidebar:hover {
-  color: var(--pink);
-  border-radius: 10px;
-}
 
-.featured-trial-card img {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
-  transition: 0.4s;
-}
+    <!-- ----------------------------------------------------------------- -->
+    <!-- JS                                                                -->
+    <!-- ----------------------------------------------------------------- -->
 
-.featured-trial-card img:hover {
-  box-shadow: 0 4px 10px var(--tanb);
-}
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
-.featured-trial-name {
-  transition: 0.4s;
-  margin-top: 1vh;
-}
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 
-/* .featured-trial-card {
-  text-align: center;
-}
+    <!-- List.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
 
-
-
-.featured-trial-name {
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-  margin-top: 1vh;
-}
-
-.featured-trial-name:hover {
-  color: var(--pink);
-  transition: 0.4s;
-}
-
-/* --------------------------- */
-/* ---------Top Button-------- */
-/* --------------------------- */
-.top {
-  position: fixed;
-  bottom: 20px;
-  right: 30px;
-  z-index: 1000;
-  cursor: pointer;
-  padding: 10px;
-  color: var(--dark-blue);
-  font-family: var(--bubbly);
-  background-color: var(--light-blue);
-  border-radius: 9999px;
-  border: 1px solid var(--blueb);
-}
-
-/* --------------------------- */
-/* -----------Footer---------- */
-/* --------------------------- */
-.footer {
-  background-image: url("../assets/footer.png");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-  padding: 2%;
-  margin-top: 2rem;
-  height: 30vh;
-  display: flex;
-  align-items: flex-end;
-}
-
-/* --------------------------- */
-/* -----------Front page------- */
-/* --------------------------- */
-.columns {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  color: var(--dark-blue);
-}
-
-.column {
-  flex: 1 1 clamp(180px, 30%, 400px);
-  padding: 1.3rem;
-  background-color: var(--tan);
-  border-top-left-radius: 120px;
-  border-top-right-radius: 120px;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  text-align: center;
-  box-shadow: inset -3px 20px 1px 20px #fff, inset -20px 40px 1px 30px var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  border: 1px solid var(--tanb);
-}
-
-.column img {
-  width: 100%;
-  height: auto;
-}
-
-.imgArch {
-  width: 100%;
-  height: auto;
-  margin-top: 50%;
-}
-
-.column h2 {
-  font-weight: 600;
-  font-family: var(--playful);
-  letter-spacing: 5px;
-}
-
-.column hr {
-  margin: auto;
-  width: 100px;
-  border: 1px solid var(--dark-blue);
-  border-radius: 10px;
-}
-
-#fp-button {
-  background-color: var(--light-blue);
-  border: 1px solid var(--blueb);
-  color: var(--dark-blue);
-  font-family: var(--bubbly);
-  text-decoration: none;
-  border-radius: 20px;
-  padding: 8px;
-  cursor: pointer;
-  transition-duration: 0.4s;
-}
-
-#fp-button:hover {
-  background-color: var(--light-pink);
-  border: 1px solid var(--pinkb);
-  color: var(--pink);
-}
-
-.frontpage-intro {
-  background-color: var(--tan);
-  border: 1px solid var(--tanb);
-  border-radius: 10px;
-  padding: 2rem;
-  padding-top: 6rem;
-  margin: 2rem 0;
-  margin-top: 8%;
-  text-align: left;
-  position: relative;
-}
-
-.frontpage-intro img {
-  position: absolute;
-  width: 300px;
-  right: -50px; 
-  top: -60px;
-  z-index: 1;
-}
-
-@media (max-width: 768px) {
-  .frontpage-intro {
-    padding-top: 4rem;
-  }
-
-  .frontpage-intro img {
-    width: 180px;
-    right: -10px;
-    top: -10px;
-  }
-}
-
-.icon-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin: 2rem;
-  font-family: var(--cyber);
-  color: var(--dark-blue);
-}
-
-.icon-row a {
-  color: var(--dark-blue);
-}
-
-.newest-designs {
-  background-color: var(--tan);
-  border: 1px solid var(--tanb);
-  border-radius: 10px;
-  padding: 2rem;
-  margin: 2rem 0;
-  text-align: left;
-}
-
-.recent-naras-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.narapedia-card.recent-card {
-  cursor: pointer;
-  text-align: center;
-  border: none;
-}
-
-.narapedia-card.recent-card:hover {
-  background-color: var(--light-pink);
-  border-color: var(--pink);
-  transition-duration: 0.4s;
-}
-
-.narapedia-card.recent-card img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.imgCol {
-  max-width: 75%;
-  height: auto;
-  display: block;
-  margin: auto;
-  margin-top: 5%;
-}
-
-.fp-trial .featured-trial-card img {
-  max-width: 50%;
-  height: auto;
-  display: block;
-  box-shadow: none;
-}
-
-.fp-trial .featured-trial-card img:hover {
-  box-shadow: 0 4px 10px var(--tanb);
-  transition: 0.4s;
-}
-
-.fp-trial .featured-trial-name {
-  font-size: 200%;
-  font-family: var(--cyber);
-}
-
-.featured-trial-dates { color: var(--dark-blue); }
-
-/* --------------------------- */
-/* ------------Login---------- */
-/* --------------------------- */
-#loginBtn {
-  font-size: 3rem;
-  box-shadow: 0 0 5px var(--tanb);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  transition: 0.4s;
-  cursor: pointer;
-}
-
-#loginBtn:hover {
-  color: var(--pink);
-  transform: translateY(-2px);
-  box-shadow: 0 0 5px var(--tanb);
-}
-
-/* --------------------------- */
-/* ---------User profile------ */
-/* --------------------------- */
-.empty-placeholder {
-  color: var(--pink);
-  font-family: var(--bubbly);
-  flex-direction: column;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1em;
-  height: 100%;
-  width: 100%;  
-  padding: 10px;
-  border-radius: 8px;
-  background-color: var(--light);
-  box-shadow: 0 0 5px rgba(204,204,204,1);
-}
-
-#crystals .currency-name {
-  color: var(--bluey);
-  font-family: var(--formal);
-}
-
-#crystals .currency-amount {
-  color: var(--dark-blue);
-  font-family: var(--formal);
-  font-weight: bold;
-}
-
-#crystals img {
-  width: 25px;
-  height: 25px;
-}
-
-.currency-name {
-  color: var(--bluey);
-  font-family: var(--bubbly);
-  margin-left: 10px;
-}
-
-.currency-amount {
-  color: var(--dark-blue);
-  font-family: var(--cyber);
-  margin-left: auto;
-  margin-right: 1px;
-}
-
-#other-currencies {
-  width: clamp(250px, 80%, 500px);
-  margin: 0 auto 2rem auto;
-  max-height: 12em; 
-  overflow-y: auto;
-}
-
-#other-currencies p {
-  display: flex;
-  justify-content: space-between;
-  font-size: 2rem;
-  padding: 8px;
-  background-color: var(--light);
-  box-shadow: 0 0 5px rgba(204,204,204,1);
-  border-radius: 8px;
-  margin: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-}
-
-#other-currencies p:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-#other-currencies p img {
-  width: 25px;
-  height: 25px;
-  margin-right: 10px;
-}
-
-#other-currencies.scroll-box::-webkit-scrollbar-thumb {
-  background-color: var(--light-blue);
-  box-shadow: 0px 0px 5px var(--light-blue);
-}
-
-#other-currencies.scroll-box::-webkit-scrollbar-track {
-  background-color: var(--light);
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
-  max-height: 11em;
-  overflow-y: auto;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.mini-card {
-  text-align: center;
-  font-size: 1em;
-  background: var(--light);
-  box-shadow: 0 0 5px rgba(204,204,204,1);
-  border-radius: 8px;
-  padding: 1px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-}
-
-.mini-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.mini-card img {
-  width: 75px;
-  height: 75px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 4px;
-}
-
-.mini-card-name {
-  font-family: var(--bubbly);
-  color: var(--bluey);
-}
-
-.mini-card-qty {
-  font-family: var(--cyber);
-  color: var(--dark-blue);
-}
-
-#myNaras {
-  float: right;
-  text-decoration:  underline;
-}
-
-.char-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Default: 4 per row */
-  gap: 16px;
-  padding: 12px;
-  border-radius: 10px;
-  overflow-y: auto;
-  background-color: var(--tan);
-}
-
-/* Medium screens → 2 per row */
-@media (max-width: 600px) {
-  .char-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Small screens → 1 per row */
-@media (max-width: 300px) {
-  .char-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.mini-nara-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-
-  background: var(--light);
-  box-shadow: 0 0 5px rgba(204,204,204,1);
-  border-radius: 8px;
-  padding: 12px;
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-}
-
-.mini-nara-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.mini-nara-card p {
-  font-family: var(--bubbly);
-  color: var(--bluey);
-  font-size: 0.9rem;
-  text-align: center;
-  margin: 0;
-  word-break: break-word;
-}
-
-/* --------------------------- */
-/* ----------Narapedia-------- */
-/* --------------------------- */
-.narapedia-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.narapedia-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  border: 1px solid var(--tanb);
-  padding: 1rem;
-  border-radius: 12px;
-  background: var(--tan);
-  cursor: pointer;
-  text-align: center;
-  max-width: 350px;
-  margin: 0 auto;
-  box-sizing: border-box;
-
-  /* card-name */
-  margin-top: 0.5rem;
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-}
-
-.narapedia-card:hover {
-  background-color: var(--pinkb);
-  color: var(--pink);
-  transition-duration: 0.4s;
-}
-
-.narapedia-card-img {
-  width: 100%;
-  height: auto;
-  max-width: 500px;
-  border-radius: 8px;
-}
-
-.back-btn {
-  margin-bottom: 1%;
-}
-
-.detail-card {
-  width: 1200px;
-  padding: 1rem;
-  background: var(--tan);
-  border: 1px solid var(--tanb);
-  border-radius: 20px;
-  text-align: center;
-  font-family: var(--calm);
-  color: var(--dark-blue);
-}
-
-.detail-name {
-  font-family: var(--bubbly)
-}
-
-@media (max-width: 1280px) {
-  .detail-card {
-    width: 850px;
-  }
-}
-
-.detail-img {
-  width: 100%;
-  max-width: 200px;
-  border-radius: 8px;
-}
-
-detail-name {
-  margin-top: 1rem;
-  font-family: var(--bubbly);
-  color: var(--dark-blue);
-}
-
-/* tablet */
-@media (max-width: 1024px) {
-  .narapedia-grid {
-    grid-template-columns: repeat(4, 1fr); 
-  }
-
-  .detail-card {
-    width: 100%;
-  }
-}
-
-/* mobile */
-@media (max-width: 600px) {
-  .narapedia-grid {
-    grid-template-columns: repeat(2, 1fr); 
-  }
-
-  .detail-card {
-    width: 100%;
-  }
-}
-
-/* --------------------------- */
-/* ----------Masterlist------- */
-/* --------------------------- */
-.masterlist-detail-img {
-  width: 100%;
-  height: auto;
-  max-width: 500px;
-  border-radius: 8px;
-}
-
-/* --------------------------- */
-/* ----------Masterlist------- */
-/* --------------------------- */
-#aboutStaff {
-  text-align: left;
-}
-
-/* --------------------------- */
-/* ---- Smooth Loading ------- */
-/* --------------------------- */
-.fade-in {
-  animation: fadeIn 0.3s ease-in forwards;
-}
-
-.fade-out {
-  animation: fadeOut 0.3s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-}
+    <!-- narasnature Script -->
+    <script src="styles/config.js"></script>
+    <script src="styles/narasnature.js"></script>
+  </body>
+</html>
