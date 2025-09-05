@@ -22,9 +22,9 @@ function getDiscordOAuthURL() {
   return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
 }
 
-/* ==============================
-   ===== Navbar =================
-   ============================== */
+// ==============================
+//  Navbar
+// ==============================
 function updateNavbarUI(userDataParam) {
   console.trace("⚡ fetchUserProfile called");
 
@@ -91,11 +91,7 @@ async function fetchUserProfile() {
 
     const data = await res.json();
     console.log("✅ GAS Response JSON:", data);
-
-    // 🔑 make sure discordId is attached (important for masterlist match)
     data.discordId = discordUser.id;
-
-    // ✅ Render user profile
     await renderUserProfile(data);
 
     if (spin) spin.style.display = "none";
@@ -193,120 +189,120 @@ async function renderUserProfile(data) {
   }
 
   // === Other Currencies ===
-const otherEl = document.getElementById("other-currencies");
-const noOtherEl = document.getElementById("no-other-currencies");
-if (otherEl && noOtherEl) {
-  otherEl.innerHTML = "";
-  noOtherEl.style.display = "none";
+    const otherEl = document.getElementById("other-currencies");
+    const noOtherEl = document.getElementById("no-other-currencies");
+    if (otherEl && noOtherEl) {
+      otherEl.innerHTML = "";
+      noOtherEl.style.display = "none";
 
-  let added = 0;
-  if (data.currencies) {
-    Object.entries(data.currencies).forEach(([name, amount]) => {
-      if (!amount || Number(amount) < 1) return;
-      if (name.toLowerCase() === "crystals") return;
+      let added = 0;
+      if (data.currencies) {
+        Object.entries(data.currencies).forEach(([name, amount]) => {
+          if (!amount || Number(amount) < 1) return;
+          if (name.toLowerCase() === "crystals") return;
 
-      added++;
-      const p = document.createElement("p");
+          added++;
+          const p = document.createElement("p");
 
-      const nameSpan = document.createElement("span");
-      nameSpan.className = "currency-name";
-      nameSpan.textContent = `${name}: `;
-      p.appendChild(nameSpan);
+          const nameSpan = document.createElement("span");
+          nameSpan.className = "currency-name";
+          nameSpan.textContent = `${name}: `;
+          p.appendChild(nameSpan);
 
-      const amountSpan = document.createElement("span");
-      amountSpan.className = "currency-amount";
-      amountSpan.textContent = amount;
-      p.appendChild(amountSpan);
+          const amountSpan = document.createElement("span");
+          amountSpan.className = "currency-amount";
+          amountSpan.textContent = amount;
+          p.appendChild(amountSpan);
 
-      const key = name.toLowerCase().trim();
-      if (artifactIconMap[key]) {
-        const img = document.createElement("img");
-        img.src = artifactIconMap[key];
-        img.alt = name;
-        img.className = "currency-icon";
-        p.appendChild(img);
+          const key = name.toLowerCase().trim();
+          if (artifactIconMap[key]) {
+            const img = document.createElement("img");
+            img.src = artifactIconMap[key];
+            img.alt = name;
+            img.className = "currency-icon";
+            p.appendChild(img);
+          }
+
+          otherEl.appendChild(p);
+        });
       }
 
-      otherEl.appendChild(p);
-    });
-  }
-
-  if (added === 0) noOtherEl.style.display = "block";
-}
-
-// === Inventory ===
-const inventoryEl = document.getElementById("inventory");
-const noInventoryEl = document.getElementById("no-inventory");
-if (inventoryEl && noInventoryEl) {
-  inventoryEl.innerHTML = "";
-  inventoryEl.classList.add("card-grid");
-  noInventoryEl.style.display = "none";
-
-  let added = 0;
-  Object.entries(data.inventory || {}).forEach(([item, qty]) => {
-    if (qty && Number(qty) >= 1) {
-      added++;
-      const card = document.createElement("div");
-      card.className = "mini-card";
-
-      const img = document.createElement("img");
-      img.src = artifactIconMap[item.toLowerCase().trim()] || "../assets/narwhal.png";
-      img.alt = item;
-      card.appendChild(img);
-
-      const nameEl = document.createElement("div");
-      nameEl.className = "mini-card-name";
-      nameEl.textContent = item;
-      card.appendChild(nameEl);
-
-      const qtyEl = document.createElement("div");
-      qtyEl.className = "mini-card-qty";
-      qtyEl.textContent = `x${qty}`;
-      card.appendChild(qtyEl);
-
-      inventoryEl.appendChild(card);
+      if (added === 0) noOtherEl.style.display = "block";
     }
-  });
 
-  if (added === 0) noInventoryEl.style.display = "block";
-}
+    // === Inventory ===
+    const inventoryEl = document.getElementById("inventory");
+    const noInventoryEl = document.getElementById("no-inventory");
+    if (inventoryEl && noInventoryEl) {
+      inventoryEl.innerHTML = "";
+      inventoryEl.classList.add("card-grid");
+      noInventoryEl.style.display = "none";
 
-// === Palcharms ===
-const palEl = document.getElementById("palcharms");
-const noPalEl = document.getElementById("no-palcharms");
-if (palEl && noPalEl) {
-  palEl.innerHTML = "";
-  palEl.classList.add("card-grid");
-  noPalEl.style.display = "none";
+      let added = 0;
+      Object.entries(data.inventory || {}).forEach(([item, qty]) => {
+        if (qty && Number(qty) >= 1) {
+          added++;
+          const card = document.createElement("div");
+          card.className = "mini-card";
 
-  let added = 0;
-  Object.entries(data.palcharms || {}).forEach(([name, qty]) => {
-    if (qty && Number(qty) >= 1) {
-      added++;
-      const card = document.createElement("div");
-      card.className = "mini-card";
+          const img = document.createElement("img");
+          img.src = artifactIconMap[item.toLowerCase().trim()] || "../assets/narwhal.png";
+          img.alt = item;
+          card.appendChild(img);
 
-      const img = document.createElement("img");
-      img.src = palcharmIconMap[name.toLowerCase().trim()] || "../assets/narwhal.png";
-      img.alt = name;
-      card.appendChild(img);
+          const nameEl = document.createElement("div");
+          nameEl.className = "mini-card-name";
+          nameEl.textContent = item;
+          card.appendChild(nameEl);
 
-      const nameEl = document.createElement("div");
-      nameEl.className = "mini-card-name";
-      nameEl.textContent = name;
-      card.appendChild(nameEl);
+          const qtyEl = document.createElement("div");
+          qtyEl.className = "mini-card-qty";
+          qtyEl.textContent = `x${qty}`;
+          card.appendChild(qtyEl);
 
-      const qtyEl = document.createElement("div");
-      qtyEl.className = "mini-card-qty";
-      qtyEl.textContent = `x${qty}`;
-      card.appendChild(qtyEl);
+          inventoryEl.appendChild(card);
+        }
+      });
 
-      palEl.appendChild(card);
+      if (added === 0) noInventoryEl.style.display = "block";
     }
-  });
 
-  if (added === 0) noPalEl.style.display = "block";
-}
+    // === Palcharms ===
+    const palEl = document.getElementById("palcharms");
+    const noPalEl = document.getElementById("no-palcharms");
+    if (palEl && noPalEl) {
+      palEl.innerHTML = "";
+      palEl.classList.add("card-grid");
+      noPalEl.style.display = "none";
+
+      let added = 0;
+      Object.entries(data.palcharms || {}).forEach(([name, qty]) => {
+        if (qty && Number(qty) >= 1) {
+          added++;
+          const card = document.createElement("div");
+          card.className = "mini-card";
+
+          const img = document.createElement("img");
+          img.src = palcharmIconMap[name.toLowerCase().trim()] || "../assets/narwhal.png";
+          img.alt = name;
+          card.appendChild(img);
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "mini-card-name";
+          nameEl.textContent = name;
+          card.appendChild(nameEl);
+
+          const qtyEl = document.createElement("div");
+          qtyEl.className = "mini-card-qty";
+          qtyEl.textContent = `x${qty}`;
+          card.appendChild(qtyEl);
+
+          palEl.appendChild(card);
+        }
+      });
+
+      if (added === 0) noPalEl.style.display = "block";
+    }
 
   // === Characters ===
   const charEl = document.getElementById("characters");
@@ -324,32 +320,42 @@ if (palEl && noPalEl) {
       );
 
       if (userNaras.length) {
+        // Only keep rows with valid Nara + URL
+        const withNara = userNaras.filter(r =>
+          typeof r["Nara"] === "string" && r["Nara"].trim() !== ""
+        );
+
         // Show first 4 as preview
-        const previewNaras = userNaras.slice(0, 4);
+        const previewNaras = withNara.slice(0, 4);
 
         previewNaras.forEach(nara => {
-          const card = document.createElement("div");
-          card.className = "mini-nara-card";
+          const naraName = String(nara["Nara"]).trim();
+
+          // wrapper link to detail page (same style as sidebar)
+          const link = document.createElement("a");
+          link.href = `/narapedia/masterlist.html?design=${encodeURIComponent(naraName)}`;
+          link.className = "mini-nara-card";
+          link.style.textDecoration = "none";
 
           const img = document.createElement("img");
-          img.src = nara["URL"] || "../assets/default-nara.png";
+          img.src = nara["URL"] || "../assets/narwhal.png"; // still using your URL column
+          img.alt = naraName;
 
           const name = document.createElement("h4");
-          name.textContent = nara["Nara"] || "";
+          name.textContent = naraName;
 
-          card.appendChild(img);
-          card.appendChild(name);
-          charEl.appendChild(card);
+          link.appendChild(img);
+          link.appendChild(name);
+          charEl.appendChild(link);
         });
 
-        // Link the "All my Naras" span to your full page
+        // "All my Naras" link
         if (myNarasLink) {
           myNarasLink.style.cursor = "pointer";
           myNarasLink.onclick = () => {
             window.location.href = `myNaras.html?discordId=${encodeURIComponent(data.discordId)}`;
           };
         }
-
       } else {
         charEl.innerHTML = "<p>No Naras found for this user.</p>";
         if (myNarasLink) myNarasLink.style.display = "none";
@@ -361,10 +367,9 @@ if (palEl && noPalEl) {
   }
 }
 
-/* ==============================
-   ===== Page Guard =============
-   - Allow OAuth callback to run on /user.html if #access_token is present
-   ============================== */
+// ==============================
+// Page Guard
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
   const isUserPage = window.location.pathname.endsWith("/user.html");
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
@@ -376,9 +381,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* ==============================
-   ===== Header Auth Spinner ====
-   ============================== */
+// ==============================
+// Header Auth Spinner
+// ==============================
 function showHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
@@ -401,9 +406,9 @@ function hideHeaderAuthSpinner() {
   }
 }
 
-/* ==============================
-   ===== OAuth ==================
-   ============================== */
+// ==============================
+// OAuth 
+// ==============================
 async function handleOAuthCallback() {
   // Handle only when URL hash has the token
   const params = new URLSearchParams(window.location.hash.substring(1));
@@ -598,9 +603,9 @@ async function loadHeaderFooter() {
   setupBackToTop();
 }
 
-/* ==========================
-   Fetch Sheets
-   ========================== */
+// ==========================
+// Fetch Sheets
+// ==========================
 async function fetchSheetData(sheetName) {
   if (!SHEET_BASE_URL) {
     throw new Error("SHEET_BASE_URL is not defined.");
@@ -611,9 +616,9 @@ async function fetchSheetData(sheetName) {
   return await response.json();
 }
 
-/* ==========================
-   Render Sheets
-   ========================== */
+// ==========================
+// Render Sheets
+// ==========================
 function renderSheets(data, config) {
   const listEl = document.getElementById(config.listId);
   const detailEl = document.getElementById(config.detailId);
@@ -677,10 +682,12 @@ function renderSheets(data, config) {
 
     const detail = detailTemplate.content.cloneNode(true);
     const imgEl = detail.querySelector("img");
-    const nameEl = detail.querySelector("h2");
 
-    if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
-    if (nameEl) nameEl.textContent = row[config.nameField] || "Unnamed";
+    if (imgEl) imgEl.src = row[config.imageField] || "../assets/narwhal.png";
+    const nameEls = detail.querySelectorAll(".detail-name");
+    nameEls.forEach(el => {
+      el.textContent = row[config.nameField] || "Unnamed";
+    });
 
     if (config.extraFields) {
       config.extraFields.forEach(fieldConf => {
@@ -689,6 +696,10 @@ function renderSheets(data, config) {
       });
     }
 
+    // ✅ Render Palcharms
+    renderDetailPalcharms(row["Palcharms"]);
+
+    // ✅ Back button
     const backBtn = detail.querySelector(".back-btn") || detail.querySelector("button");
     if (backBtn) {
       backBtn.addEventListener("click", () => {
@@ -700,11 +711,65 @@ function renderSheets(data, config) {
     detailEl.appendChild(detail);
   }
 
+  function renderDetailPalcharms(palcharmString) {
+    const palEl = document.getElementById("detail-palcharms");
+    const noPalEl = document.getElementById("no-detail-palcharms");
+
+    if (!palEl || !noPalEl) return;
+
+    palEl.innerHTML = "";
+    palEl.classList.add("card-grid");
+    noPalEl.style.display = "none";
+
+    if (!palcharmString || !palcharmString.trim()) {
+      noPalEl.style.display = "block";
+      return;
+    }
+
+    let added = 0;
+
+    palcharmString.split(",").forEach(entry => {
+      const match = entry.trim().match(/(.+?)(?:\s+x(\d+))?$/);
+      if (!match) return;
+
+      const name = match[1].trim();
+      const qty = match[2] ? Number(match[2]) : 1;
+
+      if (name) {
+        added++;
+        const card = document.createElement("div");
+        card.className = "mini-card";
+
+        const img = document.createElement("img");
+        img.src = palcharmIconMap[name.toLowerCase()] || "../assets/narwhal.png";
+        img.alt = name;
+        card.appendChild(img);
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "mini-card-name";
+        nameEl.textContent = name;
+        card.appendChild(nameEl);
+
+        if (qty > 1) {
+          const qtyEl = document.createElement("div");
+          qtyEl.className = "mini-card-qty";
+          qtyEl.textContent = `x${qty}`;
+          card.appendChild(qtyEl);
+        }
+
+        palEl.appendChild(card);
+      }
+    });
+
+    if (added === 0) noPalEl.style.display = "block";
+  }
+
   function showGrid() {
     detailEl.style.display = "none";
     listEl.style.display = "grid";
     if (pageEl) pageEl.style.display = pageDefaultDisplay;
   }
+}
 
   window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);
@@ -718,7 +783,6 @@ function renderSheets(data, config) {
       showGrid();
     }
   });
-}
 
 async function initSheet(sheetName, config) {
   try {
@@ -753,9 +817,9 @@ async function loadArtifacts() {
   }
 }
 
-/* ==============================
-   Sheet Rendering Spinners
-   ============================== */
+// ==============================
+// Sheet Rendering Spinners
+// ==============================
 function showSpinner(containerId, message = "Loading...") {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -783,9 +847,9 @@ function hideSpinner(containerId) {
   container.style.display = "grid";
 }
 
-/* ==============================
-   Featured Nara - Sidebar
-   ============================== */
+// ==============================
+// Featured Nara - Sidebar
+// ==============================
 function getMonthlySeededNara(data) {
   const now = new Date();
   const seed = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
@@ -866,9 +930,9 @@ async function loadFeaturedNaraSidebar() {
   }
 }
 
-/* =======================================
-   Featured Trials - Sidebar & Frontpage
-   ======================================= */
+// =======================================
+// Featured Trials - Sidebar & Frontpage
+// =======================================
 let cachedEligibleTrials = null;
 let cachedAllTrials = null;
 
@@ -1101,9 +1165,9 @@ async function renderFrontpageFeaturedTrials(targetId = "featured-trial-frontpag
   }
 }
 
-/* ==============================
-   Recent Naras - Frontpaage
-   ============================== */
+// ==============================
+//   Recent Naras - Frontpaage
+// ============================== 
 async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   try {
     const container = document.getElementById(targetId);
@@ -1145,9 +1209,9 @@ async function renderRecentNaras(targetId = "recent-naras", limit = 8) {
   }
 }
 
-/* ==============================
-   Transitions & Back To Top
-   ============================== */
+// ==============================
+// Transitions & Back To Top
+// ==============================
 function setupPageTransitions() {
   const wrapper = document.querySelector(".wrapper");
   if (!wrapper) return;
@@ -1199,9 +1263,9 @@ function setupBackToTop() {
   });
 }
 
-/* ==============================
-   Centralized Load
-   ============================== */
+// ==============================
+// Centralized Load
+// ==============================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
@@ -1277,6 +1341,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const retryBtn = document.getElementById("retryProfileBtn");
       if (retryBtn) retryBtn.addEventListener("click", fetchUserProfile);
+    }
+
+    // ===== Tabs Setup =====
+    const tabContainer = document.querySelector(".tabcontent");
+    if (tabContainer) {
+      function openPage(pageName, elmnt) {
+        const tabcontent = document.querySelectorAll(".tabcontent");
+        const tablinks = document.querySelectorAll(".tablink");
+
+        // Hide all tab contents
+        tabcontent.forEach(tc => tc.classList.remove("active"));
+
+        // Reset all buttons
+        tablinks.forEach(tl => tl.classList.remove("active"));
+
+        // Show selected tab + activate button
+        const selectedTab = document.getElementById(pageName);
+        if (selectedTab) selectedTab.classList.add("active");
+        if (elmnt) elmnt.classList.add("active");
+      }
+
+      // Attach listeners
+      const tablinks = document.querySelectorAll(".tablink");
+      tablinks.forEach(link => {
+        link.addEventListener("click", function () {
+          const pageName = this.getAttribute("data-page");
+          openPage(pageName, this);
+        });
+      });
     }
 
   } catch (err) {
