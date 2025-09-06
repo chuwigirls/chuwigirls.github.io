@@ -632,7 +632,6 @@ function renderSheets(data, config) {
   }
 
   const pageDefaultDisplay = pageEl ? getComputedStyle(pageEl).display : "block";
-
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
@@ -656,7 +655,11 @@ function renderSheets(data, config) {
       clickable.addEventListener("click", () => {
         renderDetail(row, config);
         const qp = config.queryParam || "id";
-        history.pushState({ view: "detail", name: row[config.nameField] }, "", `?${qp}=${encodeURIComponent(row[config.nameField] || "")}`);
+        history.pushState(
+          { view: "detail", name: row[config.nameField] },
+          "",
+          `?${qp}=${encodeURIComponent(row[config.nameField] || "")}`
+        );
       });
     }
 
@@ -672,18 +675,17 @@ function renderSheets(data, config) {
 
   function renderDetail(row, config) {
     hideSpinner(config.listId);
-
     listEl.style.display = "none";
     detailEl.style.display = "block";
     if (pageEl) pageEl.style.display = "none";
-    detailEl.innerHTML = "";
 
+    detailEl.innerHTML = "";
     window.scrollTo(0, 0);
 
     const detail = detailTemplate.content.cloneNode(true);
     const imgEl = detail.querySelector("img");
-
     if (imgEl) imgEl.src = row[config.imageField] || "../assets/narwhal.png";
+
     const nameEls = detail.querySelectorAll(".detail-name");
     nameEls.forEach(el => {
       el.textContent = row[config.nameField] || "Unnamed";
@@ -696,10 +698,6 @@ function renderSheets(data, config) {
       });
     }
 
-    // ✅ Render Palcharms
-    renderDetailPalcharms(row["Palcharms"]);
-
-    // ✅ Back button
     const backBtn = detail.querySelector(".back-btn") || detail.querySelector("button");
     if (backBtn) {
       backBtn.addEventListener("click", () => {
@@ -711,78 +709,23 @@ function renderSheets(data, config) {
     detailEl.appendChild(detail);
   }
 
-  function renderDetailPalcharms(palcharmString) {
-    const palEl = document.getElementById("detail-palcharms");
-    const noPalEl = document.getElementById("no-detail-palcharms");
-
-    if (!palEl || !noPalEl) return;
-
-    palEl.innerHTML = "";
-    palEl.classList.add("card-grid");
-    noPalEl.style.display = "none";
-
-    if (!palcharmString || !palcharmString.trim()) {
-      noPalEl.style.display = "block";
-      return;
-    }
-
-    let added = 0;
-
-    palcharmString.split(",").forEach(entry => {
-      const match = entry.trim().match(/(.+?)(?:\s+x(\d+))?$/);
-      if (!match) return;
-
-      const name = match[1].trim();
-      const qty = match[2] ? Number(match[2]) : 1;
-
-      if (name) {
-        added++;
-        const card = document.createElement("div");
-        card.className = "mini-card";
-
-        const img = document.createElement("img");
-        img.src = palcharmIconMap[name.toLowerCase()] || "../assets/narwhal.png";
-        img.alt = name;
-        card.appendChild(img);
-
-        const nameEl = document.createElement("div");
-        nameEl.className = "mini-card-name";
-        nameEl.textContent = name;
-        card.appendChild(nameEl);
-
-        if (qty > 1) {
-          const qtyEl = document.createElement("div");
-          qtyEl.className = "mini-card-qty";
-          qtyEl.textContent = `x${qty}`;
-          card.appendChild(qtyEl);
-        }
-
-        palEl.appendChild(card);
-      }
-    });
-
-    if (added === 0) noPalEl.style.display = "block";
-  }
-
   function showGrid() {
     detailEl.style.display = "none";
     listEl.style.display = "grid";
     if (pageEl) pageEl.style.display = pageDefaultDisplay;
   }
-}
 
   window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);
     const target = params.get(config.queryParam || "id");
     if (target) {
       const match = data.find(row => String(row[config.nameField]) === target);
-      if (match) {
-        renderDetail(match, config);
-      }
+      if (match) renderDetail(match, config);
     } else {
       showGrid();
     }
   });
+}
 
 async function initSheet(sheetName, config) {
   try {
@@ -793,7 +736,10 @@ async function initSheet(sheetName, config) {
     console.error(`Error loading ${sheetName}:`, err);
     const container = document.getElementById(config.listId);
     if (container) {
-      container.insertAdjacentHTML("beforebegin", `<div class="loading-spinner">⚠️ Failed to load ${sheetName}.</div>`);
+      container.insertAdjacentHTML(
+        "beforebegin",
+        `<div class="loading-spinner">⚠️ Failed to load ${sheetName}.</div>`
+      );
     }
   } finally {
     hideSpinner(config.listId);
@@ -804,13 +750,11 @@ async function loadArtifacts() {
   try {
     const artifacts = await fetchSheetData("Artifacts");
     artifactIconMap = {};
-
     artifacts.forEach(row => {
       if (!row.Hide && row.Artifact && row.URL) {
         artifactIconMap[row.Artifact.trim()] = row.URL;
       }
     });
-
     console.log("=== Artifact Icon Map ===", artifactIconMap);
   } catch (err) {
     console.error("Error loading artifacts:", err);
