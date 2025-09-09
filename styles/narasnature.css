@@ -63,37 +63,85 @@ body {
 .tab {
   overflow: hidden;
   display: flex;
-  justify-content: space-between;
-  background-image: linear-gradient(to bottom, var(--tan), var(--tan), var(--tan), var(--tanb));
+  gap: 1rem;
+  padding: 1%;
+  /* justify-content: space-between; 
+  background-image: linear-gradient(to bottom, var(--tan), var(--tan), var(--tan), var(--tanb)); */
 }
 
 .tablink {
-  background-color: var(--light);
-  border-radius: 10px 10px 0 0;
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
   border: 0;
-  font-size: 2rem;
+  border-radius: 20px;
   letter-spacing: 2px;
+  box-shadow: 0 2px 6px rgba(204, 204, 204, 1);
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .tablink:hover {
-  background-color: var(--light);
-  border-radius: 10px 10px 0 0;
+  background-color: var(--light-pink);
+  border-radius: 20px;
   border: 0;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .tabcontent {
   display: none;
-  transition-duration: 0.4s; 
-  background-image: linear-gradient(to bottom, var(--light), var(--tan), var(--tan), var(--tan));
-  height: 250px;
+  transition-duration: 0.4s ease; 
+  /* background-image: linear-gradient(to bottom, var(--light), var(--tan), var(--tan), var(--tan)); */
+  height: 350px;
   padding: 3%;
+  border: 1px solid var(--tanb); 
+  border-radius: 10px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .tabcontent.active {
   display: block;
+}
+
+.tooltip-container {
+  position: relative;
+  align-items: center;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--light-blue) transparent transparent transparent;
 }
 
 /* --------------------------- */
@@ -1281,6 +1329,73 @@ detail-name {
   border-radius: 8px;
 }
 
+.nara-section {
+  margin-top: 2rem;
+}
+
+.nara-section h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--dark-blue);
+}
+
+#detail-tabs {
+  display: flex;
+  justify-content: right;  
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.item-card {
+  background: var(--tan);
+  border-radius: 12px;
+  padding: 0.5rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(204, 204, 204, 1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.item-card img {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.item-card p {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark-blue);
+  margin: 0;
+}
+
+#detail-hr {
+  border: 1px solid var(--tanb);
+}
+
+#detail-emblems {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+#detail-emblems .item-card {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 /* --------------------------- */
 /* ----Staff / Celestials----- */
 /* --------------------------- */
@@ -1327,6 +1442,15 @@ detail-name {
 
 .staff-detail-img {
   width: 25%;
+}
+
+/* --------------------------- */
+/* ----------Dailies---------- */
+/* --------------------------- */
+#tapImage {
+  height:100px;
+  width: auto;
+  cursor: pointer;
 }
 
 /* --------------------------- */
