@@ -84,50 +84,79 @@
     <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Masterlist</button>
     <div class="detail-card">
       <h1 class="detail-name"></h1>
+
+      <!-- Titles -->
+      <h4><span class="masterlist-detail-titles"></span></h4>
+
+      <!-- Image -->
       <img class="masterlist-detail-img" src="" alt="">
 
-<!-- Tab links -->
-<div class="tab">
-  <button class="tablink active" data-page="Info">Details</button>
-  <button class="tablink" data-page="Inv">Inventory</button>
-</div>
+      <!-- Tab links -->
+      <div class="tab" id="detail-tabs">
+        <button class="tablink active" data-page="Info">Details</button>
+        <button class="tablink" data-page="Inv">Inventory</button>
+        <button class="tablink" data-page="Pal">Palcharms</button>
+      </div>
 
-<!-- Tab content -->
-<div id="Info" class="tabcontent active">
-  <div class="row">
-    <div class="col-sm-6">
-      <p><strong>Owner:</strong> <span class="masterlist-detail-owner"></span></p>
-      <p><strong>Designer:</strong> <span class="masterlist-detail-designer"></span></p>
-      <p><strong>Artist:</strong> <span class="masterlist-detail-artist"></span></p>
-    </div>
-    <div class="col-sm-6">
-      <p><strong>Status:</strong> <span class="masterlist-detail-status"></span></p>
-      <p><strong>Value:</strong> <span class="masterlist-detail-value"></span></p>
-    </div>
-  </div>
+      <!-- Tab content -->
+      <div id="Info" class="tabcontent active">
 
-  <p><strong>Region:</strong> <span class="masterlist-detail-region"></span></p>
-  <p><strong>Calling:</strong> <span class="masterlist-detail-calling"></span></p>
-  <p><strong>Build:</strong> <span class="masterlist-detail-build"></span></p>
-</div>
+        <div class="row">
+          <div class="col-sm-4">
+            <p><strong>Owner:</strong> <span class="masterlist-detail-owner"></span></p>
+          </div>
+          <div class="col-sm-4">
+            <p><strong>Designer:</strong> <span class="masterlist-detail-designer"></span></p>
+          </div>
+          <div class="col-sm-4">
+            <p><strong>Artist:</strong> <span class="masterlist-detail-artist"></span></p>
+          </div>
+        </div>
 
-<div id="Inv" class="tabcontent">
-  <p><strong>Inventory:</strong> <span class="masterlist-detail-inventory"></span></p>
+        <hr id="detail-hr">
 
-  <h3>Palcharms</h3>
-  <div id="detail-palcharms" class="card-grid"></div>
-  <p id="no-detail-palcharms" style="display:none;">No Palcharms</p>
+        <!-- Emblems -->
+        <p><strong>Emblems:</strong></p>
+        <div id="detail-emblems" class="item-grid"></div>
+        <p id="no-emblems" style="display:none;">This Nara doesn't have any Emblems.</p>
 
-  <h3>Emblems</h3>
-  <p><strong>Emblems:</strong> <span class="masterlist-detail-emblems"></span></p>
+        <hr id="detail-hr">
 
-  <h3>Titles</h3>
-  <p><strong>Titles:</strong> <span class="masterlist-detail-titles"></span></p>
-</div>
-</div></template>
+        <div class="row">
+          <div class="col-sm-6">
+            <p><strong>Status:</strong> <span class="masterlist-detail-status"></span></p>
+            <p><strong>Value:</strong> <span class="masterlist-detail-value"></span></p>
+            <p><strong>Region:</strong> <span class="masterlist-detail-region"></span></p>
+            <p><strong>Calling:</strong> <span class="masterlist-detail-calling"></span></p>
+            <p><strong>Build:</strong> <span class="masterlist-detail-build"></span></p>
+          </div>
+
+          <!-- Traits -->
+          <div class="col-sm-6">
+            <p><strong>Features:</strong> <span class="masterlist-detail-features"></span></p>
+          </div>
+        </div>
+
+        
+      </div>
+
+        <div id="Inv" class="tabcontent">
+            <h3>Inventory</h3>
+            <div id="detail-inventory" class="item-grid"></div>
+            <p id="no-inventory" style="display:none;">This Nara doesn't have any Artifacts.</p>
+        </div>
+          
+        <div id="Pal" class="tabcontent">
+            <h3>Palcharms</h3>
+            <div id="detail-palcharms" class="item-grid"></div>
+            <p id="no-palcharms" style="display:none;">This Nara doesn't have any Palcharms.</p>
+        </div>
+      </div>
+    </template>
 
   <!-- Scripts -->
   <script src="../styles/config.js"></script>
   <script src="../styles/narasnature.js"></script>
+  <script src="../styles/tabs.js"></script>
 </body>
 </html>
