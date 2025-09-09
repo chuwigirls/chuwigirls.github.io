@@ -37,7 +37,8 @@ const MASTERLIST_CONFIG = {
     { field: "Value", className: "masterlist-detail-region" },
     { field: "Build", className: "masterlist-detail-build" },
     { field: "Palcharms", className: "masterlist-detail-palcharms" },
-    { field: "Inventory", className: "masterlist-detail-inventory" }
+    { field: "Inventory", className: "masterlist-detail-inventory" },
+    { field: "Titles", className: "masterlist-detail-titles" }
   ]
 };
 
