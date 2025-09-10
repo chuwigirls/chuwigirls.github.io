@@ -1,9 +1,4 @@
-// Replace this with your deployed GAS web app URL
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
-
-// Example user info (replace with your actual auth/session values)
-const discordId = "1234567890";
-const username = "TestUser";
 
 const tapImage = document.getElementById("tapImage");
 const statusEl = document.getElementById("status");
@@ -35,25 +30,26 @@ function setDisabled(disabled) {
   }
 }
 
-async function attemptTap() {
+async function attemptTap(discordUser) {
   statusEl.textContent = "Checking...";
 
   try {
+    // Encode as form data to avoid CORS preflight
+    const body = new URLSearchParams({
+      type: "springTap",
+      discordId: discordUser.id,
+      username: discordUser.username
+    });
+
     const res = await fetch(GAS_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "springTap",
-        discordId,
-        username
-      })
+      body // no headers → no preflight
     });
 
     const data = await res.json();
     console.log("Response:", data);
 
     if (data.success) {
-      // Success: show reward and save state
       setDisabled(true);
       statusEl.textContent = `You found ${data.amount} Crystals! Come back tomorrow.`;
 
@@ -64,11 +60,9 @@ async function attemptTap() {
         reward: data.amount
       });
     } else {
-      // Already tapped today: show countdown
       setDisabled(true);
       statusEl.textContent = `Already tapped! Reset in ${data.wait}.`;
 
-      // Estimate reset time from GAS wait string
       const parts = data.wait.match(/(\d+)h (\d+)m/);
       let waitUntil = Date.now();
       if (parts) {
@@ -111,6 +105,14 @@ function startCountdown(waitUntil) {
 }
 
 function init() {
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+
+  if (!discordUser.id) {
+    setDisabled(true);
+    statusEl.textContent = "⚠️ Please log in with Discord to collect your daily crystal.";
+    return;
+  }
+
   const saved = loadState();
   if (saved && saved.waitUntil > Date.now()) {
     // Still locked
@@ -129,8 +131,14 @@ function init() {
 }
 
 tapImage.addEventListener("click", () => {
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  if (!discordUser.id) {
+    statusEl.textContent = "⚠️ Please log in with Discord to collect your daily crystal.";
+    return;
+  }
+
   if (!tapImage.classList.contains("disabled")) {
-    attemptTap();
+    attemptTap(discordUser);
   }
 });
 
