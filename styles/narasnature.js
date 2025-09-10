@@ -45,6 +45,239 @@ function updateNavbarUI(userDataParam) {
   }
 }
 
+// ==============================
+// Page Guard
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const isUserPage = window.location.pathname.endsWith("/user.html");
+  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  const hasOAuthHash = window.location.hash.includes("access_token=");
+
+  if (isUserPage && !discordUser.id && !hasOAuthHash && !previewMode) {
+    console.warn("🚫 No user logged in — redirecting to login.html");
+    window.location.href = "login.html";
+  }
+});
+
+// ==============================
+// Header Auth Spinner
+// ==============================
+function showHeaderAuthSpinner() {
+  const loginNav = document.getElementById("loginNav");
+  if (!loginNav) return;
+  if (!loginNav.dataset.prevHtml) {
+    loginNav.dataset.prevHtml = loginNav.innerHTML;
+  }
+  loginNav.innerHTML = '<div class="spinner" id="authSpinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+  loginNav.style.display = "flex";
+}
+function hideHeaderAuthSpinner() {
+  const loginNav = document.getElementById("loginNav");
+  if (!loginNav) return;
+  const prev = loginNav.dataset.prevHtml;
+  if (prev) {
+    loginNav.innerHTML = prev;
+    delete loginNav.dataset.prevHtml;
+  } else {
+    const s = document.getElementById("authSpinner");
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+  }
+}
+
+// ==============================
+// OAuth 
+// ==============================
+async function handleOAuthCallback() {
+  // Handle only when URL hash has the token
+  const params = new URLSearchParams(window.location.hash.substring(1));
+  const accessToken = params.get("access_token");
+  if (!accessToken) return;
+
+  showHeaderAuthSpinner();
+
+  try {
+    localStorage.setItem("access_token", accessToken);
+
+    const userResponse = await fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!userResponse.ok) throw new Error("Failed to fetch user info");
+
+    const userData = await userResponse.json();
+    localStorage.setItem("discordUser", JSON.stringify(userData));
+
+    // Warm the GAS
+    if (userData.id) {
+      fetch(`${GAS_ENDPOINT}?id=${encodeURIComponent(userData.id)}&username=${encodeURIComponent(userData.username || "")}`)
+        .then(res => res.json())
+        .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
+        .catch(() => {});
+    }
+
+    // If not on /user.html, go there; otherwise clean hash + update UI
+    if (!window.location.pathname.endsWith("/user.html")) {
+      window.location.replace("/user.html");
+      return;
+    } else {
+      history.replaceState(null, "", window.location.pathname);
+      updateNavbarUI();
+      hideHeaderAuthSpinner();
+    }
+  } catch (err) {
+    console.error("OAuth handling error:", err);
+    history.replaceState(null, "", window.location.pathname);
+    hideHeaderAuthSpinner();
+  }
+}
+
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!logoutBtn) return;
+  logoutBtn.addEventListener("click", e => {
+    e.preventDefault();
+    localStorage.removeItem("discordUser");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("discordAccessToken");
+    updateNavbarUI();
+    window.location.href = "/index.html";
+  });
+}
+
+// ==============================
+// ===== Sidebar, Header ========
+// ==============================
+function updateHeaderHeightCSSVar() {
+  const header = document.getElementById('siteHeader');
+  if (header) {
+    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle("sidebar-open");
+}
+
+function handleSidebarDisplay() {
+  if (window.innerWidth >= 1275) {
+    if (!document.body.classList.contains("sidebar-closed")) {
+      document.body.classList.add("sidebar-open");
+    }
+  } else {
+    document.body.classList.remove("sidebar-open");
+  }
+}
+
+function updateHeaderHeightCSSVar() {
+  const header = document.getElementById('siteHeader');
+  if (header) {
+    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle("sidebar-open");
+}
+
+function handleSidebarDisplay() {
+  if (window.innerWidth >= 1500) {
+    if (!document.body.classList.contains("sidebar-closed")) {
+      document.body.classList.add("sidebar-open");
+    }
+  } else {
+    document.body.classList.remove("sidebar-open");
+  }
+}
+
+function initSidebar() {
+  const toggleBtn = document.getElementById("openNav");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", toggleSidebar);
+  }
+
+  handleSidebarDisplay();
+
+  window.addEventListener("resize", () => {
+    updateHeaderHeightCSSVar();
+    handleSidebarDisplay();
+  });
+}
+
+function initDropdowns() {
+  document.querySelectorAll(".dropdown").forEach(dropdown => {
+    const button = dropdown.querySelector(".dropbtn");
+    const menu = dropdown.querySelector(".dropdown-content");
+    if (!button || !menu) return;
+
+    dropdown.addEventListener("mouseenter", () => menu.classList.add("show"));
+    dropdown.addEventListener("mouseleave", () => menu.classList.remove("show"));
+
+    menu.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        menu.classList.remove("show");
+        const navbarMenu = document.getElementById("navbarMenu");
+        if (navbarMenu?.classList.contains("show")) {
+          navbarMenu.classList.remove("show");
+        }
+      });
+    });
+  });
+}
+
+function initNavbarToggler() {
+  const toggler = document.getElementById("navbarToggle");
+  const navLinks = document.getElementById("navbarMenu");
+
+  if (!toggler || !navLinks) {
+    setTimeout(initNavbarToggler, 100);
+    return;
+  }
+
+  const newToggler = toggler.cloneNode(true);
+  toggler.parentNode.replaceChild(newToggler, toggler);
+
+  newToggler.addEventListener("click", () => navLinks.classList.toggle("show"));
+}
+
+window.addEventListener('load', updateHeaderHeightCSSVar);
+window.addEventListener('resize', updateHeaderHeightCSSVar);
+
+// ==============================
+// ===== Load Includes & Initialize Page ====
+// ==============================
+async function loadHeaderFooter() {
+  const includes = document.querySelectorAll(".includes");
+
+  for (const el of includes) {
+    const source = el.getAttribute("data-source");
+    if (!source) continue;
+    try {
+      const res = await fetch(source);
+      const html = await res.text();
+      el.innerHTML = html;
+    } catch (err) {
+      console.error("Failed to load include:", source, err);
+    }
+  }
+
+  await handleOAuthCallback(); 
+  updateNavbarUI();
+  setupLogoutButton();
+
+  initDropdowns();
+  initNavbarToggler();
+  initSidebar();
+  updateHeaderHeightCSSVar();
+
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) loginBtn.addEventListener("click", () => {
+    window.location.href = getDiscordOAuthURL();
+  });
+
+  setupPageTransitions();
+  setupBackToTop();
+}
+
 // ==========================
 // Fetch User Profile
 // ==========================
@@ -110,23 +343,6 @@ async function fetchUserProfile() {
     window.__profileLoading = false;
     return;
   }
-}
-
-// ==============================
-// Build Artifact & Palcharm Icon Maps
-// ==============================
-async function buildIconMap(sheetName, nameField, urlField) {
-  const url = `${SHEET_BASE_URL}/${sheetName}`;
-  const res = await fetch(url);
-  const rows = await res.json();
-  
-  const map = {};
-  rows.forEach(row => {
-    if (row[nameField] && row[urlField] && row.Hide !== "TRUE") {
-      map[row[nameField].trim().toLowerCase()] = row[urlField];
-    }
-  });
-  return map;
 }
 
 // ===============================
@@ -365,242 +581,6 @@ async function renderUserProfile(data) {
   }
 }
 
-// ==============================
-// Page Guard
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  const isUserPage = window.location.pathname.endsWith("/user.html");
-  const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
-  const hasOAuthHash = window.location.hash.includes("access_token=");
-
-  if (isUserPage && !discordUser.id && !hasOAuthHash && !previewMode) {
-    console.warn("🚫 No user logged in — redirecting to login.html");
-    window.location.href = "login.html";
-  }
-});
-
-// ==============================
-// Header Auth Spinner
-// ==============================
-function showHeaderAuthSpinner() {
-  const loginNav = document.getElementById("loginNav");
-  if (!loginNav) return;
-  if (!loginNav.dataset.prevHtml) {
-    loginNav.dataset.prevHtml = loginNav.innerHTML;
-  }
-  loginNav.innerHTML = '<div class="spinner" id="authSpinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-  loginNav.style.display = "flex";
-}
-function hideHeaderAuthSpinner() {
-  const loginNav = document.getElementById("loginNav");
-  if (!loginNav) return;
-  const prev = loginNav.dataset.prevHtml;
-  if (prev) {
-    loginNav.innerHTML = prev;
-    delete loginNav.dataset.prevHtml;
-  } else {
-    const s = document.getElementById("authSpinner");
-    if (s && s.parentNode) s.parentNode.removeChild(s);
-  }
-}
-
-// ==============================
-// OAuth 
-// ==============================
-async function handleOAuthCallback() {
-  // Handle only when URL hash has the token
-  const params = new URLSearchParams(window.location.hash.substring(1));
-  const accessToken = params.get("access_token");
-  if (!accessToken) return;
-
-  showHeaderAuthSpinner();
-
-  try {
-    // Save token
-    localStorage.setItem("access_token", accessToken);
-
-    // Fetch Discord user
-    const userResponse = await fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (!userResponse.ok) throw new Error("Failed to fetch user info");
-
-    const userData = await userResponse.json();
-    localStorage.setItem("discordUser", JSON.stringify(userData));
-
-    // Warm the GAS (optional) to create/update rows
-    if (userData.id) {
-      fetch(`${GAS_ENDPOINT}?id=${encodeURIComponent(userData.id)}&username=${encodeURIComponent(userData.username || "")}`)
-        .then(res => res.json())
-        .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
-        .catch(() => {});
-    }
-
-    /* If not on /user.html, go there; otherwise clean hash + update UI
-    if (!window.location.pathname.endsWith("/user.html")) {
-      window.location.replace("/user.html");
-      return; // stop here; the next page load will init UI
-    } else {
-      // Clean the #access_token from URL
-      history.replaceState(null, "", window.location.pathname);
-      updateNavbarUI();
-      hideHeaderAuthSpinner();
-    } */
-  } catch (err) {
-    console.error("OAuth handling error:", err);
-    history.replaceState(null, "", window.location.pathname);
-    hideHeaderAuthSpinner();
-  }
-}
-
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (!logoutBtn) return;
-  logoutBtn.addEventListener("click", e => {
-    e.preventDefault();
-    localStorage.removeItem("discordUser");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("discordAccessToken");
-    updateNavbarUI();
-    window.location.href = "/index.html";
-  });
-}
-
-// ==============================
-// ===== Sidebar, Header ========
-// ==============================
-function updateHeaderHeightCSSVar() {
-  const header = document.getElementById('siteHeader');
-  if (header) {
-    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
-  }
-}
-
-function toggleSidebar() {
-  document.body.classList.toggle("sidebar-open");
-}
-
-function handleSidebarDisplay() {
-  if (window.innerWidth >= 1275) {
-    if (!document.body.classList.contains("sidebar-closed")) {
-      document.body.classList.add("sidebar-open");
-    }
-  } else {
-    document.body.classList.remove("sidebar-open");
-  }
-}
-
-function updateHeaderHeightCSSVar() {
-  const header = document.getElementById('siteHeader');
-  if (header) {
-    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
-  }
-}
-
-function toggleSidebar() {
-  document.body.classList.toggle("sidebar-open");
-}
-
-function handleSidebarDisplay() {
-  if (window.innerWidth >= 1500) {
-    if (!document.body.classList.contains("sidebar-closed")) {
-      document.body.classList.add("sidebar-open");
-    }
-  } else {
-    document.body.classList.remove("sidebar-open");
-  }
-}
-
-function initSidebar() {
-  const toggleBtn = document.getElementById("openNav");
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", toggleSidebar);
-  }
-
-  handleSidebarDisplay();
-
-  window.addEventListener("resize", () => {
-    updateHeaderHeightCSSVar();
-    handleSidebarDisplay();
-  });
-}
-
-function initDropdowns() {
-  document.querySelectorAll(".dropdown").forEach(dropdown => {
-    const button = dropdown.querySelector(".dropbtn");
-    const menu = dropdown.querySelector(".dropdown-content");
-    if (!button || !menu) return;
-
-    dropdown.addEventListener("mouseenter", () => menu.classList.add("show"));
-    dropdown.addEventListener("mouseleave", () => menu.classList.remove("show"));
-
-    menu.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        menu.classList.remove("show");
-        const navbarMenu = document.getElementById("navbarMenu");
-        if (navbarMenu?.classList.contains("show")) {
-          navbarMenu.classList.remove("show");
-        }
-      });
-    });
-  });
-}
-
-function initNavbarToggler() {
-  const toggler = document.getElementById("navbarToggle");
-  const navLinks = document.getElementById("navbarMenu");
-
-  if (!toggler || !navLinks) {
-    setTimeout(initNavbarToggler, 100);
-    return;
-  }
-
-  const newToggler = toggler.cloneNode(true);
-  toggler.parentNode.replaceChild(newToggler, toggler);
-
-  newToggler.addEventListener("click", () => navLinks.classList.toggle("show"));
-}
-
-window.addEventListener('load', updateHeaderHeightCSSVar);
-window.addEventListener('resize', updateHeaderHeightCSSVar);
-
-// ==============================
-// ===== Load Includes & Initialize Page ====
-// ==============================
-async function loadHeaderFooter() {
-  const includes = document.querySelectorAll(".includes");
-
-  for (const el of includes) {
-    const source = el.getAttribute("data-source");
-    if (!source) continue;
-    try {
-      const res = await fetch(source);
-      const html = await res.text();
-      el.innerHTML = html;
-    } catch (err) {
-      console.error("Failed to load include:", source, err);
-    }
-  }
-
-  await handleOAuthCallback(); 
-  updateNavbarUI();
-  setupLogoutButton();
-
-  initDropdowns();
-  initNavbarToggler();
-  initSidebar();
-  updateHeaderHeightCSSVar();
-
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) loginBtn.addEventListener("click", () => {
-    window.location.href = getDiscordOAuthURL();
-  });
-
-  setupPageTransitions();
-  setupBackToTop();
-}
-
 // ==========================
 // Fetch Sheets
 // ==========================
@@ -612,6 +592,24 @@ async function fetchSheetData(sheetName) {
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Error fetching sheet: ${sheetName}`);
   return await response.json();
+}
+
+
+// ==============================
+// Build Artifact & Palcharm Icon Maps
+// ==============================
+async function buildIconMap(sheetName, nameField, urlField) {
+  const url = `${SHEET_BASE_URL}/${sheetName}`;
+  const res = await fetch(url);
+  const rows = await res.json();
+  
+  const map = {};
+  rows.forEach(row => {
+    if (row[nameField] && row[urlField] && row.Hide !== "TRUE") {
+      map[row[nameField].trim().toLowerCase()] = row[urlField];
+    }
+  });
+  return map;
 }
 
 // ==========================
@@ -1334,8 +1332,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    /* Auth routing
-    const path = window.location.pathname;
+    // Auth routing
+    const path = window.location.pathname || "";
+      let pageName = path.split("/").pop() || "index";
+      pageName = pageName.replace(".html", "");
+
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
     if (userData.username && path.endsWith("/login.html")) {
@@ -1345,7 +1346,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!userData.username && path.endsWith("/user.html")) {
       window.location.href = "/login.html";
       return;
-    } */
+    }
 
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) loginBtn.addEventListener("click", () => {
@@ -1367,7 +1368,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadFeaturedNaraSidebar();
     }
 
-    const path = window.location.pathname || "";
     if (path.endsWith("/") || path.endsWith("/index.html")) {
       renderRecentNaras("recent-naras", 8);
       renderFrontpageFeaturedTrials("featured-trial-frontpage");
@@ -1379,8 +1379,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
-
-    const pageName = path.split("/").pop().replace(".html", "");
 
     await Promise.all([loadArtifacts(), loadPalcharms(), loadEmblems()]);
 
