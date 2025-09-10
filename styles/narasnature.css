@@ -196,25 +196,16 @@ body {
   }
 }
 
-/* unvisited link */
 a:link {
   cursor: pointer;
   color: var(--bluey);
-  text-decoration: underline;
 }
 
-/* visited link */
-a:visited {
-  color: var(--dark-blue);
-}
-
-/* mouse over link */
 a:hover {
   color: var(--pink);
   transition-duration: 0.4s;
 }
 
-/* selected link */
 a:active {
   color: var(--light-blue);
 }
@@ -1447,6 +1438,39 @@ detail-name {
 /* --------------------------- */
 /* ----------Dailies---------- */
 /* --------------------------- */
+.dailies {
+  display: flex;
+  gap: 5rem;
+  justify-content: center;
+}
+
+.daily {
+  color: var(--bluey);
+  font-family: var(--bubbly);
+  font-size: 3em;
+  padding: 1%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+}
+
+.daily a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.daily:hover {
+  color: var(--pink);
+  background-color: var(--light-pink);
+  border-radius: 15px;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px var(--tanb);
+  text-decoration: none;
+}
+
+.daily:hover a {
+  color: inherit;
+}
+
 #tapImage {
   height:100px;
   width: auto;
