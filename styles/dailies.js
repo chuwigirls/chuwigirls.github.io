@@ -31,7 +31,7 @@ function setDisabled(disabled) {
 }
 
 async function attemptTap(discordUser) {
-  statusEl.textContent = "Checking...";
+  statusEl.textContent = "The spring flows over your paws...";
 
   try {
     // Encode as form data to avoid CORS preflight
