@@ -594,7 +594,6 @@ async function fetchSheetData(sheetName) {
   return await response.json();
 }
 
-
 // ==============================
 // Build Artifact & Palcharm Icon Maps
 // ==============================
@@ -612,26 +611,22 @@ async function buildIconMap(sheetName, nameField, urlField) {
   return map;
 }
 
-// ==========================
-// Load Icon Maps
-// ==========================
+/* ==========================
+   Build Icon Maps
+   ========================== */
 let artifactIconMap = {};
 let palcharmIconMap = {};
 let emblemIconMap = {};
 
 async function loadArtifacts() {
   try {
-    const data = await fetchSheetData("Artifacts"); // sheet name must match tab name
+    const data = await fetchSheetData("Artifacts");
     artifactIconMap = {};
-
     data.forEach(row => {
-      const name = row[ARTIFACTS_CONFIG.nameField];  // "Artifact"
-      const url = row[ARTIFACTS_CONFIG.imageField];  // "URL"
-      if (name && url) {
-        artifactIconMap[name.trim()] = url;
-      }
+      const name = row[ARTIFACTS_CONFIG.nameField];
+      const url = row[ARTIFACTS_CONFIG.imageField];
+      if (name && url) artifactIconMap[name.trim()] = url;
     });
-
     console.log("=== Artifact Icon Map ===", artifactIconMap);
   } catch (err) {
     console.error("Error loading Artifacts:", err);
@@ -642,15 +637,11 @@ async function loadPalcharms() {
   try {
     const data = await fetchSheetData("Palcharms");
     palcharmIconMap = {};
-
     data.forEach(row => {
-      const name = row[PALCHARMS_CONFIG.nameField];  // "Palcharm"
-      const url = row[PALCHARMS_CONFIG.imageField];  // "URL"
-      if (name && url) {
-        palcharmIconMap[name.trim()] = url;
-      }
+      const name = row[PALCHARMS_CONFIG.nameField];
+      const url = row[PALCHARMS_CONFIG.imageField];
+      if (name && url) palcharmIconMap[name.trim()] = url;
     });
-
     console.log("=== Palcharm Icon Map ===", palcharmIconMap);
   } catch (err) {
     console.error("Error loading Palcharms:", err);
@@ -661,25 +652,30 @@ async function loadEmblems() {
   try {
     const data = await fetchSheetData("Emblems");
     emblemIconMap = {};
-
     data.forEach(row => {
-      const name = row[EMBLEMS_CONFIG.nameField];  // "Emblem"
-      const url = row[EMBLEMS_CONFIG.imageField];  // "URL"
-      if (name && url) {
-        emblemIconMap[name.trim()] = url;
-      }
+      const name = row[EMBLEMS_CONFIG.nameField];
+      const url = row[EMBLEMS_CONFIG.imageField];
+      if (name && url) emblemIconMap[name.trim()] = url;
     });
-
     console.log("=== Emblem Icon Map ===", emblemIconMap);
   } catch (err) {
     console.error("Error loading Emblems:", err);
   }
 }
 
-// ==========================
-// Render Sheets
-// ==========================
-function renderSheets(data, config) {
+/* ==========================
+   Fetch Regions (for watermarks)
+   ========================== */
+async function fetchRegions() {
+  const url = `${SHEET_BASE_URL}/Regions`;
+  const res = await fetch(url);
+  return res.json();
+}
+
+/* ==========================
+   Unified Renderer
+   ========================== */
+function renderSheets(data, config, regionMap) {
   const listEl = document.getElementById(config.listId);
   const detailEl = document.getElementById(config.detailId);
   const pageEl = document.querySelector(".page");
@@ -695,6 +691,7 @@ function renderSheets(data, config) {
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
+  // --- Render grid cards ---
   data.forEach(row => {
     const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
     if (isHidden) return;
@@ -704,16 +701,27 @@ function renderSheets(data, config) {
     if (!hasName && !hasImage) return;
 
     const card = cardTemplate.content.cloneNode(true);
+    const imgWrapper = card.querySelector(".nara-image-wrapper") || card.querySelector(".narapedia-card");
     const imgEl = card.querySelector("img");
     const nameEl = card.querySelector(".narapedia-card-name");
 
     if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
     if (nameEl) nameEl.textContent = hasName ? row[config.nameField] : "Unnamed";
 
+    // === Add watermark (grid) ===
+    const region = row.Region ? row.Region.trim() : null;
+    if (region && regionMap && regionMap[region]) {
+      const wm = document.createElement("img");
+      wm.src = regionMap[region];
+      wm.classList.add("nara-watermark");
+      if (imgWrapper) imgWrapper.style.position = "relative";
+      imgWrapper.appendChild(wm);
+    }
+
     const clickable = card.querySelector(".narapedia-card") || card.firstElementChild;
     if (clickable) {
       clickable.addEventListener("click", () => {
-        renderDetail(row, config);
+        renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
         const qp = config.queryParam || "id";
         history.pushState(
           { view: "detail", name: row[config.nameField] },
@@ -726,17 +734,37 @@ function renderSheets(data, config) {
     listEl.appendChild(card);
   });
 
+  // --- If query param exists, open detail ---
   const params = new URLSearchParams(window.location.search);
   const target = params.get(config.queryParam || "id");
   if (target) {
     const match = data.find(row => String(row[config.nameField]) === target);
-    if (match) renderDetail(match, config);
+    if (match) renderDetail(match, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
   }
 
-// ==========================
-// Render Details
-// ==========================
-function renderDetail(row, config) {
+  // --- Back/forward navigation ---
+  window.addEventListener("popstate", () => {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get(config.queryParam || "id");
+    if (target) {
+      const match = data.find(row => String(row[config.nameField]) === target);
+      if (match) renderDetail(match, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
+    } else {
+      showGrid();
+    }
+  });
+
+  function showGrid() {
+    detailEl.style.display = "none";
+    listEl.style.display = "grid";
+    if (pageEl) pageEl.style.display = pageDefaultDisplay;
+  }
+}
+
+/* ==========================
+   Unified Detail Renderer
+   ========================== */
+function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay) {
   hideSpinner(config.listId);
   listEl.style.display = "none";
   detailEl.style.display = "block";
@@ -745,9 +773,20 @@ function renderDetail(row, config) {
   detailEl.innerHTML = "";
   window.scrollTo(0, 0);
 
-  const detail = detailTemplate.content.cloneNode(true);
+  const detail = document.querySelector(config.detailTemplate).content.cloneNode(true);
+  const imgWrapper = detail.querySelector(".nara-image-wrapper") || detail;
   const imgEl = detail.querySelector("img");
   if (imgEl) imgEl.src = row[config.imageField] || "../assets/narwhal.png";
+
+  // === Add watermark (detail) ===
+  const region = row.Region ? row.Region.trim() : null;
+  if (region && regionMap && regionMap[region]) {
+    const wm = document.createElement("img");
+    wm.src = regionMap[region];
+    wm.classList.add("nara-watermark");
+    if (imgWrapper) imgWrapper.style.position = "relative";
+    imgWrapper.appendChild(wm);
+  }
 
   const nameEls = detail.querySelectorAll(".detail-name");
   nameEls.forEach(el => {
@@ -761,80 +800,80 @@ function renderDetail(row, config) {
     });
   }
 
-    const categories = [
-      { field: "Inventory", containerId: "detail-inventory", map: artifactIconMap, emptyId: "no-inventory" },
-      { field: "Palcharms", containerId: "detail-palcharms", map: palcharmIconMap, emptyId: "no-palcharms" },
-      { field: "Emblems", containerId: "detail-emblems", map: emblemIconMap, emptyId: "no-emblems" }
-    ];
+  // === Inventory, Palcharms, Emblems ===
+  const categories = [
+    { field: "Inventory", containerId: "detail-inventory", map: artifactIconMap, emptyId: "no-inventory" },
+    { field: "Palcharms", containerId: "detail-palcharms", map: palcharmIconMap, emptyId: "no-palcharms" },
+    { field: "Emblems", containerId: "detail-emblems", map: emblemIconMap, emptyId: "no-emblems" }
+  ];
 
-    categories.forEach(cat => {
-      const container = detail.querySelector(`#${cat.containerId}`);
-      const emptyMsg = detail.querySelector(`#${cat.emptyId}`);
+  categories.forEach(cat => {
+    const container = detail.querySelector(`#${cat.containerId}`);
+    const emptyMsg = detail.querySelector(`#${cat.emptyId}`);
+    if (!container) return;
 
-      if (!container) return;
+    container.innerHTML = "";
 
-      container.innerHTML = ""; // clear existing
+    if (!row[cat.field]) {
+      if (emptyMsg) emptyMsg.style.display = "block";
+      return;
+    }
 
-      if (!row[cat.field]) {
-        if (emptyMsg) emptyMsg.style.display = "block";
-        return;
+    const items = row[cat.field].split(",").map(s => s.trim()).filter(Boolean);
+
+    if (items.length === 0) {
+      if (emptyMsg) emptyMsg.style.display = "block";
+      return;
+    }
+
+    items.forEach(item => {
+      if (cat.field === "Emblems") {
+        const tooltipContainer = document.createElement("div");
+        tooltipContainer.classList.add("tooltip-container");
+
+        const card = document.createElement("div");
+        card.classList.add("item-card");
+
+        const img = document.createElement("img");
+        img.src = cat.map[item] || "../assets/narwhal.png";
+        img.alt = item;
+
+        card.appendChild(img);
+        tooltipContainer.appendChild(card);
+
+        const tooltip = document.createElement("span");
+        tooltip.classList.add("tooltip-text");
+        tooltip.textContent = item;
+
+        tooltipContainer.appendChild(tooltip);
+        container.appendChild(tooltipContainer);
+      } else {
+        const card = document.createElement("div");
+        card.classList.add("item-card");
+
+        const img = document.createElement("img");
+        img.src = cat.map[item] || "../assets/narwhal.png";
+        img.alt = item;
+
+        const label = document.createElement("p");
+        label.textContent = item;
+
+        card.appendChild(img);
+        card.appendChild(label);
+        container.appendChild(card);
       }
-
-      const items = row[cat.field].split(",").map(s => s.trim()).filter(Boolean);
-
-      if (items.length === 0) {
-        if (emptyMsg) emptyMsg.style.display = "block";
-        return;
-      }
-
-      items.forEach(item => {
-        if (cat.field === "Emblems") {
-          // === Emblem special render with tooltip ===
-          const tooltipContainer = document.createElement("div");
-          tooltipContainer.classList.add("tooltip-container");
-
-          const card = document.createElement("div");
-          card.classList.add("item-card");
-
-          const img = document.createElement("img");
-          img.src = cat.map[item] || "../assets/narwhal.png";
-          img.alt = item;
-
-          card.appendChild(img);
-          tooltipContainer.appendChild(card);
-
-          const tooltip = document.createElement("span");
-          tooltip.classList.add("tooltip-text");
-          tooltip.textContent = item;
-
-          tooltipContainer.appendChild(tooltip);
-          container.appendChild(tooltipContainer);
-        } else {
-          // === Default render for Inventory/Palcharms ===
-          const card = document.createElement("div");
-          card.classList.add("item-card");
-
-          const img = document.createElement("img");
-          img.src = cat.map[item] || "../assets/narwhal.png";
-          img.alt = item;
-
-          const label = document.createElement("p");
-          label.textContent = item;
-
-          card.appendChild(img);
-          card.appendChild(label);
-          container.appendChild(card);
-        }
-      });
-
-      if (emptyMsg) emptyMsg.style.display = "none";
     });
+
+    if (emptyMsg) emptyMsg.style.display = "none";
+  });
 
   // Back button
   const backBtn = detail.querySelector(".back-btn") || detail.querySelector("button");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
-      showGrid();
+      detailEl.style.display = "none";
+      listEl.style.display = "grid";
+      if (pageEl) pageEl.style.display = pageDefaultDisplay;
       history.pushState({ view: "grid" }, "", window.location.pathname);
     });
   }
@@ -842,29 +881,28 @@ function renderDetail(row, config) {
   detailEl.appendChild(detail);
 }
 
-  function showGrid() {
-    detailEl.style.display = "none";
-    listEl.style.display = "grid";
-    if (pageEl) pageEl.style.display = pageDefaultDisplay;
-  }
-
-  window.addEventListener("popstate", () => {
-    const params = new URLSearchParams(window.location.search);
-    const target = params.get(config.queryParam || "id");
-    if (target) {
-      const match = data.find(row => String(row[config.nameField]) === target);
-      if (match) renderDetail(match, config);
-    } else {
-      showGrid();
-    }
-  });
-}
-
+/* ==========================
+   Init with Region Map
+   ========================== */
 async function initSheet(sheetName, config) {
   try {
     showSpinner(config.listId, `Loading ${sheetName}...`);
-    const data = await fetchSheetData(sheetName);
-    renderSheets(data, config);
+
+    let data, regionMap = {};
+    if (sheetName === "Masterlist") {
+      const [masterlist, regions] = await Promise.all([
+        fetchSheetData("Masterlist"),
+        fetchRegions()
+      ]);
+      data = masterlist;
+      regions.forEach(r => {
+        if (r.Region && r.URL) regionMap[r.Region] = r.URL;
+      });
+    } else {
+      data = await fetchSheetData(sheetName);
+    }
+
+    renderSheets(data, config, regionMap);
   } catch (err) {
     console.error(`Error loading ${sheetName}:`, err);
     const container = document.getElementById(config.listId);
@@ -879,9 +917,9 @@ async function initSheet(sheetName, config) {
   }
 }
 
-// ==============================
-// Sheet Rendering Spinners
-// ==============================
+/* ==========================
+   Spinners
+   ========================== */
 function showSpinner(containerId, message = "Loading...") {
   const container = document.getElementById(containerId);
   if (!container) return;
