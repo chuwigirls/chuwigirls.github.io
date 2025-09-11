@@ -673,6 +673,32 @@ async function fetchRegions() {
 }
 
 /* ==========================
+   Apply Region Watermark Helper
+   ========================== */
+function applyRegionWatermark(imgWrapper, region, regionMap, naraName, size = "grid") {
+  if (!region || !regionMap || !regionMap[region]) {
+    console.log("⚠️ No watermark found:", { naraName, region });
+    return;
+  }
+
+  const wm = document.createElement("img");
+  wm.src = regionMap[region];
+  wm.classList.add("nara-watermark");
+
+  // scale differently depending on context
+  if (size === "grid") {
+    wm.classList.add("nara-watermark-grid");
+  } else if (size === "detail") {
+    wm.classList.add("nara-watermark-detail");
+  }
+
+  imgWrapper.style.position = "relative";
+  imgWrapper.appendChild(wm);
+
+  console.log("✅ Watermark applied:", { naraName, region, url: regionMap[region] });
+}
+
+/* ==========================
    Unified Renderer
    ========================== */
 function renderSheets(data, config, regionMap) {
@@ -710,13 +736,7 @@ function renderSheets(data, config, regionMap) {
 
     // === Add watermark (grid) ===
     const region = row.Region ? row.Region.trim() : null;
-    if (region && regionMap && regionMap[region]) {
-      const wm = document.createElement("img");
-      wm.src = regionMap[region];
-      wm.classList.add("nara-watermark");
-      if (imgWrapper) imgWrapper.style.position = "relative";
-      imgWrapper.appendChild(wm);
-    }
+    if (imgWrapper) applyRegionWatermark(imgWrapper, region, regionMap, row.Nara, "grid");
 
     const clickable = card.querySelector(".narapedia-card") || card.firstElementChild;
     if (clickable) {
@@ -780,13 +800,7 @@ function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefa
 
   // === Add watermark (detail) ===
   const region = row.Region ? row.Region.trim() : null;
-  if (region && regionMap && regionMap[region]) {
-    const wm = document.createElement("img");
-    wm.src = regionMap[region];
-    wm.classList.add("nara-watermark");
-    if (imgWrapper) imgWrapper.style.position = "relative";
-    imgWrapper.appendChild(wm);
-  }
+  if (imgWrapper) applyRegionWatermark(imgWrapper, region, regionMap, row.Nara, "detail");
 
   const nameEls = detail.querySelectorAll(".detail-name");
   nameEls.forEach(el => {
@@ -896,8 +910,9 @@ async function initSheet(sheetName, config) {
       ]);
       data = masterlist;
       regions.forEach(r => {
-        if (r.Region && r.URL) regionMap[r.Region] = r.URL;
+        if (r.Region && r.URL) regionMap[r.Region.trim()] = r.URL;
       });
+      console.log("✅ Region map built:", regionMap);
     } else {
       data = await fetchSheetData(sheetName);
     }
@@ -1433,8 +1448,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (SHEET_CONFIGS[pageName]) {
       const { sheet, config } = SHEET_CONFIGS[pageName];
-      const data = await fetchSheetData(sheet);
-      renderSheets(data, config);
+      await initSheet(sheet, config);
     }
 
     if (path.endsWith("/user.html")) {
