@@ -94,13 +94,13 @@ function startCountdown(waitUntil) {
       clearInterval(countdownInterval);
       clearState();
       setDisabled(false);
-      statusEl.textContent = "Tap is available again!";
+      statusEl.textContent = "The Spring Tap is flowing! Tap to receive your Crystal(s).";
       return;
     }
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
-    statusEl.textContent = `Already tapped! Reset in ${h}h ${m}m ${s}s.`;
+    statusEl.textContent = `The Spring Tap isn't flowing. Come back in ${h}h ${m}m ${s}s.`;
   }, 1000);
 }
 
@@ -109,7 +109,7 @@ function init() {
 
   if (!discordUser.id) {
     setDisabled(true);
-    statusEl.textContent = "⚠️ Please log in with Discord to collect your daily crystal.";
+    statusEl.textContent = "⚠️ <a href='../login.html'>Log in</a> to tap.";
     return;
   }
 
@@ -118,7 +118,7 @@ function init() {
     // Still locked
     setDisabled(true);
     if (saved.reward) {
-      statusEl.textContent = `You found ${saved.reward} Crystals! Come back tomorrow.`;
+      statusEl.textContent = `You scoop up ${saved.reward} Crystals! Come back tomorrow.`;
     } else {
       startCountdown(saved.waitUntil);
     }
@@ -126,14 +126,14 @@ function init() {
     // Available
     clearState();
     setDisabled(false);
-    statusEl.textContent = "Tap the crystal to collect your daily reward!";
+    statusEl.textContent = "The Spring Tap is flowing! Tap to receive your Crystal(s).";
   }
 }
 
 tapImage.addEventListener("click", () => {
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
   if (!discordUser.id) {
-    statusEl.textContent = "⚠️ Please log in with Discord to collect your daily crystal.";
+    statusEl.textContent = "⚠️ <a href='../login.html'>Log in</a> to tap.";
     return;
   }
 
