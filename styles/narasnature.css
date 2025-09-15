@@ -1397,27 +1397,50 @@ detail-name {
   box-shadow: none;
 }
 
-/* Universal watermark styling */
+/* ==========================
+   Universal watermark styling
+   ========================== */
 .nara-watermark {
   position: absolute;
   opacity: 0.35;
   pointer-events: none;
+  z-index: 2; /* always above the image, below blocker */
 }
 
 /* Card view (Masterlist grid) */
-.narapedia-card .nara-watermark {
-  bottom: 5px;
-  right: 5px;
-  width: 40%;   /* relative to card image */
+.narapedia-card .nara-image-wrapper .nara-watermark {
+  top: 0;
+  width: 100%;
 }
 
 /* Detail view (single Nara page) */
-.detail-card .nara-watermark {
+.detail-card .nara-image-wrapper .nara-watermark {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 70%;   /* larger, more prominent */
   opacity: 0.25; /* a little more transparent */
+}
+
+/* ==========================
+   Image wrapper + click blocker
+   ========================== */
+.nara-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.nara-image-wrapper img {
+  display: block;
+  user-select: none;
+}
+
+/* Transparent overlay to block right-click / drag */
+.nara-image-wrapper .click-blocker {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: all;
+  z-index: 3; /* sits on top of image + watermark */
 }
 
 /* --------------------------- */
