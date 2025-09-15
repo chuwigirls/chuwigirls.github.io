@@ -60,28 +60,28 @@ async function attemptTap(discordUser) {
         reward: data.amount
       });
     } else {
-      setDisabled(true);
-      statusEl.textContent = `Already tapped! Reset in ${data.wait}.`;
+  setDisabled(true);
 
-      const parts = data.wait.match(/(\d+)h (\d+)m/);
-      let waitUntil = Date.now();
-      if (parts) {
-        const hours = parseInt(parts[1], 10);
-        const minutes = parseInt(parts[2], 10);
-        waitUntil += (hours * 60 + minutes) * 60 * 1000;
-      }
+  if (data.wait) {
+    statusEl.textContent = `Already tapped! Reset in ${data.wait}.`;
 
-      saveState({
-        tappedAt: new Date().toISOString(),
-        waitUntil,
-        reward: null
-      });
-
-      startCountdown(waitUntil);
+    const parts = data.wait.match(/(\d+)h (\d+)m/);
+    let waitUntil = Date.now();
+    if (parts) {
+      const hours = parseInt(parts[1], 10);
+      const minutes = parseInt(parts[2], 10);
+      waitUntil += (hours * 60 + minutes) * 60 * 1000;
     }
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = "Error connecting to server.";
+
+    saveState({
+      tappedAt: new Date().toISOString(),
+      waitUntil,
+      reward: null
+    });
+
+    startCountdown(waitUntil);
+  } else {
+    statusEl.textContent = `Something went wrong: ${data.error || "Unknown error"}`;
   }
 }
 
