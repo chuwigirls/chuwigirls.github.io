@@ -727,16 +727,30 @@ function renderSheets(data, config, regionMap) {
     if (!hasName && !hasImage) return;
 
     const card = cardTemplate.content.cloneNode(true);
-    const imgWrapper = card.querySelector(".nara-image-wrapper") || card.querySelector(".narapedia-card");
-    const imgEl = card.querySelector("img");
     const nameEl = card.querySelector(".narapedia-card-name");
-
-    if (imgEl) imgEl.src = row[config.imageField] || "../assets/placeholder.png";
     if (nameEl) nameEl.textContent = hasName ? row[config.nameField] : "Unnamed";
 
-    // === Add watermark (grid) ===
-    const region = row.Region ? row.Region.trim() : null;
-    if (imgWrapper) applyRegionWatermark(imgWrapper, region, regionMap, row.Nara, "grid");
+    // Wrap image in a protected container
+    const imgEl = card.querySelector("img");
+    if (imgEl) {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("nara-image-wrapper");
+
+      const blocker = document.createElement("div");
+      blocker.classList.add("click-blocker");
+
+      imgEl.src = row[config.imageField] || "../assets/placeholder.png";
+      imgEl.setAttribute("draggable", "false");
+      imgEl.oncontextmenu = e => e.preventDefault();
+
+      imgEl.parentNode.insertBefore(wrapper, imgEl);
+      wrapper.appendChild(imgEl);
+      wrapper.appendChild(blocker);
+
+      // === Add watermark (grid) ===
+      const region = row.Region ? row.Region.trim() : null;
+      applyRegionWatermark(wrapper, region, regionMap, row.Nara, "grid");
+    }
 
     const clickable = card.querySelector(".narapedia-card") || card.firstElementChild;
     if (clickable) {
@@ -794,13 +808,28 @@ function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefa
   window.scrollTo(0, 0);
 
   const detail = document.querySelector(config.detailTemplate).content.cloneNode(true);
-  const imgWrapper = detail.querySelector(".nara-image-wrapper") || detail;
-  const imgEl = detail.querySelector("img");
-  if (imgEl) imgEl.src = row[config.imageField] || "../assets/narwhal.png";
 
-  // === Add watermark (detail) ===
-  const region = row.Region ? row.Region.trim() : null;
-  if (imgWrapper) applyRegionWatermark(imgWrapper, region, regionMap, row.Nara, "detail");
+  // Wrap image in a protected container
+  const imgEl = detail.querySelector("img");
+  if (imgEl) {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("nara-image-wrapper");
+
+    const blocker = document.createElement("div");
+    blocker.classList.add("click-blocker");
+
+    imgEl.src = row[config.imageField] || "../assets/narwhal.png";
+    imgEl.setAttribute("draggable", "false");
+    imgEl.oncontextmenu = e => e.preventDefault();
+
+    imgEl.parentNode.insertBefore(wrapper, imgEl);
+    wrapper.appendChild(imgEl);
+    wrapper.appendChild(blocker);
+
+    // === Add watermark (detail) ===
+    const region = row.Region ? row.Region.trim() : null;
+    applyRegionWatermark(wrapper, region, regionMap, row.Nara, "detail");
+  }
 
   const nameEls = detail.querySelectorAll(".detail-name");
   nameEls.forEach(el => {
