@@ -60,28 +60,33 @@ async function attemptTap(discordUser) {
         reward: data.amount
       });
     } else {
-  setDisabled(true);
+      setDisabled(true);
 
-  if (data.wait) {
-    statusEl.textContent = `Already tapped! Reset in ${data.wait}.`;
+      if (data.wait) {
+        statusEl.textContent = `Already tapped! Reset in ${data.wait}.`;
 
-    const parts = data.wait.match(/(\d+)h (\d+)m/);
-    let waitUntil = Date.now();
-    if (parts) {
-      const hours = parseInt(parts[1], 10);
-      const minutes = parseInt(parts[2], 10);
-      waitUntil += (hours * 60 + minutes) * 60 * 1000;
+        const parts = data.wait.match(/(\d+)h (\d+)m/);
+        let waitUntil = Date.now();
+        if (parts) {
+          const hours = parseInt(parts[1], 10);
+          const minutes = parseInt(parts[2], 10);
+          waitUntil += (hours * 60 + minutes) * 60 * 1000;
+        }
+
+        saveState({
+          tappedAt: new Date().toISOString(),
+          waitUntil,
+          reward: null
+        });
+
+        startCountdown(waitUntil);
+      } else {
+        statusEl.textContent = `Something went wrong: ${data.error || "Unknown error"}`;
+      }
     }
-
-    saveState({
-      tappedAt: new Date().toISOString(),
-      waitUntil,
-      reward: null
-    });
-
-    startCountdown(waitUntil);
-  } else {
-    statusEl.textContent = `Something went wrong: ${data.error || "Unknown error"}`;
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Error connecting to server.";
   }
 }
 
@@ -109,7 +114,7 @@ function init() {
 
   if (!discordUser.id) {
     setDisabled(true);
-    statusEl.textContent = "⚠️ <a href='../login.html'>Log in</a> to tap.";
+    statusEl.innerHTML = "⚠️ <a href='../login.html'>Log in</a> to tap.";
     return;
   }
 
@@ -133,7 +138,7 @@ function init() {
 tapImage.addEventListener("click", () => {
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
   if (!discordUser.id) {
-    statusEl.textContent = "⚠️ <a href='../login.html'>Log in</a> to tap.";
+    statusEl.innerHTML = "⚠️ <a href='../login.html'>Log in</a> to tap.";
     return;
   }
 
