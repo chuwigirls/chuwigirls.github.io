@@ -315,13 +315,13 @@ async function fetchUserProfile() {
     if (err) err.style.display = "none";
 
     const url = `${GAS_ENDPOINT}?id=${encodeURIComponent(discordUser.id)}&username=${encodeURIComponent(discordUser.username || "")}`;
-    console.log("🌐 Fetching user profile from:", url);
+    /* console.log("🌐 Fetching user profile from:", url); */
 
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
-    console.log("✅ GAS Response JSON:", data);
+    /* console.log("✅ GAS Response JSON:", data); */
     data.discordId = discordUser.id;
     await renderUserProfile(data);
 
@@ -627,7 +627,7 @@ async function loadArtifacts() {
       const url = row[ARTIFACTS_CONFIG.imageField];
       if (name && url) artifactIconMap[name.trim()] = url;
     });
-    console.log("=== Artifact Icon Map ===", artifactIconMap);
+    /* console.log("=== Artifact Icon Map ===", artifactIconMap); */
   } catch (err) {
     console.error("Error loading Artifacts:", err);
   }
@@ -642,7 +642,7 @@ async function loadPalcharms() {
       const url = row[PALCHARMS_CONFIG.imageField];
       if (name && url) palcharmIconMap[name.trim()] = url;
     });
-    console.log("=== Palcharm Icon Map ===", palcharmIconMap);
+    /* console.log("=== Palcharm Icon Map ===", palcharmIconMap); */
   } catch (err) {
     console.error("Error loading Palcharms:", err);
   }
@@ -657,7 +657,7 @@ async function loadEmblems() {
       const url = row[EMBLEMS_CONFIG.imageField];
       if (name && url) emblemIconMap[name.trim()] = url;
     });
-    console.log("=== Emblem Icon Map ===", emblemIconMap);
+    /* console.log("=== Emblem Icon Map ===", emblemIconMap); */
   } catch (err) {
     console.error("Error loading Emblems:", err);
   }
@@ -695,11 +695,88 @@ function applyRegionWatermark(imgWrapper, region, regionMap, naraName, size = "g
   imgWrapper.style.position = "relative";
   imgWrapper.appendChild(wm);
 
-  console.log("✅ Watermark applied:", { naraName, region, url: regionMap[region] });
+  /* console.log("✅ Watermark applied:", { naraName, region, url: regionMap[region] }); */
 }
 
 /* ==========================
-   Unified Renderer
+   Pagination Controls Helper
+   ========================== */
+function renderPaginationControls(container, totalPages, currentPage, onPageChange) {
+  container.innerHTML = "";
+
+  // Prev Button
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "« Prev";
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.addEventListener("click", () => onPageChange(currentPage - 1));
+  container.appendChild(prevBtn);
+
+  // Page Numbers with ellipsis
+  const maxVisible = 3;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if (endPage - startPage < maxVisible - 1) {
+    startPage = Math.max(1, endPage - maxVisible + 1);
+  }
+
+  if (startPage > 1) {
+    addPageLink(1);
+    if (startPage > 2) addEllipsis();
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    addPageLink(i, i === currentPage);
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) addEllipsis();
+    addPageLink(totalPages);
+  }
+
+  // Next Button
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next »";
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.addEventListener("click", () => onPageChange(currentPage + 1));
+  container.appendChild(nextBtn);
+
+  // Jump-to-page input
+  const jumpWrapper = document.createElement("span");
+  jumpWrapper.className = "jump-wrapper";
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 1;
+  input.max = totalPages;
+  input.value = currentPage;
+  input.className = "jump-input";
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      let val = parseInt(input.value, 10);
+      if (val >= 1 && val <= totalPages) onPageChange(val);
+    }
+  });
+  jumpWrapper.appendChild(document.createTextNode("Jump to: "));
+  jumpWrapper.appendChild(input);
+  container.appendChild(jumpWrapper);
+
+  function addPageLink(page, isActive = false) {
+    const btn = document.createElement("button");
+    btn.textContent = page;
+    if (isActive) btn.classList.add("active");
+    btn.addEventListener("click", () => onPageChange(page));
+    container.appendChild(btn);
+  }
+
+  function addEllipsis() {
+    const span = document.createElement("span");
+    span.textContent = "…";
+    span.className = "ellipsis";
+    container.appendChild(span);
+  }
+}
+
+/* ==========================
+   Sheets Renderer
    ========================== */
 function renderSheets(data, config, regionMap) {
   const listEl = document.getElementById(config.listId);
@@ -717,20 +794,51 @@ function renderSheets(data, config, regionMap) {
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
-  // --- Render grid cards ---
-  data.forEach(row => {
+  /* --- Pagination Setup --- */
+  const params = new URLSearchParams(window.location.search);
+  let currentPage = parseInt(params.get("page") || "1", 10);
+  const itemsPerPage = 20;
+  const visibleData = data.filter(row => {
     const isHidden = String(row.Hide || "").toLowerCase() === "true" || row.Hide === true;
-    if (isHidden) return;
-
     const hasName = row[config.nameField] && String(row[config.nameField]).trim() !== "";
     const hasImage = row[config.imageField] && String(row[config.imageField]).trim() !== "";
-    if (!hasName && !hasImage) return;
+    return !isHidden && (hasName || hasImage);
+  });
+  const totalPages = Math.max(1, Math.ceil(visibleData.length / itemsPerPage));
 
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  const pageData = visibleData.slice(startIdx, startIdx + itemsPerPage);
+
+  /* --- Pagination Controls --- */
+  const topPagination = document.createElement("div");
+  topPagination.className = "pagination top-pagination";
+
+  const bottomPagination = document.createElement("div");
+  bottomPagination.className = "pagination bottom-pagination";
+
+  function updatePage(newPage) {
+    const qp = config.queryParam || "id";
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", newPage);
+    history.pushState({ view: "grid", page: newPage }, "", `?${params.toString()}`);
+
+    renderSheets(data, config, regionMap); // re-render
+    window.scrollTo(0, 0); // reset scroll to top
+  }
+
+  renderPaginationControls(topPagination, totalPages, currentPage, updatePage);
+  renderPaginationControls(bottomPagination, totalPages, currentPage, updatePage);
+
+  /* --- Render grid cards --- */
+  listEl.appendChild(topPagination);
+
+  pageData.forEach(row => {
     const card = cardTemplate.content.cloneNode(true);
     const nameEl = card.querySelector(".narapedia-card-name");
-    if (nameEl) nameEl.textContent = hasName ? row[config.nameField] : "Unnamed";
+    if (nameEl) nameEl.textContent = row[config.nameField] || "Unnamed";
 
-    // Wrap image in a protected container
     const imgEl = card.querySelector("img");
     if (imgEl) {
       const wrapper = document.createElement("div");
@@ -747,7 +855,6 @@ function renderSheets(data, config, regionMap) {
       wrapper.appendChild(imgEl);
       wrapper.appendChild(blocker);
 
-      // === Add watermark (grid) ===
       const region = row.Region ? row.Region.trim() : null;
       applyRegionWatermark(wrapper, region, regionMap, row.Nara, "grid");
     }
@@ -757,26 +864,26 @@ function renderSheets(data, config, regionMap) {
       clickable.addEventListener("click", () => {
         renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
         const qp = config.queryParam || "id";
-        history.pushState(
-          { view: "detail", name: row[config.nameField] },
-          "",
-          `?${qp}=${encodeURIComponent(row[config.nameField] || "")}`
-        );
+        const params = new URLSearchParams(window.location.search);
+        params.set(qp, row[config.nameField]);
+        history.pushState({ view: "detail", name: row[config.nameField] }, "", `?${params.toString()}`);
+        window.scrollTo(0, 0);
       });
     }
 
     listEl.appendChild(card);
   });
 
-  // --- If query param exists, open detail ---
-  const params = new URLSearchParams(window.location.search);
+  listEl.appendChild(bottomPagination);
+
+  /* --- If query param exists, open detail --- */
   const target = params.get(config.queryParam || "id");
   if (target) {
     const match = data.find(row => String(row[config.nameField]) === target);
     if (match) renderDetail(match, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
   }
 
-  // --- Back/forward navigation ---
+  /* --- Back/forward navigation --- */
   window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);
     const target = params.get(config.queryParam || "id");
@@ -796,7 +903,7 @@ function renderSheets(data, config, regionMap) {
 }
 
 /* ==========================
-   Unified Detail Renderer
+   Detail Renderer
    ========================== */
 function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay) {
   hideSpinner(config.listId);
@@ -941,7 +1048,7 @@ async function initSheet(sheetName, config) {
       regions.forEach(r => {
         if (r.Region && r.URL) regionMap[r.Region.trim()] = r.URL;
       });
-      console.log("✅ Region map built:", regionMap);
+      /* console.log("✅ Region map built:", regionMap); */
     } else {
       data = await fetchSheetData(sheetName);
     }
