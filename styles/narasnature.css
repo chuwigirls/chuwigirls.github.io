@@ -1321,6 +1321,67 @@ detail-name {
   }
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 1.5rem;
+  grid-column: 1 / -1;
+}
+
+.pagination button:hover {
+  background-color: var(--light-pink);
+  color: var(--pink);
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--light-pink);
+  color: var(--pink);
+}
+
+.pagination button:disabled {
+  background-color: var(--tan);
+  color: rgba(204, 204, 204, 1);
+  border: 1px solid var(--tanb);
+  cursor: not-allowed;
+}
+
+.pagination button.active {
+  background-color: var(--dark-blue);
+  color: var(--light);
+  border: 1px solid var(--dark-blue);
+}
+
+.pagination button:hover.active {
+  background-color: var(--pink);
+  color: var(--light);
+  border: 1px solid var(--pink);
+}
+
+.pagination .ellipsis {
+  font-size: 2rem;
+  color: var(--dark-blue);
+}
+
+/* Jump input */
+.jump-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-left: 5rem;
+}
+
+.jump-input {
+  width: 100%;
+  padding: .5rem;
+  border: 1px solid var(--bluey);
+  color: var(--dark-blue);
+  font-size: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
 /* --------------------------- */
 /* ----------Masterlist------- */
 /* --------------------------- */
@@ -1404,21 +1465,19 @@ detail-name {
   position: absolute;
   opacity: 0.35;
   pointer-events: none;
-  z-index: 2; /* always above the image, below blocker */
+  z-index: 2;
 }
 
-/* Card view (Masterlist grid) */
 .narapedia-card .nara-image-wrapper .nara-watermark {
   top: 0;
   width: 100%;
 }
 
-/* Detail view (single Nara page) */
 .detail-card .nara-image-wrapper .nara-watermark {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  opacity: 0.25; /* a little more transparent */
+  opacity: 0.25;
 }
 
 /* ==========================
@@ -1434,13 +1493,13 @@ detail-name {
   user-select: none;
 }
 
-/* Transparent overlay to block right-click / drag */
+
 .nara-image-wrapper .click-blocker {
   position: absolute;
   inset: 0;
   background: transparent;
   pointer-events: all;
-  z-index: 3; /* sits on top of image + watermark */
+  z-index: 3;
 }
 
 /* --------------------------- */
