@@ -1157,9 +1157,26 @@ body.sidebar-fixed #openNav { top: 0; }
   color: var(--dark-blue);
 }
 
+#userNaras-spinner {
+  color: var(--dark-blue);
+  font-size: 2rem;
+}
+
 #myNaras {
   float: right;
   text-decoration:  underline;
+}
+
+#all-naras h3 {
+  font-family: var(--bubbly);
+}
+
+#all-naras img {
+  width: 100%;
+}
+
+#backToProfile {
+  margin-top: 1%;
 }
 
 .char-grid {
