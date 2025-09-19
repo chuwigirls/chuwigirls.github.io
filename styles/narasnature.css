@@ -1163,8 +1163,13 @@ body.sidebar-fixed #openNav { top: 0; }
 }
 
 #myNaras {
-  float: right;
   text-decoration:  underline;
+  padding: 1%;
+}
+
+#myNaras:hover {
+  color: var(--pink);
+  transition-duration: 0.4s;
 }
 
 #all-naras h3 {
@@ -1177,6 +1182,12 @@ body.sidebar-fixed #openNav { top: 0; }
 
 #backToProfile {
   margin-top: 1%;
+}
+
+#characters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
 .char-grid {
