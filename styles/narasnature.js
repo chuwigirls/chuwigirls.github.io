@@ -793,8 +793,21 @@ function renderSheets(data, config, regionMap) {
   listEl.innerHTML = "";
   detailEl.innerHTML = "";
 
-  /* --- Pagination Setup --- */
+  // 👉 check query param up front
   const params = new URLSearchParams(window.location.search);
+  const target = params.get(config.queryParam || "id");
+
+  if (target) {
+    // === Render DETAIL only ===
+    const match = data.find(row => String(row[config.nameField]) === target);
+    if (match) {
+      renderDetail(match, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
+      return; // ⬅ stop here, don’t build grid
+    }
+  }
+
+  // === Otherwise, render GRID ===
+  /* --- Pagination Setup --- */
   let currentPage = parseInt(params.get("page") || "1", 10);
   const itemsPerPage = 20;
   const visibleData = data.filter(row => {
@@ -804,7 +817,6 @@ function renderSheets(data, config, regionMap) {
     return !isHidden && (hasName || hasImage);
   });
   const totalPages = Math.max(1, Math.ceil(visibleData.length / itemsPerPage));
-
   if (currentPage > totalPages) currentPage = totalPages;
 
   const startIdx = (currentPage - 1) * itemsPerPage;
@@ -822,9 +834,8 @@ function renderSheets(data, config, regionMap) {
     const params = new URLSearchParams(window.location.search);
     params.set("page", newPage);
     history.pushState({ view: "grid", page: newPage }, "", `?${params.toString()}`);
-
     renderSheets(data, config, regionMap); // re-render
-    window.scrollTo(0, 0); // reset scroll to top
+    window.scrollTo(0, 0);
   }
 
   renderPaginationControls(topPagination, totalPages, currentPage, updatePage);
@@ -842,14 +853,11 @@ function renderSheets(data, config, regionMap) {
     if (imgEl) {
       const wrapper = document.createElement("div");
       wrapper.classList.add("nara-image-wrapper");
-
       const blocker = document.createElement("div");
       blocker.classList.add("click-blocker");
-
       imgEl.src = row[config.imageField] || "../assets/placeholder.png";
       imgEl.setAttribute("draggable", "false");
       imgEl.oncontextmenu = e => e.preventDefault();
-
       imgEl.parentNode.insertBefore(wrapper, imgEl);
       wrapper.appendChild(imgEl);
       wrapper.appendChild(blocker);
@@ -874,14 +882,7 @@ function renderSheets(data, config, regionMap) {
   });
 
   listEl.appendChild(bottomPagination);
-
-  /* --- If query param exists, open detail --- */
-  const target = params.get(config.queryParam || "id");
-  if (target) {
-    const match = data.find(row => String(row[config.nameField]) === target);
-    if (match) renderDetail(match, config, regionMap, listEl, detailEl, pageEl, pageDefaultDisplay);
-  }
-
+  
   /* --- Back/forward navigation --- */
   window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);
