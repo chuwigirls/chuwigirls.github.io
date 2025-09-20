@@ -349,7 +349,7 @@ async function fetchUserProfile() {
 // Fetch Masterlist from Sheets
 // ===============================
 async function fetchMasterlist() {
-  const url = `${SHEET_BASE_URL}/Masterlist`;
+  const url = `${SHEET_BASE_URL_NARAPEDIA}/Masterlist`;
   const res = await fetch(url);
   return res.json();
 }
@@ -583,13 +583,17 @@ if (charEl) {
 // ==========================
 // Fetch Sheets
 // ==========================
-async function fetchSheetData(sheetName) {
-  if (!SHEET_BASE_URL) {
-    throw new Error("SHEET_BASE_URL is not defined.");
-  }
-  const url = `${SHEET_BASE_URL}/${encodeURIComponent(sheetName)}`;
+async function fetchSheetData(sheetName, sheetType = "narapedia") {
+  if (!sheetName) throw new Error("fetchSheetData: sheetName is required");
+
+  const type = sheetType.trim().toLowerCase();
+  const baseURL = type === "trove" ? SHEET_BASE_URL_TROVE : SHEET_BASE_URL_NARAPEDIA;
+  const url = `${baseURL}/${encodeURIComponent(sheetName.trim())}`;
+
+  console.log(`🌐 Fetching sheet "${sheetName}" from ${type} -> ${url}`);
+
   const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) throw new Error(`Error fetching sheet: ${sheetName}`);
+  if (!response.ok) throw new Error(`Error fetching sheet: ${sheetName} (HTTP ${response.status})`);
   return await response.json();
 }
 
@@ -597,7 +601,7 @@ async function fetchSheetData(sheetName) {
 // Build Artifact & Palcharm Icon Maps
 // ==============================
 async function buildIconMap(sheetName, nameField, urlField) {
-  const url = `${SHEET_BASE_URL}/${sheetName}`;
+  const url = `${SHEET_BASE_URL_NARAPEDIA}/${sheetName}`;
   const res = await fetch(url);
   const rows = await res.json();
   
@@ -666,7 +670,7 @@ async function loadEmblems() {
    Fetch Regions (for watermarks)
    ========================== */
 async function fetchRegions() {
-  const url = `${SHEET_BASE_URL}/Regions`;
+  const url = `${SHEET_BASE_URL_NARAPEDIA}/Regions`;
   const res = await fetch(url);
   return res.json();
 }
@@ -855,7 +859,7 @@ function renderSheets(data, config, regionMap) {
       wrapper.classList.add("nara-image-wrapper");
       const blocker = document.createElement("div");
       blocker.classList.add("click-blocker");
-      imgEl.src = row[config.imageField] || "../assets/placeholder.png";
+      imgEl.src = row[config.imageField] || "../assets/narwhal.png";
       imgEl.setAttribute("draggable", "false");
       imgEl.oncontextmenu = e => e.preventDefault();
       imgEl.parentNode.insertBefore(wrapper, imgEl);
@@ -1029,6 +1033,45 @@ function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefa
   }
 
   detailEl.appendChild(detail);
+}
+
+/* ==========================
+   Civilian sheets renderer
+   ========================== */
+async function loadCiviliansGrid() {
+  try {
+    // Fetch the Currencies sheet from NaraTrove
+    const currencies = await fetchSheetData("Currencies", "trove");
+
+    // Extract unique civilian names
+    const civilianNames = [...new Set(currencies.map(row => row.Civilian))];
+
+    // Sort alphabetically
+    civilianNames.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+    // Build a lightweight "card" array for renderSheets
+    const civiliansData = civilianNames.map(name => {
+      // Find the first row for extra fields
+      const row = currencies.find(r => r.Civilian === name);
+      return {
+        Civilian: name,
+        Owner: row?.Owner || "",
+        Region: row?.Region || "",
+        Status: row?.Status || "",
+        Rarity: row?.Rarity || "",
+        Titles: row?.Titles || "",
+        URL: row?.URL || "",        // if you have a representative image
+        Build: row?.Build || "",
+        Inventory: row?.Inventory || "",
+        Palcharms: row?.Palcharms || ""
+      };
+    });
+
+    // Call your renderSheets function
+    renderSheets(civiliansData, CIVILIANS_CONFIG);
+  } catch (err) {
+    console.error("Error loading civilians grid:", err);
+  }
 }
 
 /* ==========================
@@ -1242,7 +1285,7 @@ function makeTrialCard(trial, showDates = false) {
   link.style.textDecoration = "none";
 
   const img = document.createElement("img");
-  img.src = trial.URL || "../assets/placeholder.png";
+  img.src = trial.URL || "../assets/narwhal.png";
   img.alt = trial.Trial;
   img.className = "featured-trial-img";
 
@@ -1341,7 +1384,7 @@ function makeTrialCard(trial, showDates = false) {
   link.style.textDecoration = "none";
 
   const img = document.createElement("img");
-  img.src = trial.URL || "../assets/placeholder.png";
+  img.src = trial.URL || "../assets/narwhal.png";
   img.alt = trial.Trial;
   img.className = "featured-trial-img";
 
@@ -1521,10 +1564,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
 
-    // Auth routing
+    // --- Auth routing ---
     const path = window.location.pathname || "";
-      let pageName = path.split("/").pop() || "index";
-      pageName = pageName.replace(".html", "");
+    let pageName = path.split("/").pop() || "index";
+    pageName = pageName.replace(".html", "");
 
     const userData = JSON.parse(localStorage.getItem("discordUser") || "{}");
 
@@ -1551,6 +1594,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initSidebar();
     updateHeaderHeightCSSVar();
 
+    // Sidebar featured Nara
     const sidebar = document.getElementById("featured-nara-sidebar");
     if (sidebar) {
       sidebar.innerHTML = `<div class="featured-nara-placeholder">⏳ Loading featured Nara...</div>`;
@@ -1571,22 +1615,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await Promise.all([loadArtifacts(), loadPalcharms(), loadEmblems()]);
 
+    // --- Sheet configurations ---
     const SHEET_CONFIGS = {
-      masterlist: { sheet: "Masterlist", config: MASTERLIST_CONFIG },
-      features: { sheet: "Features", config: FEATURES_CONFIG },
-      artifacts: { sheet: "Artifacts", config: ARTIFACTS_CONFIG },
-      palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG },
-      trials: { sheet: "Trials", config: TRIALS_CONFIG },
-      emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG },
-      staff: { sheet: "Celestials", config: STAFF_CONFIG },
-      faq: { sheet: "FAQ", config: FAQ_CONFIG }
+      masterlist: { sheet: "Masterlist", config: MASTERLIST_CONFIG, type: "narapedia" },
+      features: { sheet: "Features", config: FEATURES_CONFIG, type: "narapedia" },
+      artifacts: { sheet: "Artifacts", config: ARTIFACTS_CONFIG, type: "narapedia" },
+      palcharms: { sheet: "Palcharms", config: PALCHARMS_CONFIG, type: "narapedia" },
+      trials: { sheet: "Trials", config: TRIALS_CONFIG, type: "narapedia" },
+      emblems: { sheet: "Emblems", config: EMBLEMS_CONFIG, type: "narapedia" },
+      staff: { sheet: "Celestials", config: STAFF_CONFIG, type: "narapedia" },
+      civilians: { sheet: "Currencies", config: CIVILIANS_CONFIG, type: "trove" },
+      faq: { sheet: "FAQ", config: FAQ_CONFIG, type: "narapedia" }
     };
 
+    // --- Page-specific rendering ---
     if (SHEET_CONFIGS[pageName]) {
-      const { sheet, config } = SHEET_CONFIGS[pageName];
-      await initSheet(sheet, config);
+      const { sheet, config, type } = SHEET_CONFIGS[pageName];
+          if (pageName === "civilians") {
+      await loadCiviliansGrid();
+    } else {
+      const data = await fetchSheetData(sheet);
+      renderSheets(data, config);
+      }
     }
 
+    // --- User profile page ---
     if (path.endsWith("/user.html")) {
       await loadArtifacts();
       await fetchUserProfile();
@@ -1604,3 +1657,4 @@ window.addEventListener("load", () => {
   const smooth = document.querySelector(".smoothLoad");
   if (smooth) smooth.classList.add("loaded");
 });
+
