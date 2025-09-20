@@ -12,8 +12,14 @@
 // ==========================
 // Google Sheets Config
 // ==========================
-const SHEET_ID = "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms";
-const SHEET_BASE_URL = `https://opensheet.elk.sh/${SHEET_ID}`;
+// Narapedia (Masterlist, Staff, etc.)
+const SHEET_ID_NARAPEDIA = "1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms";
+const SHEET_BASE_URL_NARAPEDIA = `https://opensheet.elk.sh/${SHEET_ID_NARAPEDIA}`;
+
+// NaraTrove (Currencies, Inventory, Palcharms for Civilians)
+const SHEET_ID_TROVE = "1FGsqhNZ_fYW-njhJlP39r-nQeK2X4FCIXeC_FTeU6lM";
+const SHEET_BASE_URL_TROVE = `https://opensheet.elk.sh/${SHEET_ID_TROVE}`;
+
 
 // ==========================
 // Masterlist Config
@@ -183,6 +189,25 @@ const FAQ_CONFIG = {
     { field: "Duties", className: "faq-detail-duties" },
     { field: "Custom Status", className: "faq-detail-status" },
     { field: "Blurb", className: "faq-detail-blurb" }
+  ]
+};
+
+const CIVILIANS_CONFIG = {
+  listId: "civilians-view",
+  detailId: "civilian-detail-view",
+  cardTemplate: "#civilians-card-template",   // <- updated
+  detailTemplate: "#civilian-detail-template",
+  imageField: "URL",
+  nameField: "Civilian",
+  extraFields: [
+    { field: "Owner", className: "civilian-detail-owner" },
+    { field: "Region", className: "civilian-detail-region" },
+    { field: "Rarity", className: "civilian-detail-rarity" },
+    { field: "Status", className: "civilian-detail-status" },
+    { field: "Titles", className: "civilian-detail-titles" },
+    { field: "Inventory", className: "civilian-detail-inventory" },
+    { field: "Palcharms", className: "civilian-detail-palcharms" },
+    { field: "Build", className: "civilian-detail-build" }
   ]
 };
 
