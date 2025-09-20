@@ -1117,7 +1117,6 @@ body.sidebar-fixed #openNav { top: 0; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 12px;
-  max-height: 11em;
   overflow-y: auto;
   padding: 10px;
   border-radius: 10px;
@@ -1486,9 +1485,9 @@ detail-name {
   box-shadow: none;
 }
 
-/* ==========================
-   Universal watermark styling
-   ========================== */
+/* --------------------------- */
+/* --------Watermark---------- */
+/* --------------------------- */
 .nara-watermark {
   position: absolute;
   opacity: 0.35;
@@ -1508,9 +1507,9 @@ detail-name {
   opacity: 0.25;
 }
 
-/* ==========================
-   Image wrapper + click blocker
-   ========================== */
+/* --------------------------- */
+/* ------Click Blocker-------- */
+/* --------------------------- */
 .nara-image-wrapper {
   position: relative;
   display: inline-block;
@@ -1528,6 +1527,57 @@ detail-name {
   background: transparent;
   pointer-events: all;
   z-index: 3;
+}
+
+/* --------------------------- */
+/* --------Civilians---------- */
+/* --------------------------- */
+/* Civilians full-width list */
+.civilians-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+.civilians-grid .narapedia-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--tan);
+  border: 2px solid var(--tanb);
+  border-radius: 12px;
+  padding: 10px 15px;
+  width: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* .civilians-grid .narapedia-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+} */
+
+.civilians-grid .narapedia-card-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 6px;
+}
+
+/* Extra fields inside card */
+.civilians-grid .narapedia-card-extra p {
+  margin: 2px 0;
+  font-size: 0.9em;
+}
+
+@media (max-width: 600px) {
+  .civilians-grid .narapedia-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .civilians-grid .narapedia-card-extra {
+    flex-direction: column;
+    gap: 4px;
+  }
 }
 
 /* --------------------------- */
