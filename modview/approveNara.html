@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Approve Nara Submissions</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 1em;
+    }
+    .tab {
+      padding: 0.5em 1em;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      background: #f4f4f4;
+      margin-right: 0.3em;
+      border-radius: 4px 4px 0 0;
+    }
+    .tab.active {
+      background: #fff;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5em;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+    }
+    .actions button {
+      margin-right: 0.5em;
+      padding: 0.3em 0.6em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .approve { background: #4caf50; color: #fff; }
+    .reject { background: #f44336; color: #fff; }
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 40px;
+    }
+    .spinner {
+      display: none;
+      text-align: center;
+      margin-top: 2em;
+    }
+    .spinner div {
+      width: 12px;
+      height: 12px;
+      margin: 0 3px;
+      background: #333;
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 0.6s infinite alternate;
+    }
+    .spinner div:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .spinner div:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes bounce {
+      to { transform: translateY(-8px); opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Nara Submissions Moderation</h1>
+
+  <div class="tabs">
+    <div class="tab active" data-status="pending">Pending</div>
+    <div class="tab" data-status="approved">Approved</div>
+    <div class="tab" data-status="rejected">Rejected</div>
+  </div>
+
+  <div class="spinner" id="loadingSpinner">
+    <div></div><div></div><div></div>
+    <p>Loading submissions...</p>
+  </div>
+
+  <table id="submissionsTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Nara</th>
+        <th>Designer</th>
+        <th>Type</th>
+        <th>Region</th>
+        <th>URL</th>
+        <th>Comments</th>
+        <th id="actionsHeader">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filled dynamically -->
+    </tbody>
+  </table>
+
+  <script>
+    const SHEET_BASE_URL = "YOUR_WEBAPP_URL_HERE"; // published GAS endpoint
+    let currentStatus = "pending";
+
+    async function fetchSubmissions(status) {
+      toggleSpinner(true);
+      try {
+        const res = await fetch(`${SHEET_BASE_URL}?type=submissions&status=${status}`);
+        const data = await res.json();
+        renderTable(data, status);
+      } catch (err) {
+        console.error("Error fetching submissions:", err);
+      } finally {
+        toggleSpinner(false);
+      }
+    }
+
+    function renderTable(data, status) {
+      const tbody = document.querySelector("#submissionsTable tbody");
+      tbody.innerHTML = "";
+
+      // hide Actions column for approved/rejected
+      document.getElementById("actionsHeader").style.display =
+        status === "pending" ? "" : "none";
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+
+        let actionsCell = "";
+        if (status === "pending") {
+          actionsCell = `
+            <td class="actions">
+              <button class="approve" onclick="handleAction('approve', '${row.Timestamp}')">Approve</button>
+              <button class="reject" onclick="handleAction('reject', '${row.Timestamp}')">Reject</button>
+            </td>
+          `;
+        }
+
+        tr.innerHTML = `
+          <td>${row.Timestamp}</td>
+          <td>${row.Nara}</td>
+          <td>${row.Designer || ""}</td>
+          <td>${row.Type || ""}</td>
+          <td>${row.Region || ""}</td>
+          <td><a href="${row.URL}" target="_blank">View</a></td>
+          <td><textarea data-timestamp="${row.Timestamp}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea></td>
+          ${actionsCell}
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleAction(action, timestamp) {
+      const textarea = document.querySelector(`textarea[data-timestamp="${timestamp}"]`);
+      const comments = textarea ? textarea.value : "";
+
+      try {
+        const res = await fetch(SHEET_BASE_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            type: "moderationAction",
+            action,
+            timestamp,
+            comments
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert(`Submission ${action}d successfully.`);
+          fetchSubmissions("pending"); // refresh pending tab
+        } else {
+          alert("Error: " + result.error);
+        }
+      } catch (err) {
+        console.error("Action failed:", err);
+      }
+    }
+
+    function toggleSpinner(show) {
+      document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
+    }
+
+    // Tab switching
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentStatus = tab.dataset.status;
+        fetchSubmissions(currentStatus);
+      });
+    });
+
+    // Initial load
+    fetchSubmissions(currentStatus);
+  </script>
+</body>
+</html>
