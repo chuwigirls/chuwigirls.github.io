@@ -1,74 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
-<!--
-        _..---.--.
-       .'\ __|/O.__)
-      /__.' _/ .-'_\
-     (____.'.-_\____)
-      (_/ _)__(_ \_)\_
-    mrf(_..)--(.._)'--'
-    
-    if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help!
--->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai">
+<meta name="robots" content="noimageai">
+<meta property="og:title" content="Naras Nature" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://narasnature.netlify.app" />
+<meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
+<meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
 
-    <!-- Meta tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Prevent AI scraping -->
-    <meta name="robots" content="noai">
-    <meta name="robots" content="noimageai">
-    <meta property="og:title" content="Naras Nature" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://narasnature.netlify.app" />
-    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
-    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+<title>Naras Nature - Civilians</title>
+<link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
 
-    <!-- Your site -->
-    <title>Naras Nature</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+<!-- Styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="../styles/narasnature.css" />
 
-    <!-- Styles -->
-     <!-- Fontawesome v6 icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles/narasnature.css" />
-    
 </head>
 <body>
-    
-  <!-- Page load -->
-  <div class="smoothLoad"> 
 
-    <!-- Header -->
-    <div class="includes" id="header" data-source="../includes/header.html"></div>
+<div class="smoothLoad">
 
-    <!-- Sidebar -->
-    <div class="includes" id="sidebar" data-source="../includes/sidebar.html"></div>
+  <!-- Header -->
+  <div class="includes" id="header" data-source="../includes/header.html"></div>
 
-    <!-- Content -->
-    <div class="wrapper">
-      <div class="page">
+  <!-- Sidebar -->
+  <div class="includes" id="sidebar" data-source="../includes/sidebar.html"></div>
+
+  <!-- Content -->
+  <div class="wrapper">
+    <div class="page">
       <h1>Civilians</h1>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="includes" id="footer" data-source="../includes/footer.html"></div>
-
   </div>
 
-  <script src="../styles/config.js"></script>
-  <script src="../styles/narasnature.js"></script>
-  <script src="../styles/smoothLoad.js"></script>
+  <!-- Civilians Grid -->
+  <div id="civilians-view" class="card-grid  civilians-grid"></div>
+
+  <!-- Civilians Detail -->
+  <div id="civilian-detail-view" class="detail-view" style="display:none;"></div>
+
+      <!-- Civilians Card Template -->
+      <template id="civilians-card-template">
+        <div class="narapedia-card">
+          <!-- <img class="narapedia-card-img" src="" alt=""> -->
+          <div class="narapedia-card-name"></div>
+          <div class="narapedia-card-extra">
+          </div>
+        </div>
+      </template>
+
+      <!-- Civilians Detail Template -->
+      <template id="civilian-detail-template">
+        <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Civilians</button>
+        <div class="detail-card">
+          <img class="civilian-detail-img" src="" alt="">
+          <h2 class="detail-name"></h2>
+
+          <p><strong>Owner:</strong> <span class="civilian-detail-owner"></span></p>
+          <p><strong>Region:</strong> <span class="civilian-detail-region"></span></p>
+          <p><strong>Rarity:</strong> <span class="civilian-detail-rarity"></span></p>
+          <p><strong>Status:</strong> <span class="civilian-detail-status"></span></p>
+          <p><strong>Titles:</strong> <span class="civilian-detail-titles"></span></p>
+          <p><strong>Inventory:</strong> <span class="civilian-detail-inventory"></span></p>
+          <p><strong>Palcharms:</strong> <span class="civilian-detail-palcharms"></span></p>
+          <p><strong>Build:</strong> <span class="civilian-detail-build"></span></p>
+        </div>
+      </template>
+
+  <!-- Footer -->
+  <div class="includes" id="footer" data-source="../includes/footer.html"></div>
+
+</div>
+
+<script src="../styles/config.js"></script>
+<script src="../styles/narasnature.js"></script>
 </body>
 </html>
