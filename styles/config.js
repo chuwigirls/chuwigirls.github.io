@@ -84,7 +84,10 @@ const ARTIFACTS_CONFIG = {
     { field: "Price", className: "artifact-detail-price" },
     { field: "Rarity", className: "artifact-detail-rarity" },
     { field: "Found", className: "artifact-detail-found" },
-    { field: "Description", className: "artifact-detail-description" }
+    { field: "Description", className: "artifact-detail-description" },
+    { field: "Useage", className: "artifact-detail-useage" },
+    { field: "Tradeable", className: "artifact-detail-trade" },
+    { field: "Recycleable", className: "artifact-detail-recycle" }
   ]
 };
 
