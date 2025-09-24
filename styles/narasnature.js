@@ -275,7 +275,7 @@ async function loadHeaderFooter() {
   });
 
   setupPageTransitions();
-  setupBackToTop();
+  BackToTop();
 }
 
 // ==========================
@@ -1538,22 +1538,18 @@ function setupPageTransitions() {
   });
 }
 
-function setupBackToTop() {
-  const button = document.getElementById("top");
-  if (!button) return;
+// ==============================
+// Back to Top Button
+// ==============================
+function BackToTop() {
+  const mybutton = document.getElementById("top");
+  if (!mybutton) return;
 
-  function scrollFunction() {
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-      button.style.display = "block";
-    } else {
-      button.style.display = "none";
-    }
-  }
-
-  window.addEventListener("scroll", scrollFunction);
-
-  button.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  mybutton.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   });
 }
 
@@ -1563,6 +1559,8 @@ function setupBackToTop() {
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadHeaderFooter();
+    setupPageTransitions();
+    BackToTop();
 
     // --- Auth routing ---
     const path = window.location.pathname || "";
@@ -1606,9 +1604,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderFrontpageFeaturedTrials("featured-trial-frontpage");
     }
     renderSidebarFeaturedTrial("featured-trial-sidebar");  
-
-    setupPageTransitions();
-    setupBackToTop();
 
     const mainContent = document.querySelector(".smoothLoad, .wrapper");
     if (mainContent) mainContent.classList.add("fade-in");
