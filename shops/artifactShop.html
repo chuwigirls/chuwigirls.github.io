@@ -28,7 +28,7 @@
 
     <!-- Your site -->
     <title>Bazaar | Naras Nature</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
+    <link rel="shortcut icon" type="image/png" href="/assets/narwhal.png" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles/narasnature.css" />
+    <link rel="stylesheet" href="/styles/narasnature.css" />
     
 </head>
 <body>
@@ -50,27 +50,43 @@
 <div class="smoothLoad"> 
 
     <!-- Header -->
-    <div class="includes" id="header" data-source="../includes/header.html"></div>
+    <div class="includes" id="header" data-source="/includes/header.html"></div>
 
     <!-- Sidebar -->
-    <div class="includes" id="sidebar" data-source="../includes/sidebar.html"></div>
+    <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
 
     <!-- Content -->
     <div class="wrapper">
       <div class="page">
         <h1>Artifact Shop</h1>
-        <h1 id="shopsOpen">The shops are open!</h1>
+        <h1 id="shopsOpen">Always open!</h1>
         <hr>
 
+        <div class="artifacts">
+          <a class="artifact" href="/shops/artifactShop.html">
+              <i class="fa-solid fa-store"></i><br>Another shop</a>
+          <div class="artifact"><a  href="/shops/reeldeal.html">
+              <i class="fa-solid fa-fish-fins"></i><br>Reel Deals</a></div>
+          <div class="artifact"><a  href="/shops/recycle.html">
+              <i class="fa-solid fa-recycle"></i><br>Recycle Center</a></div>
+        </div>
+
+        <div id="test">
+            <p>Summoning Scroll - 50</p>
+            <p></p>
+        </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="includes" id="footer" data-source="../includes/footer.html"></div>
+    <div class="includes" id="footer" data-source="/includes/footer.html"></div>
 </div>
 
+  <!-- Top button -->
+  <div class="includes" id="top" data-source="includes/top.html"></div>
+
   <!-- Scripts -->
-  <script src="../styles/config.js"></script>
-  <script src="../styles/narasnature.js"></script>
+  <script src="/styles/config.js"></script>
+  <script src="/styles/narasnature.js"></script>
 </body>
 </html>
