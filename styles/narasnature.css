@@ -40,7 +40,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   overflow-x: hidden;
-  font-size: 14px;
+  font-size: 16px;
   font-family: var(--calm);
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
   background-color: var(--light-blue);
@@ -51,7 +51,6 @@ body {
 
 p {
   color: var(--dark-blue);
-  font-size: 16px;
 }
 
 .loading-spinner {
@@ -246,12 +245,25 @@ h4 {
 }
 
 ul {
-  text-align: left;
   list-style-image: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/cf2836cb-5893-4a6c-b156-5a89d94fc721/dcajzs5-18e13a23-88ac-4556-8920-eac8f0e12673.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2NmMjgzNmNiLTU4OTMtNGE2Yy1iMTU2LTVhODlkOTRmYzcyMVwvZGNhanpzNS0xOGUxM2EyMy04OGFjLTQ1NTYtODkyMC1lYWM4ZjBlMTI2NzMuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ITsUa1vtqjgSnJfw92CwanM0nZDinqUDy8q1NjY90uY');
+  text-align: left;
+  font-family: var(--calm);
+  color: var(--dark-blue);
 }
 
 li {
   margin-bottom: 1%;
+}
+
+ol {
+  list-style-type: none;
+  text-align: left;
+  font-family: var(--calm);
+  color: var(--dark-blue);
+}
+
+li.a {
+  margin-left:25px;
 }
 
 summary {
@@ -261,8 +273,11 @@ summary {
               height 0.3s ease;
 }
 
+#center {
+  text-align: center;
+}
+
 .page {
-  font-size: 18px;
   background-color: var(--tan);
   border-radius: 20px;
   border: 1px solid var(--tanb);
@@ -1009,6 +1024,13 @@ body.sidebar-fixed #openNav { top: 0; }
 }
 
 .featured-trial-dates { color: var(--dark-blue); }
+
+/* --------------------------- */
+/* ------------TOS---------- */
+/* --------------------------- */
+#tos {
+  text-align: left;
+}
 
 /* --------------------------- */
 /* ------------Login---------- */
