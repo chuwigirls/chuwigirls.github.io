@@ -28,7 +28,7 @@
 
     <!-- Your site -->
     <title>Login | Naras Nature</title>
-    <link rel="shortcut icon" href="assets/narwhal.png" />
+    <link rel="shortcut icon" href="/assets/narwhal.png" />
 
     <!-- Scripts -->
     <!-- jQuery library -->
@@ -47,7 +47,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles/narasnature.css" />
+    <link rel="stylesheet" href="/styles/narasnature.css" />
     
 </head>
 <body>
@@ -56,10 +56,10 @@
   <div class="smoothLoad">  
 
     <!-- Header -->
-    <div class="includes" id="header" data-source="includes/header.html"></div>
+    <div class="includes" id="header" data-source="/includes/header.html"></div>
 
     <!-- Sidebar -->
-    <div class="includes" id="sidebar" data-source="includes/sidebar.html"></div>
+    <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
 
     <!-- Content -->
     <div class="wrapper">
@@ -75,12 +75,13 @@
 
         <hr>
         <!--- About Discord login --->
-        <p>Naras Nature is playable by authorizing your Discord account via
-            <u><a href="https://discord.com/developers/docs/topics/oauth2" target="_blank">
-            OAuth2 <i class="fas fa-external-link-alt"></i></a></u>. This process 
-            is the same as authorizing a Discord bot access to your Discord account.
-            The only information we retain is your Discord User ID and username, purely 
-            for verification purposes in the Naras Nature ARPG. </i>
+        <p>Naras Nature is playable after verifying your Discord account in the Discord 
+            server, then authorizing your Discord account on this website. This process 
+            is the same as authorizing a Discord bot access to your Discord account. For
+            information about what information we access and retain, please read our
+            <a href="/help/tos.html">Terms of Service.</a>
+        </p>
+        <p>. 
         </p>
         <p><b>Please note:</b> You may be redirected to a screen that says <b>Discord App
           Launched.</b> You can click on <b>'Continue to Discord'</b> or wait a few seconds to be 
@@ -93,9 +94,12 @@
     </div>
 
     <!-- Footer -->
-    <div class="includes" id="footer" data-source="includes/footer.html"></div>
+    <div class="includes" id="footer" data-source="/includes/footer.html"></div>
 
   </div>
+
+    <!-- Top button -->
+    <div class="includes" id="top" data-source="/includes/top.html"></div>
 
     <!-- ----------------------------------------------------------------- -->
     <!-- JS                                                                -->
@@ -111,7 +115,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
 
     <!-- narasnature Script -->
-    <script src="styles/config.js"></script>
-    <script src="styles/narasnature.js"></script>
+    <script src="/styles/config.js"></script>
+    <script src="/styles/narasnature.js"></script>
   </body>
 </html>
