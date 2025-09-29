@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Approve Nara Submissions</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="/styles/narasnature.css">
   <style>
     body { font-family: Arial, sans-serif; }
     .tabs {
@@ -77,39 +77,43 @@
   </style>
 </head>
 <body>
-  <h1>Nara Submissions Moderation</h1>
+  <div class="wrapper">
+    <div class="page">
+      <h1>Nara Submissions Moderation</h1>
 
-  <div class="tabs">
-    <div class="tab active" data-status="pending">Pending</div>
-    <div class="tab" data-status="approved">Approved</div>
-    <div class="tab" data-status="rejected">Rejected</div>
+      <div class="tabs">
+        <div class="tab active" data-status="pending">Pending</div>
+        <div class="tab" data-status="approved">Approved</div>
+        <div class="tab" data-status="rejected">Rejected</div>
+      </div>
+
+      <div class="spinner" id="loadingSpinner">
+        <div></div><div></div><div></div>
+        <p>Loading submissions...</p>
+      </div>
+
+      <table id="submissionsTable">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Nara</th>
+            <th>Designer</th>
+            <th>Type</th>
+            <th>Region</th>
+            <th>URL</th>
+            <th>Comments</th>
+            <th id="actionsHeader">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled dynamically -->
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <div class="spinner" id="loadingSpinner">
-    <div></div><div></div><div></div>
-    <p>Loading submissions...</p>
-  </div>
-
-  <table id="submissionsTable">
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>Nara</th>
-        <th>Designer</th>
-        <th>Type</th>
-        <th>Region</th>
-        <th>URL</th>
-        <th>Comments</th>
-        <th id="actionsHeader">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Filled dynamically -->
-    </tbody>
-  </table>
 
   <script>
-    const SHEET_BASE_URL = "YOUR_WEBAPP_URL_HERE"; // published GAS endpoint
+    const SHEET_BASE_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
     let currentStatus = "pending";
 
     async function fetchSubmissions(status) {
@@ -129,40 +133,44 @@
       const tbody = document.querySelector("#submissionsTable tbody");
       tbody.innerHTML = "";
 
-      // hide Actions column for approved/rejected
       document.getElementById("actionsHeader").style.display =
         status === "pending" ? "" : "none";
 
       data.forEach(row => {
         const tr = document.createElement("tr");
 
+        // normalize timestamp to ISO string for matching GAS
+        const ts = row.Timestamp ? new Date(row.Timestamp).toISOString() : "";
+        const tsDisplay = row.Timestamp || "";
+
         let actionsCell = "";
         if (status === "pending") {
           actionsCell = `
             <td class="actions">
-              <button class="approve" onclick="handleAction('approve', '${row.Timestamp}')">Approve</button>
-              <button class="reject" onclick="handleAction('reject', '${row.Timestamp}')">Reject</button>
+              <button class="approve" onclick="handleAction('approve', \`${ts}\`)">Approve</button>
+              <button class="reject" onclick="handleAction('reject', \`${ts}\`)">Reject</button>
             </td>
           `;
         }
 
         tr.innerHTML = `
-          <td>${row.Timestamp}</td>
-          <td>${row.Nara}</td>
+          <td>${tsDisplay}</td>
+          <td>${row.Nara || ""}</td>
           <td>${row.Designer || ""}</td>
           <td>${row.Type || ""}</td>
           <td>${row.Region || ""}</td>
-          <td><a href="${row.URL}" target="_blank">View</a></td>
-          <td><textarea data-timestamp="${row.Timestamp}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea></td>
+          <td>${row.URL ? `<a href="${row.URL}" target="_blank">View</a>` : ""}</td>
+          <td>
+            <textarea data-timestamp="${ts}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea>
+          </td>
           ${actionsCell}
         `;
-
         tbody.appendChild(tr);
       });
     }
 
     async function handleAction(action, timestamp) {
-      const textarea = document.querySelector(`textarea[data-timestamp="${timestamp}"]`);
+      const textarea = document.querySelector(`textarea[data-timestamp="${CSS.escape(timestamp)}"]`);
       const comments = textarea ? textarea.value : "";
 
       try {
@@ -178,7 +186,7 @@
         const result = await res.json();
         if (result.success) {
           alert(`Submission ${action}d successfully.`);
-          fetchSubmissions("pending"); // refresh pending tab
+          fetchSubmissions("pending");
         } else {
           alert("Error: " + result.error);
         }
@@ -191,7 +199,6 @@
       document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
     }
 
-    // Tab switching
     document.querySelectorAll(".tab").forEach(tab => {
       tab.addEventListener("click", () => {
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -201,7 +208,6 @@
       });
     });
 
-    // Initial load
     fetchSubmissions(currentStatus);
   </script>
 </body>
