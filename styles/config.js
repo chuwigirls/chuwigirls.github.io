@@ -20,6 +20,10 @@ const SHEET_BASE_URL_NARAPEDIA = `https://opensheet.elk.sh/${SHEET_ID_NARAPEDIA}
 const SHEET_ID_TROVE = "1FGsqhNZ_fYW-njhJlP39r-nQeK2X4FCIXeC_FTeU6lM";
 const SHEET_BASE_URL_TROVE = `https://opensheet.elk.sh/${SHEET_ID_TROVE}`;
 
+// Narapprovals
+const SCRIPT_URL_SUMMONS = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
+const FEATURES_BASE_URL = `${SHEET_BASE_URL_NARAPEDIA}/Features`; 
+
 
 // ==========================
 // Masterlist Config
