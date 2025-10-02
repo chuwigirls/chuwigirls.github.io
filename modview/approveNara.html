@@ -1,10 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Approve Nara Submissions</title>
-  <link rel="stylesheet" href="/styles/narasnature.css">
-  <style>
+    
+<!--
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+    
+    if you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
+-->
+
+    <!-- Meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent AI scraping -->
+    <meta name="robots" content="noai">
+    <meta name="robots" content="noimageai">
+    <meta property="og:title" content="Naras Nature" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://narasnature.netlify.app" />
+    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
+    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+
+    <!-- Your site -->
+    <title>Summoning | Celestial Naras Nature</title>
+    <link rel="shortcut icon" type="image/png" href="/assets/narwhal.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <!-- Fontawesome v6 icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/narasnature.css" />
+    <style>
     body { font-family: Arial, sans-serif; }
     .tabs {
       display: flex;
@@ -77,9 +115,18 @@
   </style>
 </head>
 <body>
+  <!-- Page load -->
+  <div class="smoothLoad"> 
+
+    <!-- Header -->
+    <div class="includes" id="header" data-source="/includes/header.html"></div>
+
+    <!-- Sidebar -->
+    <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
+  
   <div class="wrapper">
     <div class="page">
-      <h1>Nara Submissions Moderation</h1>
+      <h1>Nara Summons Moderation</h1>
 
       <div class="tabs">
         <div class="tab active" data-status="pending">Pending</div>
@@ -87,14 +134,10 @@
         <div class="tab" data-status="rejected">Rejected</div>
       </div>
 
-      <div class="spinner" id="loadingSpinner">
-        <div></div><div></div><div></div>
-        <p>Loading submissions...</p>
-      </div>
-
-      <table id="submissionsTable">
+      <table id="summonsTable">
         <thead>
           <tr>
+            <th>UUID</th>
             <th>Timestamp</th>
             <th>Nara</th>
             <th>Designer</th>
@@ -109,28 +152,38 @@
           <!-- Filled dynamically -->
         </tbody>
       </table>
+
+      <div class="spinner" id="loadingSpinner">
+        <div></div><div></div><div></div>
+        <p>Loading summons...</p>
+      </div>
     </div>
   </div>
+<!-- Footer -->
+  <div class="includes" id="footer" data-source="/includes/footer.html"></div>
+</div>
 
+  <!-- Top button -->
+  <div class="includes" id="top" data-source="/includes/top.html"></div>
   <script>
     const SHEET_BASE_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
     let currentStatus = "pending";
 
-    async function fetchSubmissions(status) {
+    async function fetchsummons(status) {
       toggleSpinner(true);
       try {
-        const res = await fetch(`${SHEET_BASE_URL}?type=submissions&status=${status}`);
+        const res = await fetch(`${SHEET_BASE_URL}?type=summons&status=${status}`);
         const data = await res.json();
         renderTable(data, status);
       } catch (err) {
-        console.error("Error fetching submissions:", err);
+        console.error("Error fetching summons:", err);
       } finally {
         toggleSpinner(false);
       }
     }
 
     function renderTable(data, status) {
-      const tbody = document.querySelector("#submissionsTable tbody");
+      const tbody = document.querySelector("#summonsTable tbody");
       tbody.innerHTML = "";
 
       document.getElementById("actionsHeader").style.display =
@@ -139,21 +192,21 @@
       data.forEach(row => {
         const tr = document.createElement("tr");
 
-        // normalize timestamp to ISO string for matching GAS
-        const ts = row.Timestamp ? new Date(row.Timestamp).toISOString() : "";
+        const uuid = row.UUID || "";
         const tsDisplay = row.Timestamp || "";
 
         let actionsCell = "";
         if (status === "pending") {
           actionsCell = `
             <td class="actions">
-              <button class="approve" onclick="handleAction('approve', \`${ts}\`)">Approve</button>
-              <button class="reject" onclick="handleAction('reject', \`${ts}\`)">Reject</button>
+              <button class="approve" onclick="handleAction('approve', \`${uuid}\`)">Approve</button>
+              <button class="reject" onclick="handleAction('reject', \`${uuid}\`)">Reject</button>
             </td>
           `;
         }
 
         tr.innerHTML = `
+          <td>${uuid}</td>
           <td>${tsDisplay}</td>
           <td>${row.Nara || ""}</td>
           <td>${row.Designer || ""}</td>
@@ -161,7 +214,7 @@
           <td>${row.Region || ""}</td>
           <td>${row.URL ? `<a href="${row.URL}" target="_blank">View</a>` : ""}</td>
           <td>
-            <textarea data-timestamp="${ts}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea>
+            <textarea data-uuid="${uuid}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea>
           </td>
           ${actionsCell}
         `;
@@ -169,8 +222,8 @@
       });
     }
 
-    async function handleAction(action, timestamp) {
-      const textarea = document.querySelector(`textarea[data-timestamp="${CSS.escape(timestamp)}"]`);
+    async function handleAction(action, uuid) {
+      const textarea = document.querySelector(`textarea[data-uuid="${CSS.escape(uuid)}"]`);
       const comments = textarea ? textarea.value : "";
 
       try {
@@ -179,14 +232,14 @@
           body: new URLSearchParams({
             type: "moderationAction",
             action,
-            timestamp,
+            uuid,
             comments
           })
         });
         const result = await res.json();
         if (result.success) {
-          alert(`Submission ${action}d successfully.`);
-          fetchSubmissions("pending");
+          alert(`Summon ${action}d successfully.`);
+          fetchsummons("pending");
         } else {
           alert("Error: " + result.error);
         }
@@ -204,11 +257,27 @@
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         currentStatus = tab.dataset.status;
-        fetchSubmissions(currentStatus);
+        fetchsummons(currentStatus);
       });
     });
 
-    fetchSubmissions(currentStatus);
+    fetchsummons(currentStatus);
   </script>
+      <!-- ----------------------------------------------------------------- -->
+    <!-- JS                                                                -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    <!-- List.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
+
+    <!-- narasnature Script -->
+    <script src="/styles/config.js"></script>
+    <script src="/styles/narasnature.js"></script>
 </body>
 </html>
