@@ -154,6 +154,42 @@ p {
   border-color: var(--light-blue) transparent transparent transparent;
 }
 
+form {
+  padding: 2%;
+  font-family: var(--calm);
+  color: var(--dark-blue);
+}
+
+label {
+  display: block; 
+  text-align: left;
+}
+
+input[type=text] {
+  background-image: url('/assets/narwhal.png');
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  padding-left: 40px;
+}
+
+input[type=text]:focus {
+  outline: 1px solid var(--light-blue);
+  box-shadow: 0 0 5px var(--light-blue);
+}
+
+input[type=text], select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 1.5%;
+  border: 1px solid var(--tanb);
+  border-radius: 5px;
+}
+
+#submit {
+  box-shadow: 0 0 10px var(--tanb);
+  font-size: 150%;
+}
+
 /* --------------------------- */
 /* ---- Overall Page Fade ---- */
 /* --------------------------- */
@@ -1471,7 +1507,7 @@ detail-name {
   border-radius: 12px;
   padding: 0.5rem;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(204, 204, 204, 1);
+  box-shadow: 0 0 6px rgba(204, 204, 204, 1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
