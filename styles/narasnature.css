@@ -19,6 +19,7 @@
   --blueb: #b7dbf0;
   --light-pink: #ffe4e8;
   --pink: #d16273;
+  --red: #b92138;
   --pinkb: #f5d4d9;
 
   --calm: "Huninn", sans-serif;
@@ -154,6 +155,9 @@ p {
   border-color: var(--light-blue) transparent transparent transparent;
 }
 
+/* --------------------------- */
+/* --------- Forms ----------- */
+/* --------------------------- */
 form {
   padding: 2%;
   font-family: var(--calm);
@@ -177,17 +181,64 @@ input[type=text]:focus {
   box-shadow: 0 0 5px var(--light-blue);
 }
 
-input[type=text], select {
+input[type=text],
+select {
   width: 100%;
   padding: 10px;
   margin-bottom: 1.5%;
   border: 1px solid var(--tanb);
   border-radius: 5px;
+  background: var(--tan); /* unify background */
+  color: var(--dark-blue);
+  font-size: 14px;
+  appearance: none;        /* remove native OS dropdown quirks */
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 #submit {
   box-shadow: 0 0 10px var(--tanb);
   font-size: 150%;
+}
+
+/* ==========================
+   Multi-select dropdown style
+   ========================== */
+.dynamic-select {
+  height: auto;       /* remove "scrollable box" look */
+  min-height: 34px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Wrapper so each dropdown + remove button sits inline */
+.dropdown-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.dropdown-wrapper select {
+  min-width: 200px;
+  margin: 4px 0;
+  padding: 6px 10px;
+}
+
+/* Small × remove button */
+.dropdown-wrapper .remove-btn {
+  margin-left: 6px;
+  background: var(--pink);
+  border: none;
+  color: var(--light);
+  font-weight: bold;
+  border-radius: 4px;
+  padding: 0 6px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.dropdown-wrapper .remove-btn:hover {
+  background: var(--red);
 }
 
 /* --------------------------- */
