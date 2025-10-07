@@ -11,29 +11,49 @@
 ==============================
 ===== Summoning New Nara =====
 ============================== */
-const IMGUR_CLIENT_ID = "YOUR_IMGUR_CLIENT_ID";  // for later
+const IMGUR_CLIENT_ID = "YOUR_IMGUR_CLIENT_ID"; // for later
 const SUMMONS_URL = SCRIPT_URL_SUMMONS;
-const FEATURES_URL = FEATURES_BASE_URL + "/Features";
+const FEATURES_URL = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Features";
+const OPTIONS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Options";
+const ARTIFACTS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Artifacts";
 
 // ==============================
-// Load Features → Dropdowns
+// Generic loader for all sheets
 // ==============================
-// ==============================
-// Load Features → Dropdowns
-// ==============================
-async function loadOptions(selectId, category, isMulti = false) {
+async function loadSheetOptions(selectId, category, isMulti = false, sheet = "features") {
   try {
-    // Fetch the Features sheet directly from Narapedia
-    const res = await fetch(FEATURES_BASE_URL);
+    // 🧩 Choose correct sheet
+    let url;
+    if (sheet === "options") url = OPTIONS_URL;
+    else if (sheet === "artifacts") url = ARTIFACTS_URL;
+    else url = FEATURES_URL;
+
+    const res = await fetch(url);
     const rows = await res.json();
 
-    // Filter by Type column (case-insensitive match)
-    const features = rows
-      .filter(r => r.Type && r.Type.trim().toLowerCase() === category.toLowerCase())
-      .map(r => r.Feature)
+    const fieldName =
+      sheet === "options" ? "Option" :
+      sheet === "artifacts" ? "Artifact" : "Feature";
+
+    const filterField = rows[0].Type ? "Type" : "Category";
+
+    // 🧠 Filter logic
+    let filteredRows;
+    if (sheet === "artifacts") {
+      filteredRows = rows.filter(r =>
+        ["Design Artifact", "Feature Artifact"].includes(r[filterField])
+      );
+    } else {
+      filteredRows = rows.filter(r =>
+        r[filterField] && r[filterField].trim().toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    const values = filteredRows
+      .map(r => r[fieldName])
       .filter(Boolean);
 
-    console.log(`Features for ${category}:`, features);
+    console.log(`Loaded [${category}] from ${sheet}:`, values);
 
     const container = document.getElementById(selectId);
     if (!container) {
@@ -41,41 +61,49 @@ async function loadOptions(selectId, category, isMulti = false) {
       return;
     }
 
+    container.innerHTML = "";
+
     if (isMulti) {
-      // Multi-select categories → spawn dynamic dropdowns
-      container.innerHTML = "";
-      spawnDropdown(container, features, category);
-    } else {
-      // Single-select categories → populate the existing <select>
-      container.innerHTML = ""; // clear old options
-
-      const blank = document.createElement("option");
-      blank.value = "";
-      blank.textContent = "-- Select --";
-      container.appendChild(blank);
-
-      features.forEach(f => {
-        const opt = document.createElement("option");
-        opt.value = f;
-        opt.textContent = f;
-        container.appendChild(opt);
-      });
+      spawnDropdown(container, values, category, true);
+      return;
     }
+
+    const select = document.createElement("select");
+    select.name = category;
+    select.required = true;
+
+    const blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = `-- Select ${category} --`;
+    select.appendChild(blank);
+
+    values.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    });
+
+    container.appendChild(select);
   } catch (err) {
-    console.error("Error loading features:", err);
+    console.error(`Error loading ${category} from ${sheet}:`, err);
   }
 }
 
 // ==============================
-// Spawn Multi Dropdown + Remove
+// Multi-select dropdown spawner
 // ==============================
 function spawnDropdown(container, features, category) {
+  const existingAddBtn = container.querySelector(".add-btn");
+  if (existingAddBtn) existingAddBtn.remove();
+
   const wrapper = document.createElement("div");
   wrapper.classList.add("dropdown-wrapper");
 
   const selectEl = document.createElement("select");
   selectEl.name = `${category}[]`;
   selectEl.classList.add("dynamic-select");
+  if (container.children.length === 0) selectEl.required = true;
 
   const blank = document.createElement("option");
   blank.value = "";
@@ -89,30 +117,48 @@ function spawnDropdown(container, features, category) {
     selectEl.appendChild(opt);
   });
 
-  // Only add remove button if this is NOT the first select
   let removeBtn = null;
   if (container.children.length > 0) {
     removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.textContent = "×";
     removeBtn.classList.add("remove-btn");
-
     removeBtn.addEventListener("click", () => {
       container.removeChild(wrapper);
+      updateAddButton(container, features, category);
     });
   }
 
-  // Append in the order: select first, then button (so button is on right)
   wrapper.appendChild(selectEl);
   if (removeBtn) wrapper.appendChild(removeBtn);
+  container.appendChild(wrapper);
 
   selectEl.addEventListener("change", () => {
-    if (selectEl.value && container.lastElementChild === wrapper) {
-      spawnDropdown(container, features, category);
-    }
+    updateAddButton(container, features, category);
   });
 
-  container.appendChild(wrapper);
+  updateAddButton(container, features, category);
+}
+
+function updateAddButton(container, features, category) {
+  const existingAddBtn = container.querySelector(".add-btn");
+  if (existingAddBtn) existingAddBtn.remove();
+
+  const selects = container.querySelectorAll("select.dynamic-select");
+  const lastSelect = selects[selects.length - 1];
+
+  if (selects.length >= 5) return;
+  if (!lastSelect || !lastSelect.value) return;
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.textContent = "+";
+  addBtn.classList.add("add-btn");
+  addBtn.addEventListener("click", () => {
+    spawnDropdown(container, features, category);
+  });
+
+  container.appendChild(addBtn);
 }
 
 // ==============================
@@ -120,15 +166,17 @@ function spawnDropdown(container, features, category) {
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
   const dropdowns = [
-    { id: "buildSelect", category: "Build", multi: false },
-    { id: "vesselSelect", category: "Vessel", multi: true },
-    { id: "ribbonsSelect", category: "Ribbons", multi: true },
-    { id: "tailSelect", category: "Tail", multi: true },
-    { id: "physiognomySelect", category: "Physiognomy", multi: true },
-    { id: "aestheticsSelect", category: "Aesthetics", multi: true }
+    { id: "stageSelect", category: "Stage", multi: false, sheet: "options" },
+    { id: "artifactSelect", category: "Artifacts", multi: true, sheet: "artifacts" },
+    { id: "buildSelect", category: "Build", multi: false, sheet: "features" },
+    { id: "vesselSelect", category: "Vessel", multi: true, sheet: "features" },
+    { id: "ribbonsSelect", category: "Ribbons", multi: true, sheet: "features" },
+    { id: "tailSelect", category: "Tail", multi: true, sheet: "features" },
+    { id: "physiognomySelect", category: "Physiognomy", multi: true, sheet: "features" },
+    { id: "aestheticsSelect", category: "Aesthetics", multi: true, sheet: "features" }
   ];
 
-  dropdowns.forEach(d => loadOptions(d.id, d.category, d.multi));
+  dropdowns.forEach(d => loadSheetOptions(d.id, d.category, d.multi, d.sheet));
 
   const form = document.getElementById("naraForm");
   form.addEventListener("submit", handleFormSubmit);
@@ -142,8 +190,7 @@ async function handleFormSubmit(e) {
   const statusMsg = document.getElementById("statusMsg");
   statusMsg.textContent = "Preparing Summon...";
 
-  const imageUrl = "https://via.placeholder.com/300"; // placeholder
-
+  const imageUrl = "/assets/narwhal.png";
   const form = e.target;
   const now = new Date();
   const timestampISO = now.toISOString();
@@ -164,7 +211,8 @@ async function handleFormSubmit(e) {
     Hide: "",
     URL: imageUrl,
     Art: "",
-    Stage: form.Stage.value,
+    Stage: form.querySelector("select[name='Stage']")?.value || "",
+    Artifacts: collectMulti("Artifacts"),
     Owner: form.Owner.value,
     "Discord ID": "",
     Designer: form.Designer.value,
@@ -174,7 +222,7 @@ async function handleFormSubmit(e) {
     Region: "",
     Calling: "",
     Value: "",
-    Build: form.querySelector("#buildSelect")?.value || "",
+    Build: form.querySelector("select[name='Build']")?.value || "",
     Inventory: "",
     Palcharms: "",
     Emblems: "",
