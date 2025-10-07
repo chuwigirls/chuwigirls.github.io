@@ -58,9 +58,19 @@
       <h1>Summon a New Nara</h1>
 
       <form id="naraForm">
-        <label>Type:
-          <input type="text" name="Stage" required>
+        <label>Upload Image:
+          <input type="file" id="imageFile" accept="image/*">
         </label>
+
+        <label>Stage:
+          <div id="stageSelect"></div>
+        </label>
+
+        <label>Artifacts:
+          <div id="artifactSelect"></div>
+        </label>
+
+        <hr>
         <label>Owner:
           <input type="text" name="Owner" required>
         </label>
@@ -70,8 +80,10 @@
         <label>Artist:
           <input type="text" name="Artist" required>
         </label>
+
+        <hr>
         <label>Build</label>
-        <select id="buildSelect" name="Build"></select>
+        <select id="buildSelect" name="Build" required></select>
 
         <label>Vessel</label>
         <div id="vesselSelect"></div>
@@ -82,15 +94,148 @@
         <label>Tail</label>
         <div id="tailSelect"></div>
 
+        <hr>
         <label>Physiognomy</label>
         <div id="physiognomySelect"></div>
 
         <label>Aesthetics</label>
         <div id="aestheticsSelect"></div>
 
+        <button id="submit" type="submit">Submit</button>
+      </form>
+
+      <p id="statusMsg"></p>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div class="includes" id="footer" data-source="/includes/footer.html"></div>
+</div>
+
+  <!-- Top button -->
+  <div class="includes" id="top" data-source="/includes/top.html"></div>
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- JS                                                                -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    <!-- List.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
+
+    <!-- narasnature Script -->
+    <script src="/styles/config.js"></script>
+    <script src="/styles/submissions.js"></script>
+    <script src="/styles/narasnature.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+<!--
+        _..---.--.
+       .'\ __|/O.__)
+      /__.' _/ .-'_\
+     (____.'.-_\____)
+      (_/ _)__(_ \_)\_
+    mrf(_..)--(.._)'--'
+    
+    hif you're looking at this page to learn about coding,
+    you can ask chuwigirls for help!
+-->
+
+    <!-- Meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent AI scraping -->
+    <meta name="robots" content="noai">
+    <meta name="robots" content="noimageai">
+    <meta property="og:title" content="Naras Nature" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://narasnature.netlify.app" />
+    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
+    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+
+    <!-- Your site -->
+    <title>Summons | Naras Nature</title>
+    <link rel="shortcut icon" type="image/png" href="/assets/narwhal.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+     <!-- Fontawesome v6 icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/narasnature.css" />
+</head>
+<body>
+  <!-- Page load -->
+  <div class="smoothLoad"> 
+
+    <!-- Header -->
+    <div class="includes" id="header" data-source="/includes/header.html"></div>
+
+    <!-- Sidebar -->
+    <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
+
+  <div class="wrapper">
+    <div class="page">
+      <h1>Summon a New Nara</h1>
+
+      <form id="naraForm">
         <label>Upload Image:
           <input type="file" id="imageFile" accept="image/*">
         </label>
+
+        <label>Stage:
+          <div id="stageSelect"></div>
+        </label>
+
+        <label>Artifacts:
+          <div id="artifactSelect"></div>
+        </label>
+
+        <hr>
+        <label>Owner:
+          <input type="text" name="Owner" required>
+        </label>
+        <label>Designer:
+          <input type="text" name="Designer" required>
+        </label>
+        <label>Artist:
+          <input type="text" name="Artist" required>
+        </label>
+
+        <hr>
+        <label>Build</label>
+        <select id="buildSelect" name="Build" required></select>
+
+        <label>Vessel</label>
+        <div id="vesselSelect"></div>
+
+        <label>Ribbons</label>
+        <div id="ribbonsSelect"></div>
+
+        <label>Tail</label>
+        <div id="tailSelect"></div>
+
+        <hr>
+        <label>Physiognomy</label>
+        <div id="physiognomySelect"></div>
+
+        <label>Aesthetics</label>
+        <div id="aestheticsSelect"></div>
 
         <button id="submit" type="submit">Submit</button>
       </form>
