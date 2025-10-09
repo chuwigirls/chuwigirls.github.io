@@ -18,11 +18,11 @@ const OPTIONS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8
 const ARTIFACTS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Artifacts";
 
 // ==============================
-// Generic loader for all sheets
+// Generic loader for all sheets (with Subtype grouping support)
 // ==============================
 async function loadSheetOptions(selectId, category, isMulti = false, sheet = "features") {
   try {
-    // 🧩 Choose correct sheet
+    // choose sheet url
     let url;
     if (sheet === "options") url = OPTIONS_URL;
     else if (sheet === "artifacts") url = ARTIFACTS_URL;
@@ -31,29 +31,39 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
     const res = await fetch(url);
     const rows = await res.json();
 
-    const fieldName =
-      sheet === "options" ? "Option" :
-      sheet === "artifacts" ? "Artifact" : "Feature";
+    if (!Array.isArray(rows)) {
+      console.warn(`Expected rows array from ${url} but got:`, rows);
+      return;
+    }
 
-    const filterField = rows[0].Type ? "Type" : "Category";
+    // determine which field holds the label
+    const fieldName = sheet === "options" ? "Option" : (sheet === "artifacts" ? "Artifact" : "Feature");
 
-    // 🧠 Filter logic
+    // support either "Type" or "Category" header
+    const filterField = rows.length && rows[0].Type ? "Type" : "Category";
+
+    // Filtering:
     let filteredRows;
     if (sheet === "artifacts") {
+      // include both Design Artifact and Feature Artifact when category is "Artifacts"
       filteredRows = rows.filter(r =>
-        ["Design Artifact", "Feature Artifact"].includes(r[filterField])
+        category.toLowerCase() === "artifacts"
+          ? ["design artifact", "feature artifact"].includes((r[filterField] || "").trim().toLowerCase())
+          : (r[filterField] && (r[filterField] || "").trim().toLowerCase() === category.toLowerCase())
       );
     } else {
       filteredRows = rows.filter(r =>
-        r[filterField] && r[filterField].trim().toLowerCase() === category.toLowerCase()
+        r[filterField] && (r[filterField] || "").trim().toLowerCase() === category.toLowerCase()
       );
     }
 
-    const values = filteredRows
-      .map(r => r[fieldName])
-      .filter(Boolean);
-
-    console.log(`Loaded [${category}] from ${sheet}:`, values);
+    if (!filteredRows.length) {
+      console.warn(`⚠️ No matches found for ${category} in ${sheet}`);
+      // still clear container to avoid stale options
+      const containerEmpty = document.getElementById(selectId);
+      if (containerEmpty) containerEmpty.innerHTML = "";
+      return;
+    }
 
     const container = document.getElementById(selectId);
     if (!container) {
@@ -61,104 +71,170 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
       return;
     }
 
+    // detect Subtype grouping
+    const hasSubtype = filteredRows.some(r => r.Subtype && r.Subtype.toString().trim() !== "");
+    // grouped: { SubtypeName: [ values... ] }
+    const grouped = {};
+    if (hasSubtype) {
+      filteredRows.forEach(r => {
+        const g = (r.Subtype || "Other").toString().trim() || "Other";
+        if (!grouped[g]) grouped[g] = [];
+        // push the label for this row (fieldName)
+        const label = r[fieldName];
+        if (label) grouped[g].push(label);
+      });
+    }
+
+    // clear container
     container.innerHTML = "";
 
-    if (isMulti) {
-      spawnDropdown(container, values, category, true);
+    // -------------------------
+    // SINGLE SELECT (no multi)
+    // -------------------------
+    if (!isMulti) {
+      const select = document.createElement("select");
+      select.name = category;
+      select.required = true;
+
+      const blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = `-- Select ${category} --`;
+      select.appendChild(blank);
+
+      if (hasSubtype) {
+        // add optgroups
+        for (const [group, items] of Object.entries(grouped)) {
+          const optgroup = document.createElement("optgroup");
+          optgroup.label = group;
+          items.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.textContent = v;
+            optgroup.appendChild(opt);
+          });
+          select.appendChild(optgroup);
+        }
+      } else {
+        // simple list
+        filteredRows.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r[fieldName];
+          opt.textContent = r[fieldName];
+          select.appendChild(opt);
+        });
+      }
+
+      container.appendChild(select);
       return;
     }
 
-    const select = document.createElement("select");
-    select.name = category;
-    select.required = true;
+    // -------------------------
+    // MULTI-SELECT (dynamic grouped selects)
+    // -------------------------
+    // create function that will build a grouped select wrapper and append it to container
+    // closure captures grouped and filteredRows + hasSubtype
+    function createGroupedSelect() {
+      // remove existing add button (we'll re-create it)
+      const existingAddBtn = container.querySelector(".add-btn");
+      if (existingAddBtn) existingAddBtn.remove();
 
-    const blank = document.createElement("option");
-    blank.value = "";
-    blank.textContent = `-- Select ${category} --`;
-    select.appendChild(blank);
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("dropdown-wrapper");
 
-    values.forEach(v => {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      select.appendChild(opt);
-    });
+      const selectEl = document.createElement("select");
+      selectEl.name = `${category}[]`;
+      selectEl.classList.add("dynamic-select");
+      // make first required
+      if (container.querySelectorAll(".dropdown-wrapper").length === 0) {
+        selectEl.required = true;
+      }
 
-    container.appendChild(select);
+      // blank top option
+      const blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "-- Select --";
+      selectEl.appendChild(blank);
+
+      if (hasSubtype) {
+        // add optgroups in the same order as grouped object's keys
+        for (const [group, items] of Object.entries(grouped)) {
+          const optgroup = document.createElement("optgroup");
+          optgroup.label = group;
+          items.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.textContent = v;
+            optgroup.appendChild(opt);
+          });
+          selectEl.appendChild(optgroup);
+        }
+      } else {
+        filteredRows.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r[fieldName];
+          opt.textContent = r[fieldName];
+          selectEl.appendChild(opt);
+        });
+      }
+
+      // remove button for additional selects only
+      let removeBtn = null;
+      if (container.querySelectorAll(".dropdown-wrapper").length > 0) {
+        removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "×";
+        removeBtn.classList.add("remove-btn");
+        removeBtn.addEventListener("click", () => {
+          container.removeChild(wrapper);
+          // after remove, update the add button state
+          updateAddButton();
+        });
+      }
+
+      wrapper.appendChild(selectEl);
+      if (removeBtn) wrapper.appendChild(removeBtn);
+      container.appendChild(wrapper);
+
+      selectEl.addEventListener("change", () => {
+        updateAddButton();
+      });
+
+      // refresh add button state after adding new select
+      updateAddButton();
+    }
+
+    // updateAddButton checks last select value and count, shows/hides + button
+    function updateAddButton() {
+      // remove existing add button
+      const existingAddBtn = container.querySelector(".add-btn");
+      if (existingAddBtn) existingAddBtn.remove();
+
+      const selects = container.querySelectorAll("select.dynamic-select");
+      const lastSelect = selects[selects.length - 1];
+
+      // limit 5 selects
+      if (selects.length >= 5) return;
+
+      // only show + when last select exists and has a value
+      if (!lastSelect || !lastSelect.value) return;
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.textContent = "+";
+      addBtn.classList.add("add-btn");
+      addBtn.addEventListener("click", () => {
+        createGroupedSelect();
+      });
+
+      container.appendChild(addBtn);
+    }
+
+    // initial create
+    createGroupedSelect();
+
   } catch (err) {
     console.error(`Error loading ${category} from ${sheet}:`, err);
   }
-}
-
-// ==============================
-// Multi-select dropdown spawner
-// ==============================
-function spawnDropdown(container, features, category) {
-  const existingAddBtn = container.querySelector(".add-btn");
-  if (existingAddBtn) existingAddBtn.remove();
-
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("dropdown-wrapper");
-
-  const selectEl = document.createElement("select");
-  selectEl.name = `${category}[]`;
-  selectEl.classList.add("dynamic-select");
-  if (container.children.length === 0) selectEl.required = true;
-
-  const blank = document.createElement("option");
-  blank.value = "";
-  blank.textContent = "-- Select --";
-  selectEl.appendChild(blank);
-
-  features.forEach(f => {
-    const opt = document.createElement("option");
-    opt.value = f;
-    opt.textContent = f;
-    selectEl.appendChild(opt);
-  });
-
-  let removeBtn = null;
-  if (container.children.length > 0) {
-    removeBtn = document.createElement("button");
-    removeBtn.type = "button";
-    removeBtn.textContent = "×";
-    removeBtn.classList.add("remove-btn");
-    removeBtn.addEventListener("click", () => {
-      container.removeChild(wrapper);
-      updateAddButton(container, features, category);
-    });
-  }
-
-  wrapper.appendChild(selectEl);
-  if (removeBtn) wrapper.appendChild(removeBtn);
-  container.appendChild(wrapper);
-
-  selectEl.addEventListener("change", () => {
-    updateAddButton(container, features, category);
-  });
-
-  updateAddButton(container, features, category);
-}
-
-function updateAddButton(container, features, category) {
-  const existingAddBtn = container.querySelector(".add-btn");
-  if (existingAddBtn) existingAddBtn.remove();
-
-  const selects = container.querySelectorAll("select.dynamic-select");
-  const lastSelect = selects[selects.length - 1];
-
-  if (selects.length >= 5) return;
-  if (!lastSelect || !lastSelect.value) return;
-
-  const addBtn = document.createElement("button");
-  addBtn.type = "button";
-  addBtn.textContent = "+";
-  addBtn.classList.add("add-btn");
-  addBtn.addEventListener("click", () => {
-    spawnDropdown(container, features, category);
-  });
-
-  container.appendChild(addBtn);
 }
 
 // ==============================
