@@ -58,17 +58,24 @@
       <h1>Summon a New Nara</h1>
 
       <form id="naraForm">
-        <label>Upload Image:
+        <label>Upload Design Image:
           <input type="file" id="imageFile" accept="image/*">
+          <p class="text-left">Preview:</p>
         </label>
+        <p id="uploadStatus"></p>
+
+        <!-- 🔍 Live image preview -->
+        <div id="imagePreviewContainer" style="display:none; margin-top: 10px;">
+          
+          <img id="imagePreview" src="" alt="Image preview" style="max-width: 300px; border-radius: 8px; display:block;">
+        </div>
 
         <label>Stage:
           <div id="stageSelect"></div>
         </label>
 
-        <label>Artifacts:
-          <div id="artifactSelect"></div>
-        </label>
+        <label>Artifacts</label>
+        <div id="artifactSelect"></div>
 
         <hr>
         <label>Owner:
