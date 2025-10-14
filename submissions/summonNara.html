@@ -1,144 +1,435 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-<!--
-        _..---.--.
+/*       _..---.--.
        .'\ __|/O.__)
       /__.' _/ .-'_\
      (____.'.-_\____)
-      (_/ _)__(_ \_)\_
+      (_/ _)__(_ \_ )_
     mrf(_..)--(.._)'--'
-    
-    hif you're looking at this page to learn about coding,
+
+    if you're looking at this page to learn about coding,
     you can ask chuwigirls for help!
--->
 
-    <!-- Meta tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Prevent AI scraping -->
-    <meta name="robots" content="noai">
-    <meta name="robots" content="noimageai">
-    <meta property="og:title" content="Naras Nature" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://narasnature.netlify.app" />
-    <meta property="og:image" content="https://narasnature.netlify.app/assets/meta.png" />
-    <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
+==============================
+===== Summoning New Nara =====
+============================== */
+const CLOUDINARY_CLOUD_NAME = "NarasNature"; // e.g. "naranature"
+const CLOUDINARY_UPLOAD_PRESET = "NarasNature"; // your unsigned preset name
+const SUMMONS_URL = SCRIPT_URL_SUMMONS;
+const FEATURES_URL = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Features";
+const OPTIONS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Options";
+const ARTIFACTS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Artifacts";
 
-    <!-- Your site -->
-    <title>Summons | Naras Nature</title>
-    <link rel="shortcut icon" type="image/png" href="/assets/narwhal.png" />
+// ==============================
+// Generic loader
+// ==============================
+async function loadSheetOptions(selectId, category, isMulti = false, sheet = "features") {
+  try {
+    let url;
+    if (sheet === "options") url = OPTIONS_URL;
+    else if (sheet === "artifacts") url = ARTIFACTS_URL;
+    else url = FEATURES_URL;
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&family=DynaPuff:wght@400..700&family=Hanalei&family=Huninn&family=Righteous&family=Rubik+Puddles&display=swap" rel="stylesheet">
+    const res = await fetch(url);
+    const rows = await res.json();
+    if (!Array.isArray(rows)) {
+      console.warn(`Expected rows array from ${url} but got:`, rows);
+      return;
+    }
 
-    <!-- Styles -->
-     <!-- Fontawesome v6 icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/styles/narasnature.css" />
-</head>
-<body>
-  <!-- Page load -->
-  <div class="smoothLoad"> 
+    const fieldName = sheet === "options" ? "Option" : (sheet === "artifacts" ? "Artifact" : "Feature");
+    const norm = v => (v === undefined || v === null) ? "" : String(v).trim().toLowerCase();
 
-    <!-- Header -->
-    <div class="includes" id="header" data-source="/includes/header.html"></div>
+    let filteredRows = [];
+    if (sheet === "artifacts") {
+      const allArtifacts = rows.filter(r => {
+        const st = norm(r.Subtype);
+        return st === "design artifact" || st === "feature artifact";
+      });
 
-    <!-- Sidebar -->
-    <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
+      const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
+      const discordId = discordUser?.id?.toString?.().trim?.();
 
-  <div class="wrapper">
-    <div class="page">
-      <h1>Summon a New Nara</h1>
+      if (discordId) {
+        try {
+          const troveURL = "https://opensheet.elk.sh/1FGsqhNZ_fYW-njhJlP39r-nQeK2X4FCIXeC_FTeU6lM/Inventory";
+          const invRes = await fetch(troveURL);
+          if (!invRes.ok) throw new Error(`Bad response: ${invRes.status}`);
+          const invRows = await invRes.json();
+          if (!Array.isArray(invRows)) throw new Error("Inventory data not array");
 
-      <form id="naraForm">
-        <label>Upload Design Image:
-          <input type="file" id="imageFile" accept="image/*">
-          <p class="text-left">Preview:</p>
-        </label>
-        <p id="uploadStatus"></p>
+          const userRow = invRows.find(r => {
+            const idCell = (r["Discord ID"] || r["discord id"] || r["DiscordID"] || "").toString().trim();
+            return idCell === discordId;
+          });
 
-        <!-- 🔍 Live image preview -->
-        <div id="imagePreviewContainer" style="display:none; margin-top: 10px;">
-          
-          <img id="imagePreview" src="" alt="Image preview" style="max-width: 300px; border-radius: 8px; display:block;">
-        </div>
+          if (userRow) {
+            const ownedArtifacts = Object.entries(userRow)
+              .filter(([key, val]) => {
+                const keyNorm = key.toString().trim();
+                if (!keyNorm) return false;
+                if (["Civilian", "Discord ID", "discord id", "Civilian Name"].includes(keyNorm)) return false;
+                return Number(val) > 0;
+              })
+              .map(([key]) => norm(key));
 
-        <label>Stage:
-          <div id="stageSelect"></div>
-        </label>
+            if (ownedArtifacts.length) {
+              filteredRows = allArtifacts.filter(a => ownedArtifacts.includes(norm(a.Artifact)));
+            } else {
+              filteredRows = [];
+              console.warn("⚠️ User owns no Design/Feature Artifacts.");
+            }
+          } else {
+            filteredRows = [];
+            console.warn("⚠️ User not found in Inventory (Nara Trove).");
+          }
+        } catch (err) {
+          console.error("Error loading Inventory; falling back to all artifacts:", err);
+          filteredRows = allArtifacts.slice();
+        }
+      } else {
+        console.warn("⚠️ No Discord user logged in; showing all artifacts.");
+        filteredRows = allArtifacts.slice();
+      }
 
-        <label>Artifacts</label>
-        <div id="artifactSelect"></div>
+    } else {
+      const filterField = rows.length && rows[0].Type ? "Type" : "Category";
+      filteredRows = rows.filter(r => norm(r[filterField]) === category.toLowerCase());
+    }
 
-        <hr>
-        <label>Owner:
-          <input type="text" name="Owner" required>
-        </label>
-        <label>Designer:
-          <input type="text" name="Designer" required>
-        </label>
-        <label>Artist:
-          <input type="text" name="Artist" required>
-        </label>
+    const container = document.getElementById(selectId);
+    if (!container) {
+      console.warn(`❌ No container with id ${selectId}`);
+      return;
+    }
 
-        <hr>
-        <label>Build:
-          <div id="buildSelect"></div>
-        </label>
+    container.innerHTML = "";
 
-        <label>Vessel</label>
-        <div id="vesselSelect"></div>
+    if (!filteredRows || filteredRows.length === 0) {
+      if (sheet === "artifacts") {
+        const select = document.createElement("select");
+        select.name = category;
+        select.required = true;
+        select.classList.add("dynamic-select");
 
-        <label>Ribbons</label>
-        <div id="ribbonsSelect"></div>
+        const blank = document.createElement("option");
+        blank.value = "";
+        blank.textContent = `-- Select ${category} --`;
+        select.appendChild(blank);
 
-        <label>Tail</label>
-        <div id="tailSelect"></div>
+        const noOpt = document.createElement("option");
+        noOpt.disabled = true;
+        noOpt.selected = true;
+        noOpt.textContent = "No Design/Feature Artifacts in your inventory";
+        select.appendChild(noOpt);
 
-        <hr>
-        <label>Physiognomy</label>
-        <div id="physiognomySelect"></div>
+        container.appendChild(select);
+        return;
+      } else {
+        return;
+      }
+    }
 
-        <label>Aesthetics</label>
-        <div id="aestheticsSelect"></div>
+    const hasSubtype = filteredRows.some(r => (r.Subtype || "").toString().trim() !== "");
+    const grouped = {};
+    if (hasSubtype) {
+      filteredRows.forEach(r => {
+        const g = (r.Subtype || "Other").toString().trim() || "Other";
+        if (!grouped[g]) grouped[g] = [];
+        const label = r[fieldName];
+        if (label) grouped[g].push(label);
+      });
+    }
 
-        <button id="submit" type="submit">Submit</button>
-      </form>
+    if (!isMulti) {
+      const select = document.createElement("select");
+      select.name = category;
+      select.required = true;
+      select.classList.add("dynamic-select");
 
-      <p id="statusMsg"></p>
-    </div>
-  </div>
-  
-  <!-- Footer -->
-  <div class="includes" id="footer" data-source="/includes/footer.html"></div>
-</div>
+      const blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = `-- Select ${category} --`;
+      select.appendChild(blank);
 
-  <!-- Top button -->
-  <div class="includes" id="top" data-source="/includes/top.html"></div>
+      if (hasSubtype) {
+        for (const [group, items] of Object.entries(grouped)) {
+          const optgroup = document.createElement("optgroup");
+          optgroup.label = group;
+          items.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.textContent = v;
+            optgroup.appendChild(opt);
+          });
+          select.appendChild(optgroup);
+        }
+      } else {
+        filteredRows.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r[fieldName];
+          opt.textContent = r[fieldName];
+          select.appendChild(opt);
+        });
+      }
 
-    <!-- ----------------------------------------------------------------- -->
-    <!-- JS                                                                -->
-    <!-- ----------------------------------------------------------------- -->
+      container.appendChild(select);
+      return;
+    }
 
-    <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    function createGroupedSelect() {
+      const existingAddBtn = container.querySelector(".add-btn");
+      if (existingAddBtn) existingAddBtn.remove();
 
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("dropdown-wrapper");
 
-    <!-- List.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
+      const selectEl = document.createElement("select");
+      selectEl.name = `${category}[]`;
+      selectEl.classList.add("dynamic-select");
+      if (container.querySelectorAll(".dropdown-wrapper").length === 0) selectEl.required = true;
 
-    <!-- narasnature Script -->
-    <script src="/styles/config.js"></script>
-    <script src="/styles/submissions.js"></script>
-    <script src="/styles/narasnature.js"></script>
-  </body>
-</html>
+      const blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = "-- Select --";
+      selectEl.appendChild(blank);
+
+      if (hasSubtype) {
+        for (const [group, items] of Object.entries(grouped)) {
+          const optgroup = document.createElement("optgroup");
+          optgroup.label = group;
+          items.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.textContent = v;
+            optgroup.appendChild(opt);
+          });
+          selectEl.appendChild(optgroup);
+        }
+      } else {
+        filteredRows.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r[fieldName];
+          opt.textContent = r[fieldName];
+          selectEl.appendChild(opt);
+        });
+      }
+
+      let removeBtn = null;
+      if (container.querySelectorAll(".dropdown-wrapper").length > 0) {
+        removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "×";
+        removeBtn.classList.add("remove-btn");
+        removeBtn.addEventListener("click", () => {
+          container.removeChild(wrapper);
+          updateAddButton();
+        });
+      }
+
+      wrapper.appendChild(selectEl);
+      if (removeBtn) wrapper.appendChild(removeBtn);
+      container.appendChild(wrapper);
+
+      selectEl.addEventListener("change", () => updateAddButton());
+      updateAddButton();
+    }
+
+    function updateAddButton() {
+      const existingAddBtn = container.querySelector(".add-btn");
+      if (existingAddBtn) existingAddBtn.remove();
+
+      const selects = container.querySelectorAll("select.dynamic-select");
+      const lastSelect = selects[selects.length - 1];
+      if (selects.length >= 5) return;
+      if (!lastSelect || !lastSelect.value) return;
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.textContent = "+";
+      addBtn.classList.add("add-btn");
+      addBtn.addEventListener("click", createGroupedSelect);
+      container.appendChild(addBtn);
+    }
+
+    createGroupedSelect();
+
+  } catch (err) {
+    console.error(`Error loading ${category} from ${sheet}:`, err);
+  }
+}
+
+// ==============================
+// DOM Ready
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const dropdowns = [
+    { id: "stageSelect", category: "Stage", multi: false, sheet: "options" },
+    { id: "artifactSelect", category: "Artifacts", multi: true, sheet: "artifacts" },
+    { id: "buildSelect", category: "Build", multi: false, sheet: "features" },
+    { id: "vesselSelect", category: "Vessel", multi: true, sheet: "features" },
+    { id: "ribbonsSelect", category: "Ribbons", multi: true, sheet: "features" },
+    { id: "tailSelect", category: "Tail", multi: true, sheet: "features" },
+    { id: "physiognomySelect", category: "Physiognomy", multi: true, sheet: "features" },
+    { id: "aestheticsSelect", category: "Aesthetics", multi: true, sheet: "features" }
+  ];
+
+  dropdowns.forEach(d => loadSheetOptions(d.id, d.category, d.multi, d.sheet));
+
+  const form = document.getElementById("naraForm");
+  form.addEventListener("submit", handleFormSubmit);
+});
+
+// ==============================
+// Image Preview Handler
+// ==============================
+document.addEventListener("change", e => {
+  if (e.target.id === "imageFile") {
+    const fileInput = e.target;
+    const previewContainer = document.getElementById("imagePreviewContainer");
+    const previewImg = document.getElementById("imagePreview");
+
+    if (fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        previewImg.src = ev.target.result;
+        previewContainer.style.display = "block";
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      previewContainer.style.display = "none";
+      previewImg.src = "";
+    }
+  }
+});
+
+// ==============================
+// Form Submit Handler
+// ==============================
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const statusMsg = document.getElementById("statusMsg");
+  statusMsg.textContent = "Submitting Summon...";
+
+  const user = JSON.parse(localStorage.getItem("discordUser"));
+  if (!user) {
+    alert("You must be logged in to submit a Summon.");
+    statusMsg.textContent = "Login required.";
+    return;
+  }
+
+  const username = user.username;
+  const discordId = user.id;
+
+  const fileInput = document.getElementById("imageFile");
+  let imageUrl = "";
+
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    uploadStatus.textContent = "Uploading image...";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    try {
+      const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const cloudData = await cloudRes.json();
+
+      if (!cloudRes.ok || !cloudData.secure_url) {
+        throw new Error(cloudData.error?.message || "Upload failed.");
+      }
+
+      imageUrl = cloudData.secure_url;
+      uploadStatus.textContent = "✅ Image uploaded successfully!";
+      console.log("Uploaded to Cloudinary:", imageUrl);
+
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      uploadStatus.textContent = "❌ Upload failed: " + err.message;
+      statusMsg.textContent = "❌ Summon cancelled due to upload error.";
+      return;
+    }
+  } else {
+    alert("Please upload an image before submitting.");
+    statusMsg.textContent = "Image required.";
+    return;
+  }
+
+  const form = e.target;
+  const now = new Date();
+  const timestampISO = now.toISOString();
+  const timestampEpoch = now.getTime().toString();
+
+  function collectMulti(name) {
+    return [...form.querySelectorAll(`select[name="${name}[]"]`)]
+      .map(s => s.value)
+      .filter(v => v)
+      .join(", ");
+  }
+
+  const payload = {
+    type: "summonNara",
+    Timestamp: timestampISO,
+    TimestampEpoch: timestampEpoch,
+    Comments: "",
+    Hide: "",
+    URL: imageUrl,
+    Art: "",
+    Stage: form.querySelector("select[name='Stage']")?.value || "",
+    Artifacts: collectMulti("Artifacts"),
+    Owner: username || form.Owner.value,
+    "Discord ID": discordId, 
+    Designer: form.Designer.value,
+    Artist: form.Artist.value,
+    Status: "Pending",
+    Rarity: "",
+    Region: "",
+    Calling: "",
+    Value: "",
+    Build: form.querySelector("select[name='Build']")?.value || "",
+    Inventory: "",
+    Palcharms: "",
+    Emblems: "",
+    Titles: "",
+    Guild: "",
+    Vessel: collectMulti("Vessel"),
+    Ribbons: collectMulti("Ribbons"),
+    Tail: collectMulti("Tail"),
+    Physiognomy: collectMulti("Physiognomy"),
+    Aesthetics: collectMulti("Aesthetics"),
+    "Narling Form": "",
+    Mernara: "",
+    Humanara: "",
+    Transformation: "",
+    "Alt form": ""
+  };
+
+  try {
+    const res = await fetch(SUMMONS_URL, {
+      method: "POST",
+      body: new URLSearchParams(payload)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      statusMsg.textContent = "✅ Nara submitted successfully!";
+      form.reset();
+
+      // 🧹 Clear image preview
+      const previewContainer = document.getElementById("imagePreviewContainer");
+      const previewImg = document.getElementById("imagePreview");
+      previewContainer.style.display = "none";
+      previewImg.src = "";
+      uploadStatus.textContent = "";
+    } else {
+      statusMsg.textContent = "❌ Error: " + result.error;
+    }
+  } catch (err) {
+    console.error(err);
+    statusMsg.textContent = "❌ Summon failed: " + err.message;
+  }
+}
