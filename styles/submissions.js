@@ -19,7 +19,7 @@ const OPTIONS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8
 const ARTIFACTS_URL  = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Artifacts";
 
 // ==============================
-// Generic loader
+// Generic loader (clean version)
 // ==============================
 async function loadSheetOptions(selectId, category, isMulti = false, sheet = "features") {
   try {
@@ -35,10 +35,27 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
       return;
     }
 
-    const fieldName = sheet === "options" ? "Option" : (sheet === "artifacts" ? "Artifact" : "Feature");
-    const norm = v => (v === undefined || v === null) ? "" : String(v).trim().toLowerCase();
+    const container = document.getElementById(selectId);
+    if (!container) {
+      console.warn(`❌ No container with id ${selectId}`);
+      return;
+    }
+    container.innerHTML = "";
 
+    // Determine if this field is required
+    const isRequired = container.getAttribute("data-required") !== "false";
+
+    const fieldName =
+      sheet === "options" ? "Option" :
+      sheet === "artifacts" ? "Artifact" :
+      "Feature";
+    const norm = v => (v == null ? "" : String(v).trim().toLowerCase());
+
+    // =====================================
+    // FILTERING
+    // =====================================
     let filteredRows = [];
+
     if (sheet === "artifacts") {
       const allArtifacts = rows.filter(r => {
         const st = norm(r.Subtype);
@@ -50,12 +67,11 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
 
       if (discordId) {
         try {
-          const troveURL = "https://opensheet.elk.sh/1FGsqhNZ_fYW-njhJlP39r-nQeK2X4FCIXeC_FTeU6lM/Inventory";
+          const troveURL =
+            "https://opensheet.elk.sh/1FGsqhNZ_fYW-njhJlP39r-nQeK2X4FCIXeC_FTeU6lM/Inventory";
           const invRes = await fetch(troveURL);
           if (!invRes.ok) throw new Error(`Bad response: ${invRes.status}`);
           const invRows = await invRes.json();
-          if (!Array.isArray(invRows)) throw new Error("Inventory data not array");
-
           const userRow = invRows.find(r => {
             const idCell = (r["Discord ID"] || r["discord id"] || r["DiscordID"] || "").toString().trim();
             return idCell === discordId;
@@ -64,22 +80,18 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
           if (userRow) {
             const ownedArtifacts = Object.entries(userRow)
               .filter(([key, val]) => {
-                const keyNorm = key.toString().trim();
-                if (!keyNorm) return false;
-                if (["Civilian", "Discord ID", "discord id", "Civilian Name"].includes(keyNorm)) return false;
-                return Number(val) > 0;
+                const keyNorm = key.trim();
+                return (
+                  keyNorm &&
+                  !["Civilian", "Discord ID", "discord id", "Civilian Name"].includes(keyNorm) &&
+                  Number(val) > 0
+                );
               })
               .map(([key]) => norm(key));
-
-            if (ownedArtifacts.length) {
-              filteredRows = allArtifacts.filter(a => ownedArtifacts.includes(norm(a.Artifact)));
-            } else {
-              filteredRows = [];
-              console.warn("⚠️ User owns no Design/Feature Artifacts.");
-            }
+            filteredRows = allArtifacts.filter(a => ownedArtifacts.includes(norm(a.Artifact)));
           } else {
             filteredRows = [];
-            console.warn("⚠️ User not found in Inventory (Nara Trove).");
+            console.warn("⚠️ User not found in Inventory.");
           }
         } catch (err) {
           console.error("Error loading Inventory; falling back to all artifacts:", err);
@@ -89,61 +101,56 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
         console.warn("⚠️ No Discord user logged in; showing all artifacts.");
         filteredRows = allArtifacts.slice();
       }
-
     } else {
-      const filterField = rows.length && rows[0].Type ? "Type" : "Category";
+      const filterField = rows[0].Type ? "Type" : "Category";
       filteredRows = rows.filter(r => norm(r[filterField]) === category.toLowerCase());
     }
 
-    const container = document.getElementById(selectId);
-    if (!container) {
-      console.warn(`❌ No container with id ${selectId}`);
+    // If no data
+    if (!filteredRows.length) {
+      const select = document.createElement("select");
+      select.name = category;
+      select.classList.add("dynamic-select");
+      if (isRequired) select.required = true;
+
+      const blank = document.createElement("option");
+      blank.value = "";
+      blank.textContent = `-- Select ${category} --`;
+      select.appendChild(blank);
+
+      const noOpt = document.createElement("option");
+      noOpt.disabled = true;
+      noOpt.selected = true;
+      noOpt.textContent =
+        sheet === "artifacts"
+          ? "No Design/Feature Artifacts in your inventory"
+          : "No options available";
+      select.appendChild(noOpt);
+
+      container.appendChild(select);
       return;
     }
 
-    container.innerHTML = "";
-
-    if (!filteredRows || filteredRows.length === 0) {
-      if (sheet === "artifacts") {
-        const select = document.createElement("select");
-        select.name = category;
-        select.required = true;
-        select.classList.add("dynamic-select");
-
-        const blank = document.createElement("option");
-        blank.value = "";
-        blank.textContent = `-- Select ${category} --`;
-        select.appendChild(blank);
-
-        const noOpt = document.createElement("option");
-        noOpt.disabled = true;
-        noOpt.selected = true;
-        noOpt.textContent = "No Design/Feature Artifacts in your inventory";
-        select.appendChild(noOpt);
-
-        container.appendChild(select);
-        return;
-      } else {
-        return;
-      }
-    }
-
-    const hasSubtype = filteredRows.some(r => (r.Subtype || "").toString().trim() !== "");
+    // Grouping
+    const hasSubtype = filteredRows.some(r => (r.Subtype || "").trim() !== "");
     const grouped = {};
     if (hasSubtype) {
       filteredRows.forEach(r => {
-        const g = (r.Subtype || "Other").toString().trim() || "Other";
+        const g = (r.Subtype || "Other").trim() || "Other";
         if (!grouped[g]) grouped[g] = [];
         const label = r[fieldName];
         if (label) grouped[g].push(label);
       });
     }
 
+    // =====================================
+    // SINGLE SELECT
+    // =====================================
     if (!isMulti) {
       const select = document.createElement("select");
       select.name = category;
-      select.required = true;
       select.classList.add("dynamic-select");
+      if (isRequired) select.required = true;
 
       const blank = document.createElement("option");
       blank.value = "";
@@ -175,17 +182,21 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
       return;
     }
 
-    function createGroupedSelect() {
-      const existingAddBtn = container.querySelector(".add-btn");
-      if (existingAddBtn) existingAddBtn.remove();
-
+    // =====================================
+    // MULTI SELECT
+    // =====================================
+    function createSelect() {
       const wrapper = document.createElement("div");
       wrapper.classList.add("dropdown-wrapper");
 
       const selectEl = document.createElement("select");
       selectEl.name = `${category}[]`;
       selectEl.classList.add("dynamic-select");
-      if (container.querySelectorAll(".dropdown-wrapper").length === 0) selectEl.required = true;
+
+      // only first one required
+      if (isRequired && container.querySelectorAll("select.dynamic-select").length === 0) {
+        selectEl.required = true;
+      }
 
       const blank = document.createElement("option");
       blank.value = "";
@@ -213,9 +224,8 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
         });
       }
 
-      let removeBtn = null;
       if (container.querySelectorAll(".dropdown-wrapper").length > 0) {
-        removeBtn = document.createElement("button");
+        const removeBtn = document.createElement("button");
         removeBtn.type = "button";
         removeBtn.textContent = "×";
         removeBtn.classList.add("remove-btn");
@@ -223,13 +233,13 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
           container.removeChild(wrapper);
           updateAddButton();
         });
+        wrapper.appendChild(removeBtn);
       }
 
-      wrapper.appendChild(selectEl);
-      if (removeBtn) wrapper.appendChild(removeBtn);
+      wrapper.insertBefore(selectEl, wrapper.firstChild);
       container.appendChild(wrapper);
 
-      selectEl.addEventListener("change", () => updateAddButton());
+      selectEl.addEventListener("change", updateAddButton);
       updateAddButton();
     }
 
@@ -246,12 +256,11 @@ async function loadSheetOptions(selectId, category, isMulti = false, sheet = "fe
       addBtn.type = "button";
       addBtn.textContent = "+";
       addBtn.classList.add("add-btn");
-      addBtn.addEventListener("click", createGroupedSelect);
+      addBtn.addEventListener("click", createSelect);
       container.appendChild(addBtn);
     }
 
-    createGroupedSelect();
-
+    createSelect();
   } catch (err) {
     console.error(`Error loading ${category} from ${sheet}:`, err);
   }
