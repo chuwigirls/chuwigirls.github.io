@@ -57,6 +57,8 @@
     <div class="page">
       <h1>Summon a New Nara</h1>
 
+      <h1 id="statusMsg"></h1>
+
       <form id="naraForm">
         <label>Upload Design Image:
           <input type="file" id="imageFile" accept="image/*">
@@ -71,11 +73,11 @@
         </div>
 
         <label>Stage:
-          <div id="stageSelect"></div>
+          <div id="stageSelect" data-required="true"></div>
         </label>
 
         <label>Artifacts</label>
-        <div id="artifactSelect"></div>
+        <div id="artifactSelect"  data-required="true"></div>
 
         <hr>
         <label>Owner:
@@ -90,29 +92,31 @@
 
         <hr>
         <label>Build:
-          <div id="buildSelect"></div>
+          <div id="buildSelect" data-required="true"></div>
         </label>
 
-        <label>Vessel</label>
-        <div id="vesselSelect"></div>
+        <label>Vessel
+          <div id="vesselSelect" data-required="true"></div>
+        </label>
 
         <label>Ribbons</label>
-        <div id="ribbonsSelect"></div>
+        <div id="ribbonsSelect" data-required="true"></div>
 
         <label>Tail</label>
-        <div id="tailSelect"></div>
+        <div id="tailSelect" data-required="true"></div>
 
         <hr>
-        <label>Physiognomy</label>
-        <div id="physiognomySelect"></div>
+        <label>Physiognomy
+          <div id="physiognomySelect" data-required="false"></div>
+        </label>
 
-        <label>Aesthetics</label>
-        <div id="aestheticsSelect"></div>
+        <label>Aesthetics
+          <div id="aestheticsSelect" data-required="false"></div>
+        </label>
 
         <button id="submit" type="submit">Submit</button>
       </form>
 
-      <p id="statusMsg"></p>
     </div>
   </div>
   
