@@ -27,7 +27,7 @@
     <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
 
     <!-- Your site -->
-    <title>Summoning | Celestial Naras Nature</title>
+    <title>Design Approval | Celestial Naras Nature</title>
     <link rel="shortcut icon" type="image/png" href="/assets/narwhal.png" />
 
     <!-- Google Fonts -->
@@ -42,242 +42,351 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/styles/narasnature.css" />
-    <style>
-    body { font-family: Arial, sans-serif; }
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid #ccc;
-      margin-bottom: 1em;
-    }
-    .tab {
-      padding: 0.5em 1em;
-      cursor: pointer;
-      border: 1px solid #ccc;
-      border-bottom: none;
-      background: #f4f4f4;
-      margin-right: 0.3em;
-      border-radius: 4px 4px 0 0;
-    }
-    .tab.active {
-      background: #fff;
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.5em;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5em;
-      text-align: left;
-    }
-    th {
-      background: #f4f4f4;
-    }
-    .actions button {
-      margin-right: 0.5em;
-      padding: 0.3em 0.6em;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .approve { background: #4caf50; color: #fff; }
-    .reject { background: #f44336; color: #fff; }
-    textarea {
-      width: 100%;
-      resize: vertical;
-      min-height: 40px;
-    }
-    .spinner {
-      display: none;
-      text-align: center;
-      margin-top: 2em;
-    }
-    .spinner div {
-      width: 12px;
-      height: 12px;
-      margin: 0 3px;
-      background: #333;
-      border-radius: 50%;
-      display: inline-block;
-      animation: bounce 0.6s infinite alternate;
-    }
-    .spinner div:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    .spinner div:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-    @keyframes bounce {
-      to { transform: translateY(-8px); opacity: 0.7; }
-    }
-  </style>
+</head>
 </head>
 <body>
-  <!-- Page load -->
   <div class="smoothLoad"> 
-
-    <!-- Header -->
     <div class="includes" id="header" data-source="/includes/header.html"></div>
-
-    <!-- Sidebar -->
     <div class="includes" id="sidebar" data-source="/includes/sidebar.html"></div>
-  
-  <div class="wrapper">
-    <div class="page">
-      <h1>Nara Summons Moderation</h1>
 
-      <div class="tabs">
-        <div class="tab active" data-status="pending">Pending</div>
-        <div class="tab" data-status="approved">Approved</div>
-        <div class="tab" data-status="rejected">Rejected</div>
-      </div>
+    <div class="wrapper">
+      <div class="page">
+        <h1>Nara Summons Moderation</h1>
 
-      <table id="summonsTable">
-        <thead>
-          <tr>
-            <th>UUID</th>
-            <th>Timestamp</th>
-            <th>Nara</th>
-            <th>Designer</th>
-            <th>Type</th>
-            <th>Region</th>
-            <th>URL</th>
-            <th>Comments</th>
-            <th id="actionsHeader">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filled dynamically -->
-        </tbody>
-      </table>
+        <div class="tabs">
+          <div class="tab active" data-status="pending">Pending</div>
+          <div class="tab" data-status="approved">Approved</div>
+          <div class="tab" data-status="rejected">Rejected</div>
+        </div>
 
-      <div class="spinner" id="loadingSpinner">
-        <div></div><div></div><div></div>
-        <p>Loading summons...</p>
+        <!-- List View -->
+        <div id="summonsListView">
+          <table id="naraSubmissionsTable">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User Submitted</th>
+                <th>Thumbnail</th>
+                <th>View More</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="spinner" id="loadingSpinner">
+            <div></div><div></div><div></div>
+            <p>Loading summons...</p>
+          </div>
+        </div>
+
+        <!-- Detail View -->
+        <div id="summonsDetailView" style="display:none;">
+          <button class="backToListBtn">← Back</button>
+
+          <div class="detail-container">
+            <div class="row no-gutters">
+              <div class="col-sm-6">
+                <img data-field="URL" class="detail-image" src="" alt="">
+              </div>
+              <div class="col-sm-6">
+                <p><strong>Submitted by:</strong> <span data-field="Civilian"></span></p>
+                <p><strong>Stage:</strong> <span data-field="Stage"></span></p>
+                <hr>
+                <h3>Image details:</h3>
+                <p><strong>Owner:</strong> <span data-field="Owner"></span></p>
+                <p><strong>Designer:</strong> <span data-field="Designer"></span></p>
+                <p><strong>Artist:</strong> <span data-field="Artist"></span></p>
+                <hr>
+                <h3>Features</h3>
+
+                <!-- 🟢 NEW editable feature boxes -->
+                <div id="featuresContainer">
+                  <div class="feature-category" data-category="Build">
+                    <h4>Build</h4>
+                    <div class="feature-list" id="buildFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                  <div class="feature-category" data-category="Vessel">
+                    <h4>Vessel</h4>
+                    <div class="feature-list" id="vesselFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                  <div class="feature-category" data-category="Ribbons">
+                    <h4>Ribbons</h4>
+                    <div class="feature-list" id="ribbonsFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                  <div class="feature-category" data-category="Tail">
+                    <h4>Tail</h4>
+                    <div class="feature-list" id="tailFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                  <div class="feature-category" data-category="Physiognomy">
+                    <h4>Physiognomy</h4>
+                    <div class="feature-list" id="physiognomyFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                  <div class="feature-category" data-category="Aesthetics">
+                    <h4>Aesthetics</h4>
+                    <div class="feature-list" id="aestheticsFeatures"></div>
+                    <button class="add-feature-btn">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+            <div class="detail-info">
+              <p><strong>Timestamp:</strong> <span data-field="Timestamp"></span></p>
+              <p><strong>Artifacts used:</strong> <span data-field="Artifacts"></span></p>
+              <p><strong>Comments:</strong></p>
+              <textarea id="modComment"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="rejectBtn" class="btn btn-danger">Reject</button>
+            <button id="approveBtn" class="btn btn-success">Approve</button>
+          </div>
+
+          <button class="backToListBtn">← Back</button>
+        </div>
       </div>
     </div>
+
+    <div class="includes" id="footer" data-source="/includes/footer.html"></div>
   </div>
-<!-- Footer -->
-  <div class="includes" id="footer" data-source="/includes/footer.html"></div>
-</div>
 
-  <!-- Top button -->
   <div class="includes" id="top" data-source="/includes/top.html"></div>
+
   <script>
-    const SHEET_BASE_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
-    let currentStatus = "pending";
+  const SHEET_BASE_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
+  let currentStatus = "pending";
+  let allData = [];
 
-    async function fetchsummons(status) {
-      toggleSpinner(true);
-      try {
-        const res = await fetch(`${SHEET_BASE_URL}?type=summons&status=${status}`);
-        const data = await res.json();
-        renderTable(data, status);
-      } catch (err) {
-        console.error("Error fetching summons:", err);
-      } finally {
-        toggleSpinner(false);
-      }
+  async function fetchSummons(status) {
+    toggleSpinner(true);
+    try {
+      const res = await fetch(`${SHEET_BASE_URL}?type=summons&status=${status}`);
+      const data = await res.json();
+      allData = data;
+      renderTable(data);
+    } catch (err) {
+      console.error("Error fetching summons:", err);
+    } finally {
+      toggleSpinner(false);
     }
+  }
 
-    function renderTable(data, status) {
-      const tbody = document.querySelector("#summonsTable tbody");
-      tbody.innerHTML = "";
+  function renderTable(data) {
+    const tbody = document.querySelector("#naraSubmissionsTable tbody");
+    tbody.innerHTML = "";
 
-      document.getElementById("actionsHeader").style.display =
-        status === "pending" ? "" : "none";
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      const timestamp = row.Timestamp || "";
+      const civilian = row.Civilian || "Unknown";
+      const url = row.URL || "";
 
-      data.forEach(row => {
-        const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${timestamp}</td>
+        <td>${civilian}</td>
+        <td>${url ? `<img src="${url}" alt="Thumbnail" style="width:60px;height:60px;object-fit:cover;border-radius:6px;">` : ""}</td>
+        <td><button class="view-more-btn btn btn-sm btn-info" data-id="${row.UUID}">View More</button></td>
+      `;
 
-        const uuid = row.UUID || "";
-        const tsDisplay = row.Timestamp || "";
-
-        let actionsCell = "";
-        if (status === "pending") {
-          actionsCell = `
-            <td class="actions">
-              <button class="approve" onclick="handleAction('approve', \`${uuid}\`)">Approve</button>
-              <button class="reject" onclick="handleAction('reject', \`${uuid}\`)">Reject</button>
-            </td>
-          `;
-        }
-
-        tr.innerHTML = `
-          <td>${uuid}</td>
-          <td>${tsDisplay}</td>
-          <td>${row.Nara || ""}</td>
-          <td>${row.Designer || ""}</td>
-          <td>${row.Type || ""}</td>
-          <td>${row.Region || ""}</td>
-          <td>${row.URL ? `<a href="${row.URL}" target="_blank">View</a>` : ""}</td>
-          <td>
-            <textarea data-uuid="${uuid}" ${status !== "pending" ? "disabled" : ""}>${row.Comments || ""}</textarea>
-          </td>
-          ${actionsCell}
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function handleAction(action, uuid) {
-      const textarea = document.querySelector(`textarea[data-uuid="${CSS.escape(uuid)}"]`);
-      const comments = textarea ? textarea.value : "";
-
-      try {
-        const res = await fetch(SHEET_BASE_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            type: "moderationAction",
-            action,
-            uuid,
-            comments
-          })
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert(`Summon ${action}d successfully.`);
-          fetchsummons("pending");
-        } else {
-          alert("Error: " + result.error);
-        }
-      } catch (err) {
-        console.error("Action failed:", err);
-      }
-    }
-
-    function toggleSpinner(show) {
-      document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
-    }
-
-    document.querySelectorAll(".tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentStatus = tab.dataset.status;
-        fetchsummons(currentStatus);
-      });
+      tbody.appendChild(tr);
     });
 
-    fetchsummons(currentStatus);
+    document.querySelectorAll(".view-more-btn").forEach(btn => {
+      btn.addEventListener("click", e => {
+        const uuid = e.target.dataset.id;
+        showDetails(uuid);
+      });
+    });
+  }
+
+  function showDetails(uuid) {
+    const entry = allData.find(r => r.UUID === uuid);
+    if (!entry) return;
+
+    const detailView = document.getElementById("summonsDetailView");
+    const listView = document.getElementById("summonsListView");
+
+    // Fill data fields
+    detailView.querySelectorAll("[data-field]").forEach(el => {
+      const key = el.dataset.field;
+      const value = entry[key] || "";
+
+      if (el.tagName === "IMG") {
+        el.src = value;
+        el.style.display = value ? "block" : "none";
+      } else {
+        el.textContent = value;
+      }
+    });
+
+    // 🟢 Render editable features
+    renderFeatures("Build", entry.Build);
+    renderFeatures("Vessel", entry.Vessel);
+    renderFeatures("Ribbons", entry.Ribbons);
+    renderFeatures("Tail", entry.Tail);
+    renderFeatures("Physiognomy", entry.Physiognomy);
+    renderFeatures("Aesthetics", entry.Aesthetics);
+
+    // Comments
+    document.getElementById("modComment").value = entry.Comments || "";
+
+    document.getElementById("approveBtn").dataset.uuid = uuid;
+    document.getElementById("rejectBtn").dataset.uuid = uuid;
+
+    listView.style.display = "none";
+    detailView.style.display = "block";
+
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set("uuid", uuid);
+    window.history.pushState({ uuid }, "", newUrl);
+  }
+
+  // 🟢 Editable Features logic
+  function renderFeatures(category, featureString) {
+    const container = document.getElementById(category.toLowerCase() + "Features");
+    container.innerHTML = "";
+
+    const features = featureString
+      ? featureString.split(",").map(f => f.trim()).filter(f => f)
+      : [];
+
+    features.forEach(feature => {
+      const tag = document.createElement("div");
+      tag.classList.add("feature-tag");
+      tag.draggable = true;
+      tag.innerHTML = `
+        <span>${feature}</span>
+        <button class="remove-feature">✕</button>
+      `;
+      tag.querySelector(".remove-feature").addEventListener("click", () => tag.remove());
+      container.appendChild(tag);
+    });
+  }
+
+  // 🟢 Add Feature buttons
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("add-feature-btn")) {
+      const category = e.target.closest(".feature-category").dataset.category;
+      const container = document.getElementById(category.toLowerCase() + "Features");
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "New feature...";
+      container.appendChild(input);
+      input.focus();
+
+      input.addEventListener("blur", () => {
+        const val = input.value.trim();
+        if (val) {
+          const current = Array.from(container.querySelectorAll(".feature-tag span"))
+            .map(el => el.textContent);
+          current.push(val);
+          renderFeatures(category, current.join(", "));
+        }
+        input.remove();
+      });
+    }
+  });
+
+  function backToList() {
+    document.getElementById("summonsDetailView").style.display = "none";
+    document.getElementById("summonsListView").style.display = "block";
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.delete("uuid");
+    window.history.pushState({}, "", newUrl);
+  }
+
+  document.querySelectorAll(".backToListBtn").forEach(btn => {
+    btn.addEventListener("click", backToList);
+  });
+
+  document.getElementById("approveBtn").addEventListener("click", () => handleAction("approve"));
+  document.getElementById("rejectBtn").addEventListener("click", () => handleAction("reject"));
+
+  async function handleAction(action) {
+    const uuid = document.querySelector(`#${action}Btn`).dataset.uuid;
+    const comments = document.getElementById("modComment").value || "";
+
+    // 🟢 collect updated feature strings before submission
+    const updatedFeatures = {};
+    ["Build","Vessel","Ribbons","Tail","Physiognomy","Aesthetics"].forEach(cat => {
+      const list = document.getElementById(cat.toLowerCase() + "Features");
+      const features = Array.from(list.querySelectorAll(".feature-tag span"))
+        .map(el => el.textContent)
+        .join(", ");
+      updatedFeatures[cat] = features;
+    });
+
+    try {
+      const body = new URLSearchParams({
+        type: "moderationAction",
+        action,
+        uuid,
+        comments,
+        ...updatedFeatures
+      });
+
+      const res = await fetch(SHEET_BASE_URL, { method: "POST", body });
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`Summon ${action}d successfully.`);
+        backToList();
+        fetchSummons(currentStatus);
+      } else {
+        alert("Error: " + result.error);
+      }
+    } catch (err) {
+      console.error("Action failed:", err);
+    }
+  }
+
+  function toggleSpinner(show) {
+    document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
+  }
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentStatus = tab.dataset.status;
+      fetchSummons(currentStatus);
+    });
+  });
+
+  fetchSummons(currentStatus);
+
+  window.addEventListener("popstate", e => {
+    if (e.state && e.state.uuid) showDetails(e.state.uuid);
+    else backToList();
+  });
+
+  window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const uuid = params.get("uuid");
+    if (uuid) {
+      const check = setInterval(() => {
+        if (allData.length > 0) {
+          showDetails(uuid);
+          clearInterval(check);
+        }
+      }, 200);
+    }
+  });
   </script>
-      <!-- ----------------------------------------------------------------- -->
-    <!-- JS                                                                -->
-    <!-- ----------------------------------------------------------------- -->
 
-    <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.js" crossorigin="anonymous"></script>
-
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-
-    <!-- List.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js" crossorigin="anonymous"></script>
-
-    <!-- narasnature Script -->
-    <script src="/styles/config.js"></script>
-    <script src="/styles/narasnature.js"></script>
+  <!-- JS includes (same as before) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.0/list.min.js"></script>
+  <script src="/styles/config.js"></script>
+  <script src="/styles/narasnature.js"></script>
 </body>
 </html>
