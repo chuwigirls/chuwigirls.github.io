@@ -172,6 +172,11 @@ button:hover {
   border-color: var(--light-blue) transparent transparent transparent;
 }
 
+#pleft {
+  text-align: left;
+  color: var(--dark-blue);
+}
+
 /* --------------------------- */
 /* --------- Forms ----------- */
 /* --------------------------- */
@@ -1740,11 +1745,6 @@ detail-name {
 /* --------------------------- */
 /* ----Staff / Celestials----- */
 /* --------------------------- */
-#aboutStaff {
-  text-align: left;
-  color: var(--dark-blue);
-}
-
 #staff-view {
   max-height: none !important;
 }
@@ -1930,6 +1930,175 @@ detail-name {
     flex-direction: column;
     gap: 2rem;
   }
+}
+
+/* --------------------------- */
+/* -------- Mod Views -------- */
+/* --------------------------- */
+  #approveBtn {
+    margin: 1%;
+    padding: 1%;
+    font-size: 200%;
+    border-radius: 50px;
+    color: white;
+    box-shadow: 0px 0px 5px var(--tanb);
+  }
+
+  #rejectBtn {
+    margin: 2%;
+    padding: 1%;
+    font-size: 200%;
+    border-radius: 50px;
+    color: white;
+    box-shadow: 0px 0px 5px var(--tanb);
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid var(--tanb);
+    margin-bottom: 1%;
+    color: var(--dark-blue);
+    font-family: var(--bubbly);
+  }
+
+  .tab {
+    padding: 0.5em 1em;
+    cursor: pointer;
+    border: 1px solid var(--blueb);
+    border-bottom: none;
+    background: var(--light-blue);
+    margin-right: 1%;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .tab.active {
+    background: var(--light-pink);
+    color: var(--pink);
+    border: 2px solid var(--pinkb);
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1%;
+  }
+
+  th, td {
+    border: 1px solid var(--tanb);
+    padding: 0.5em;
+    text-align: center;
+  }
+
+  th { 
+    border: 1px solid var(--blueb);
+    color: var(--dark-blue); 
+    background: var(--light-blue); 
+  }
+
+  /* Buttons */
+  .view-more-btn {
+    border-radius: 100px;
+    border: 1px solid var(--blueb);
+    padding: 10px 20px;
+  }
+
+  .view-more-btn:hover {
+    color: var(--pink)
+  }
+
+  .actions button {
+    margin-right: 0.5em;
+    padding: 0.3em 0.6em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .approve { background: #4caf50; color: #fff; }
+  .reject { background: #f44336; color: #fff; }
+  .add-feature-btn {
+    display: inline-block;
+    background: #2196f3;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 0.2em 0.6em;
+    font-size: 0.85em;
+    cursor: pointer;
+    margin-top: 0.3em;
+  }
+
+  .add-feature-btn:hover { background: #1976d2; }
+
+  /* Spinner */
+  .spinner {
+    display: none;
+    text-align: center;
+    margin-top: 2em;
+  }
+
+  .spinner div {
+    width: 12px;
+    height: 12px;
+    margin: 0 3px;
+    background: #333;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 0.6s infinite alternate;
+  }
+
+  .spinner div:nth-child(2) { animation-delay: 0.2s; }
+  .spinner div:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    to { transform: translateY(-8px); opacity: 0.7; }
+  }
+
+.feature-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--tan);
+  color: var(--dark-blue);
+  border-radius: 20px;
+  padding: 6px 10px;
+  margin: 4px;
+  font-size: 0.9em;
+  cursor: grab;
+  transition: background 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.feature-tag.dragging {
+  opacity: 0.5;
+  transform: scale(1.05);
+}
+
+.feature-tag .remove-feature {
+  background: none;
+  border: none;
+  color: inherit;
+  margin-left: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.feature-list {
+  min-height: 40px;
+  border: 1px dashed rgba(0,0,0,0.1);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.feature-dropdown {
+  display: block;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: var(--tan);
+  color: var(--dark-blue);
 }
 
 /* --------------------------- */
