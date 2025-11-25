@@ -41,7 +41,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   overflow-x: hidden;
-  font-size: 16px;
+  font-size: 18px;
   font-family: var(--calm);
   background-image: url("https://i.gifer.com/embedded/download/2Cw0.gif");
   background-color: var(--light-blue);
