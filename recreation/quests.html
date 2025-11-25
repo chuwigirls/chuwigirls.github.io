@@ -11,7 +11,8 @@
     mrf(_..)--(.._)'--'
     
     if you're looking at this page to learn about coding,
-    you can ask chuwigirls for help! -->
+    you can ask chuwigirls for help!
+-->
 
     <!-- Meta tags -->
     <meta charset="UTF-8">
@@ -26,7 +27,7 @@
     <meta name="description" content="A private closed species about magical, furry four-legged narwhal-inspired creatures">
 
     <!-- Your site -->
-    <title>Trials | Naras Nature</title>
+    <title>Quests | Naras Nature</title>
     <link rel="shortcut icon" type="image/png" href="../assets/narwhal.png" />
 
     <!-- Google Fonts -->
@@ -57,14 +58,77 @@
     <!-- Content -->
     <div class="wrapper">
       <div class="page">
-      <h1>Trials</h1>
+      <h1>Quests</h1>
+      <hr>
+      <details>
+        <summary><h4>Read more <i class="fa fa-caret-down"></i></h4></summary>
+          <p><i>Quests</i> are a combination of prompts and questlines to 
+            complete for rewards or personal character development. 
+            Most Quests are completely optional; you do not have to complete 
+            Quests, except Narlings evolution Quests, to participate in Naras 
+            Nature. Rewards range from crystals, Palcharms, emblems, features,
+            and more!
+          <p><u>Why should you do a Quest?</u> All Quests award additional 
+            crystals on top of regular crystal 
+            Currency costs. For example, if you draw a fullbody for a Quest, 
+            it will net you the regular 25 <img src="https://static.vecteezy.com/system/resources/thumbnails/041/643/035/small_2x/holographic-geomatry-shapes-abstract-gradient-color-icon-png.png?" style="width:20px;"> 
+            on top of any additional rewards given out by that Quest.
+            Why not draw your Nara in a Quest and get that sweet extra crystals?</p>
+          <p>Emblems are cosmetic badges to embellish your Nara's 
+            masterlist. Some can award additional Crystals when the Nara it is 
+            equipped to is used in other Quests or recreational activities. 
+            When depicting multiple Naras in an Emblem 
+            submission, only the Naras that are the main subjects and follow 
+            that Quest's requirements will be rewarded the Emblem.</p>
+          <p>Each Quest will have its own requirements. Some must be done 
+            in consecutive order, may be done more than once, require another 
+            Nara or need a specific feature. Depiction requirements are low to 
+            encourage creativity in your Quests; perhaps it would be better 
+            to show your Nara's head peeking out the water for their swimming 
+            hobby, or a halfbody shot of your Nara's legs and weapon standing 
+            over a monster corpse for a Hunting emblem, rather than force a 
+            fullbody or long word count. If you have any questions about a 
+            Quest, please ask in the <a href="https://discord.com/channels/735233356169740329/735292632862818314" target="_blank"><u>
+            Discord server's help desk</u></a> or the commenting on the 
+            <a href="https://toyhou.se/~world/57896.narasnature/comments" target="_blank"><u>
+              Toyhouse world.</u></a></p>
+            <h4><u>Tag breakdown:</u></h4>
+            <ul>
+              <li><b>Prompt Quests</b> have simple themes meant to inspire 
+                you on how to depict your Nara. These Quests are usually 
+                standalone and do not have entry requirements. Some may 
+                only occur for a period of time, like quick flash prompts 
+                or recurring holiday events.</li>
+
+              <li><b>Questline Quests</b> are groups of Quests that can be 
+                done to evolve or enlighten your Nara. These Quests are meant 
+                to build upon your Nara's lore and for character development. 
+                Like a chain of quests, these Quests are related and may build 
+                upon each other, requiring greater effort but reaping greater 
+                rewards. You may only receive rewards once all of the Quests 
+                in a questline have been completed, unlike one-time entry prompt Quests.</li>
+
+              <li><b>Evolution Quests</b> must be completed for Narlings to 
+                evolve and to use them in all aspects of Naras Nature, including 
+                other Quests. Full-fledged Naras can do these Quests at any time 
+                as well. Any Naras depicted in an approved Narling form in these Quests can earn an additional 5 Crystals. (EXPAND MORE)</li>
+
+              <li><b>Eternal Quests</b> have no end date and can be done at any time.</li>
+
+              <li><b>Ephemeral Quests</b> are small Quests that pop up and appear only for a short time. They may not return, or make rare, unplanned comebacks.</li>
+
+              <li><b>Seasonal</b> Quests occur during certain parts of the year, or occur on a schedule and have planned comebacks.</li>
+
+              <li>Quests with the <i>Feature</i> or <i>Emblem</i> tags grants those rewards besides Crystals.</p></li>
+            </ul>
+        </details>
       </div>
 
     <!-- Grid List -->
     <div id="narapedia-view" class="narapedia-grid"></div>
 
       <!-- Detail View -->
-      <div id="trial-detail-view" class="detail-view" style="display:none;"></div>
+      <div id="Quest-detail-view" class="detail-view" style="display:none;"></div>
     </div>
 
     <!-- Footer -->
@@ -79,37 +143,34 @@
     </div>
   </template>
 
-  <template id="trial-detail-template">
-    <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Trials</button>
+  <template id="Quest-detail-template">
+    <button class="back-btn"><i class="fa-solid fa-angle-left"></i> Back to Quests</button>
     <div class="detail-card">
       <img class="detail-img" src="" alt="">
       <h2 class="detail-name"></h2>
       <div class="row">
         <div class="col-sm-6">
-            <p><strong>Status:</strong> <span class="trial-detail-status"></span></p>
-            <p><strong>Start:</strong> <span class="trial-detail-start"></span></p>
+            <p><strong>Owner:</strong> <span class="Quest-detail-owner"></span></p>
+            <p><strong>Designer:</strong> <span class="Quest-detail-designer"></span></p>
+            <p><strong>Artist:</strong> <span class="Quest-detail-artist"></span></p>
         </div>
         <div class="col-sm-6">
-            <p><strong>Tags:</strong> <span class="trial-detail-tags"></span></p>
-            <p><strong>End:</strong> <span class="trial-detail-end"></span></p>
+            <p><strong>Status:</strong> <span class="Quest-detail-status"></span></p>
+            <p><strong>Value:</strong> <span class="Quest-detail-value"></span></p>
         </div>
       </div>
       
-      <p><span class="trial-detail-flavor"></span></p>
-
-      <div class="text-left">
-        <h4>Description:</h4>
-          <p><span class="trial-detail-description"></span></p>
-        <h4>Rewards:</h4>
-          <ul><li><span class="trial-detail-rewards"></li></ul>
-        <h4>Requirements:</h4> 
-          <p><span class="trial-detail-reqs"></span></p>
-      </div>
+      <p><strong>Region:</strong> <span class="Quest-detail-region"></span></p>
+      <p><strong>Calling:</strong> <span class="Quest-detail-calling"></span></p>
+      <p><strong>Build:</strong> <span class="Quest-detail-build"></span></p>
+      
+      <p class="Quest-detail-description"></p>
     </div>
   </template>
 
   <!-- Scripts -->
   <script src="../styles/config.js"></script>
   <script src="../styles/narasnature.js"></script>
+  <!-- <script src="../styles/smoothLoad.js"></script> -->
 </body>
 </html>
