@@ -54,9 +54,9 @@
         <h1>Nara Summons Moderation</h1>
 
         <div class="tabs">
+          <div class="tab" data-status="rejected">Rejected</div>
           <div class="tab active" data-status="pending">Pending</div>
           <div class="tab" data-status="approved">Approved</div>
-          <div class="tab" data-status="rejected">Rejected</div>
         </div>
 
         <!-- List View -->
@@ -89,17 +89,23 @@
                 <img data-field="URL" class="detail-image" src="" alt="">
               </div>
               <div class="col-sm-6">
+                <h3>Summon details:</h3>
                 <p><strong>Submitted by:</strong> <span data-field="Civilian"></span></p>
                 <p><strong>Stage:</strong> <span data-field="Stage"></span></p>
+                <p><strong>Timestamp:</strong> <span data-field="Timestamp"></span></p>
+                <p><strong>Artifacts used:</strong> <span data-field="Artifacts"></span></p>
+
                 <hr>
                 <h3>Image details:</h3>
                 <p><strong>Owner:</strong> <span data-field="Owner"></span></p>
                 <p><strong>Designer:</strong> <span data-field="Designer"></span></p>
                 <p><strong>Artist:</strong> <span data-field="Artist"></span></p>
-                <hr>
-                <h3>Features</h3>
+              </div>
+            </div>
 
-                <!-- 🟢 NEW editable feature boxes -->
+            <hr>
+            <div class="detail-info">
+              <h3>Features</h3>
                 <div id="featuresContainer">
                   <div class="feature-category" data-category="Build">
                     <h4>Build</h4>
@@ -132,15 +138,11 @@
                     <button class="add-feature-btn">+</button>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <hr>
-            <div class="detail-info">
-              <p><strong>Timestamp:</strong> <span data-field="Timestamp"></span></p>
-              <p><strong>Artifacts used:</strong> <span data-field="Artifacts"></span></p>
-              <p><strong>Comments:</strong></p>
+              <hr>
+              <h1><strong>Comments:</strong></h1>
               <textarea id="modComment"></textarea>
+              <hr>
             </div>
           </div>
 
@@ -160,198 +162,357 @@
   <div class="includes" id="top" data-source="/includes/top.html"></div>
 
   <script>
-  const SHEET_BASE_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
-  let currentStatus = "pending";
-  let allData = [];
+// ==============================
+// URLs + Global Vars
+// ==============================
+const FEATURES_URL = "https://opensheet.elk.sh/1lGc4CVqcFr9LtcyVW-78N5En7_imdfC8bTf6PRUD-Ms/Features";
+const SUMMONS_URL = "https://script.google.com/macros/s/AKfycbyYg8RUmOYKgbBuz8mtFqq_KM6JUcW_uTzt83gITg2-qLZRaWoaFFFo0OtZQOD9mGOY/exec";
 
-  async function fetchSummons(status) {
-    toggleSpinner(true);
-    try {
-      const res = await fetch(`${SHEET_BASE_URL}?type=summons&status=${status}`);
-      const data = await res.json();
-      allData = data;
-      renderTable(data);
-    } catch (err) {
-      console.error("Error fetching summons:", err);
-    } finally {
-      toggleSpinner(false);
-    }
-  }
+let FEATURE_OPTIONS = {};
+let allData = [];
+let currentStatus = "pending";
 
-  function renderTable(data) {
-    const tbody = document.querySelector("#naraSubmissionsTable tbody");
-    tbody.innerHTML = "";
+// ==============================
+// Load Features from OpenSheet
+// ==============================
+async function loadFeatureOptionsFromSheet() {
+  try {
+    const res = await fetch(FEATURES_URL);
+    const rows = await res.json();
+    console.log("🔍 Raw OpenSheet data:", rows);
 
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-      const timestamp = row.Timestamp || "";
-      const civilian = row.Civilian || "Unknown";
-      const url = row.URL || "";
+    const featureOptions = {};
 
-      tr.innerHTML = `
-        <td>${timestamp}</td>
-        <td>${civilian}</td>
-        <td>${url ? `<img src="${url}" alt="Thumbnail" style="width:60px;height:60px;object-fit:cover;border-radius:6px;">` : ""}</td>
-        <td><button class="view-more-btn btn btn-sm btn-info" data-id="${row.UUID}">View More</button></td>
-      `;
+    rows.forEach(row => {
+      if (row.Hide === "TRUE" || !row.Feature) return;
 
-      tbody.appendChild(tr);
-    });
+      const type = row.Type?.trim() || "Uncategorized";
 
-    document.querySelectorAll(".view-more-btn").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const uuid = e.target.dataset.id;
-        showDetails(uuid);
+      if (!featureOptions[type]) {
+        featureOptions[type] = [];
+      }
+
+      featureOptions[type].push({
+        name: row.Feature,
+        image: row.URL || "",
+        rarity: row.Rarity || "",
+        description: row.Description || ""
       });
     });
+
+    console.log("✅ Loaded feature options:", featureOptions);
+    return featureOptions;
+
+  } catch (err) {
+    console.error("❌ Failed to load features:", err);
+    return {};
   }
+}
 
-  function showDetails(uuid) {
-    const entry = allData.find(r => r.UUID === uuid);
-    if (!entry) return;
+// ==============================
+// Populate Feature Dropdowns
+// ==============================
+function populateFeatureDropdowns(entry) {
+  const featureCats = ["Build", "Vessel", "Ribbons", "Tail", "Physiognomy", "Aesthetics"];
 
-    const detailView = document.getElementById("summonsDetailView");
-    const listView = document.getElementById("summonsListView");
-
-    // Fill data fields
-    detailView.querySelectorAll("[data-field]").forEach(el => {
-      const key = el.dataset.field;
-      const value = entry[key] || "";
-
-      if (el.tagName === "IMG") {
-        el.src = value;
-        el.style.display = value ? "block" : "none";
-      } else {
-        el.textContent = value;
-      }
-    });
-
-    // 🟢 Render editable features
-    renderFeatures("Build", entry.Build);
-    renderFeatures("Vessel", entry.Vessel);
-    renderFeatures("Ribbons", entry.Ribbons);
-    renderFeatures("Tail", entry.Tail);
-    renderFeatures("Physiognomy", entry.Physiognomy);
-    renderFeatures("Aesthetics", entry.Aesthetics);
-
-    // Comments
-    document.getElementById("modComment").value = entry.Comments || "";
-
-    document.getElementById("approveBtn").dataset.uuid = uuid;
-    document.getElementById("rejectBtn").dataset.uuid = uuid;
-
-    listView.style.display = "none";
-    detailView.style.display = "block";
-
-    const newUrl = new URL(window.location);
-    newUrl.searchParams.set("uuid", uuid);
-    window.history.pushState({ uuid }, "", newUrl);
-  }
-
-  // 🟢 Editable Features logic
-  function renderFeatures(category, featureString) {
-    const container = document.getElementById(category.toLowerCase() + "Features");
+  featureCats.forEach(cat => {
+    const container = document.getElementById(`${cat.toLowerCase()}Features`);
+    if (!container) return;
     container.innerHTML = "";
 
-    const features = featureString
-      ? featureString.split(",").map(f => f.trim()).filter(f => f)
-      : [];
+    const select = document.createElement("select");
+    select.classList.add("feature-select");
+    select.dataset.category = cat;
 
-    features.forEach(feature => {
-      const tag = document.createElement("div");
-      tag.classList.add("feature-tag");
-      tag.draggable = true;
-      tag.innerHTML = `
-        <span>${feature}</span>
-        <button class="remove-feature">✕</button>
-      `;
-      tag.querySelector(".remove-feature").addEventListener("click", () => tag.remove());
-      container.appendChild(tag);
-    });
+    const blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = `-- Select ${cat} Feature --`;
+    select.appendChild(blank);
+
+    if (FEATURE_OPTIONS[cat]) {
+      FEATURE_OPTIONS[cat].forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f;
+        select.appendChild(opt);
+      });
+    }
+
+    // Preselect existing values from summon entry
+    const existing = (entry[cat] || "").split(",").map(v => v.trim());
+    if (existing.length && existing[0]) {
+      existing.forEach(v => {
+        if (![...select.options].some(o => o.value === v)) {
+          const custom = document.createElement("option");
+          custom.value = v;
+          custom.textContent = v + " (custom)";
+          select.appendChild(custom);
+        }
+      });
+      select.value = existing[0];
+    }
+
+    container.appendChild(select);
+  });
+}
+
+// ----------------------------------------------------
+// 🧩 Fetch summons list
+// ----------------------------------------------------
+async function fetchSummons(status) {
+  toggleSpinner(true);
+  try {
+    const res = await fetch(`${SUMMONS_URL}?type=summons&status=${status}`);
+    const data = await res.json();
+    allData = data;
+    renderTable(data);
+  } catch (err) {
+    console.error("Error fetching summons:", err);
+  } finally {
+    toggleSpinner(false);
   }
+}
 
-  // 🟢 Add Feature buttons
-  document.addEventListener("click", e => {
+// ----------------------------------------------------
+// 🧩 Render summons table
+// ----------------------------------------------------
+function renderTable(data) {
+  const tbody = document.querySelector("#naraSubmissionsTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    const timestamp = row.Timestamp || "";
+    const civilian = row.Civilian || "Unknown";
+    const url = row.URL || "";
+
+    tr.innerHTML = `
+      <td>${timestamp}</td>
+      <td>${civilian}</td>
+      <td>${url ? `<img src="${url}" alt="Thumbnail" style="width:60px;height:60px;object-fit:cover;border-radius:6px;">` : ""}</td>
+      <td><button class="view-more-btn btn" data-id="${row.UUID}"><i class="fa-solid fa-wand-magic-sparkles"></i></button></td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll(".view-more-btn").forEach(btn => {
+    btn.addEventListener("click", e => showDetails(e.target.dataset.id));
+  });
+}
+
+// ----------------------------------------------------
+// 🧩 Show summon details
+// ----------------------------------------------------
+function showDetails(uuid) {
+  const entry = allData.find(r => r.UUID === uuid);
+  if (!entry) return;
+
+  const detailView = document.getElementById("summonsDetailView");
+  const listView = document.getElementById("summonsListView");
+
+  // Fill data fields
+  detailView.querySelectorAll("[data-field]").forEach(el => {
+    const key = el.dataset.field;
+    const value = entry[key] || "";
+
+    if (el.tagName === "IMG") {
+      el.src = value;
+      el.style.display = value ? "block" : "none";
+    } else {
+      el.textContent = value;
+    }
+  });
+
+  // Render editable feature sections
+  ["Build", "Vessel", "Ribbons", "Tail", "Physiognomy", "Aesthetics"].forEach(cat => {
+    renderFeatures(cat, entry[cat]);
+  });
+
+  document.getElementById("modComment").value = entry.Comments || "";
+
+  document.getElementById("approveBtn").dataset.uuid = uuid;
+  document.getElementById("rejectBtn").dataset.uuid = uuid;
+
+  listView.style.display = "none";
+  detailView.style.display = "block";
+
+  const newUrl = new URL(window.location);
+  newUrl.searchParams.set("uuid", uuid);
+  window.history.pushState({ uuid }, "", newUrl);
+}
+
+// ----------------------------------------------------
+// 🧩 Render feature tags and drag/drop
+// ----------------------------------------------------
+function renderFeatures(category, featureString) {
+  const container = document.getElementById(category.toLowerCase() + "Features");
+  container.innerHTML = "";
+
+  const features = featureString
+    ? featureString.split(",").map(f => f.trim()).filter(f => f)
+    : [];
+
+  const createChip = (text) => {
+    const chip = document.createElement("div");
+    chip.classList.add("feature-tag");
+    chip.draggable = true;
+    const formatted = text
+      .split(" ")
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+    chip.innerHTML = `<span>${formatted}</span><button class="remove-feature">✕</button>`;
+
+    chip.querySelector(".remove-feature").addEventListener("click", () => chip.remove());
+
+    chip.addEventListener("dragstart", (e) => {
+      chip.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+
+    return chip;
+  };
+
+  features.forEach(feature => container.appendChild(createChip(feature)));
+
+  container.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const dragging = container.querySelector(".dragging");
+    const afterEl = getDragAfterElement(container, e.clientY);
+    if (afterEl == null) container.appendChild(dragging);
+    else container.insertBefore(dragging, afterEl);
+  });
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll(".feature-tag:not(.dragging)")];
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset, element: child };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY }
+    ).element;
+  }
+}
+
+// ----------------------------------------------------
+// 🧩 Click handlers
+// ----------------------------------------------------
+function backToList() {
+  document.getElementById("summonsDetailView").style.display = "none";
+  document.getElementById("summonsListView").style.display = "block";
+  const newUrl = new URL(window.location);
+  newUrl.searchParams.delete("uuid");
+  window.history.pushState({}, "", newUrl);
+}
+
+async function handleAction(action) {
+  const uuid = document.querySelector(`#${action}Btn`).dataset.uuid;
+  const comments = document.getElementById("modComment").value || "";
+
+  const updatedFeatures = {};
+  ["Build", "Vessel", "Ribbons", "Tail", "Physiognomy", "Aesthetics"].forEach(cat => {
+    const list = document.getElementById(cat.toLowerCase() + "Features");
+    const features = Array.from(list.querySelectorAll(".feature-tag span"))
+      .map(el => el.textContent)
+      .join(", ");
+    updatedFeatures[cat] = features;
+  });
+
+  try {
+    const body = new URLSearchParams({
+      type: "moderationAction",
+      action,
+      uuid,
+      comments,
+      ...updatedFeatures
+    });
+
+    const res = await fetch(SUMMONS_URL, { method: "POST", body });
+    const result = await res.json();
+
+    if (result.success) {
+      alert(`Summon ${action}d successfully.`);
+      backToList();
+      fetchSummons(currentStatus);
+    } else {
+      alert("Error: " + result.error);
+    }
+  } catch (err) {
+    console.error("Action failed:", err);
+  }
+}
+
+// ----------------------------------------------------
+// 🧩 Init
+// ----------------------------------------------------
+function toggleSpinner(show) {
+  document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ Load features first and assign globally
+  FEATURE_OPTIONS = await loadFeatureOptionsFromSheet();
+  console.log("✅ Feature options ready:", FEATURE_OPTIONS);
+
+  // Then fetch summons data
+  fetchSummons(currentStatus);
+
+  // Handle "Add Feature" dropdowns safely
+  document.addEventListener("click", (e) => {
     if (e.target.classList.contains("add-feature-btn")) {
       const category = e.target.closest(".feature-category").dataset.category;
       const container = document.getElementById(category.toLowerCase() + "Features");
+      if (!container) return;
 
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "New feature...";
-      container.appendChild(input);
-      input.focus();
+      // prevent duplicate dropdowns
+      if (container.querySelector("select")) return;
 
-      input.addEventListener("blur", () => {
-        const val = input.value.trim();
+      // get options from loaded feature groups
+      const options = (FEATURE_OPTIONS[category] || []).map(f => f.name);
+      if (options.length === 0) {
+        alert(`No available features for ${category}.`);
+        return;
+      }
+
+      const select = document.createElement("select");
+      select.classList.add("feature-dropdown");
+      select.innerHTML = `
+        <option value="">+ Add ${category} feature...</option>
+        ${options.map(opt => `<option value="${opt}">${opt}</option>`).join("")}
+      `;
+      container.appendChild(select);
+      select.focus();
+
+      select.addEventListener("change", () => {
+        const val = select.value;
         if (val) {
           const current = Array.from(container.querySelectorAll(".feature-tag span"))
             .map(el => el.textContent);
-          current.push(val);
-          renderFeatures(category, current.join(", "));
+          if (!current.includes(val)) {
+            current.push(val);
+            renderFeatures(category, current.join(", "));
+          }
         }
-        input.remove();
+        select.remove();
       });
+
+      select.addEventListener("blur", () => select.remove());
     }
   });
 
-  function backToList() {
-    document.getElementById("summonsDetailView").style.display = "none";
-    document.getElementById("summonsListView").style.display = "block";
-    const newUrl = new URL(window.location);
-    newUrl.searchParams.delete("uuid");
-    window.history.pushState({}, "", newUrl);
-  }
-
-  document.querySelectorAll(".backToListBtn").forEach(btn => {
-    btn.addEventListener("click", backToList);
-  });
-
+  // navigation + action buttons
+  document.querySelectorAll(".backToListBtn").forEach(btn => btn.addEventListener("click", backToList));
   document.getElementById("approveBtn").addEventListener("click", () => handleAction("approve"));
   document.getElementById("rejectBtn").addEventListener("click", () => handleAction("reject"));
 
-  async function handleAction(action) {
-    const uuid = document.querySelector(`#${action}Btn`).dataset.uuid;
-    const comments = document.getElementById("modComment").value || "";
-
-    // 🟢 collect updated feature strings before submission
-    const updatedFeatures = {};
-    ["Build","Vessel","Ribbons","Tail","Physiognomy","Aesthetics"].forEach(cat => {
-      const list = document.getElementById(cat.toLowerCase() + "Features");
-      const features = Array.from(list.querySelectorAll(".feature-tag span"))
-        .map(el => el.textContent)
-        .join(", ");
-      updatedFeatures[cat] = features;
-    });
-
-    try {
-      const body = new URLSearchParams({
-        type: "moderationAction",
-        action,
-        uuid,
-        comments,
-        ...updatedFeatures
-      });
-
-      const res = await fetch(SHEET_BASE_URL, { method: "POST", body });
-      const result = await res.json();
-
-      if (result.success) {
-        alert(`Summon ${action}d successfully.`);
-        backToList();
-        fetchSummons(currentStatus);
-      } else {
-        alert("Error: " + result.error);
-      }
-    } catch (err) {
-      console.error("Action failed:", err);
-    }
-  }
-
-  function toggleSpinner(show) {
-    document.getElementById("loadingSpinner").style.display = show ? "block" : "none";
-  }
-
+  // tab filtering
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -361,25 +522,18 @@
     });
   });
 
-  fetchSummons(currentStatus);
-
-  window.addEventListener("popstate", e => {
-    if (e.state && e.state.uuid) showDetails(e.state.uuid);
-    else backToList();
-  });
-
-  window.addEventListener("load", () => {
-    const params = new URLSearchParams(window.location.search);
-    const uuid = params.get("uuid");
-    if (uuid) {
-      const check = setInterval(() => {
-        if (allData.length > 0) {
-          showDetails(uuid);
-          clearInterval(check);
-        }
-      }, 200);
-    }
-  });
+  // check if we’re in detail mode via ?uuid=
+  const params = new URLSearchParams(window.location.search);
+  const uuid = params.get("uuid");
+  if (uuid) {
+    const check = setInterval(() => {
+      if (allData.length > 0) {
+        showDetails(uuid);
+        clearInterval(check);
+      }
+    }, 200);
+  }
+});
   </script>
 
   <!-- JS includes (same as before) -->
