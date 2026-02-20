@@ -48,7 +48,12 @@ const MASTERLIST_CONFIG = {
     { field: "Build", className: "masterlist-detail-build" },
     { field: "Palcharms", className: "masterlist-detail-palcharms" },
     { field: "Inventory", className: "masterlist-detail-inventory" },
-    { field: "Titles", className: "masterlist-detail-titles" }
+    { field: "Titles", className: "masterlist-detail-titles" },
+    { field: "Vessel", className: "masterlist-detail-vessel" },
+    { field: "Ribbons", className: "masterlist-detail-ribbons" },
+    { field: "Tail", className: "masterlist-detail-tail" },
+    { field: "Physiognomy", className: "masterlist-detail-physiognomy" },
+    { field: "Aesthetics", className: "masterlist-detail-aesthetics" }
   ]
 };
 
