@@ -1965,9 +1965,7 @@ detail-name {
   .tab {
     padding: 0.5em 1em;
     cursor: pointer;
-    border: 1px solid var(--blueb);
     border-bottom: none;
-    background: var(--light-blue);
     margin-right: 1%;
     border-radius: 10px 10px 0 0;
   }
