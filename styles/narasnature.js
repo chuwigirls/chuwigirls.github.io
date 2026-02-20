@@ -11,26 +11,34 @@
 ==============================
 ===== Discord OAuth Config ===
 ============================== */
+const GUILD_ID = "735233356169740329";
 const CLIENT_ID = "1319474218550689863";
 const REDIRECT_URI = `${window.location.origin}/user.html`;
 const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO5xAQ9iUtJWgkeYYfhlIZmHQSj4kHjs5tnfQLvuU6L5HGyguUMU-9tTWTi8KGJ69U3A/exec";
+const STAFF_ROLE_IDS = ["735289897656516698", "1319475810314223686"];
 
 function getDiscordOAuthURL() {
-  const scope = "identify";
-  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scope}`;
+  // ✅ Added "guilds" for broader access (required for /member)
+  const scope = "identify guilds guilds.members.read";
+  return `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&response_type=token&scope=${encodeURIComponent(scope)}`;
 }
 
-// ==============================
-//  Navbar
-// ==============================
+/* ==============================
+===== Navbar UI Updates ========
+============================== */
 function updateNavbarUI(userDataParam) {
-  console.trace("⚡ fetchUserProfile called");
-
   const userData = userDataParam || JSON.parse(localStorage.getItem("discordUser") || "{}");
   const loginNav = document.getElementById("loginNav");
   const userDropdown = document.getElementById("userDropdown");
+  const staffWand = document.getElementById("staffWand");
 
-  if (userData && userData.id && userData.username) {
+  const isLoggedIn = userData && userData.id && userData.username;
+  const isStaff = isStaffUser(); // 🔮 unified helper used here
+
+  if (isLoggedIn) {
+    // Hide login button, show user dropdown
     if (loginNav) loginNav.style.display = "none";
     if (userDropdown) {
       userDropdown.style.display = "flex";
@@ -38,16 +46,34 @@ function updateNavbarUI(userDataParam) {
       if (usernameSpan) usernameSpan.textContent = userData.username;
     }
 
+    // 🪄 Show staff wand if applicable
+    if (staffWand) {
+      staffWand.style.display = isStaff ? "flex" : "none";
+    }
+
+    // 🧙 Load staff.js only if user is staff
+    if (isStaff && !document.querySelector('script[src="/js/staff.js"]')) {
+      const script = document.createElement("script");
+      script.src = "/js/staff.js";
+      document.body.appendChild(script);
+      console.log("🪄 staff.js loaded for staff user.");
+    }
+
+    // Optionally update profile info
     fetchUserProfile();
   } else {
+    // Not logged in → hide staff & user sections, show login
     if (loginNav) loginNav.style.display = "flex";
     if (userDropdown) userDropdown.style.display = "none";
+    if (staffWand) staffWand.style.display = "none";
   }
+
+  console.log("🔍 Navbar updated — isLoggedIn:", isLoggedIn, "isStaff:", isStaff);
 }
 
-// ==============================
-// Page Guard
-// ==============================
+/* ==============================
+===== Page Guard ===============
+============================== */
 document.addEventListener("DOMContentLoaded", () => {
   const isUserPage = window.location.pathname.endsWith("/user.html");
   const discordUser = JSON.parse(localStorage.getItem("discordUser") || "{}");
@@ -59,9 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ==============================
-// Header Auth Spinner
-// ==============================
+/* ==============================
+===== Header Auth Spinner ======
+============================== */
 function showHeaderAuthSpinner() {
   const loginNav = document.getElementById("loginNav");
   if (!loginNav) return;
@@ -84,11 +110,10 @@ function hideHeaderAuthSpinner() {
   }
 }
 
-// ==============================
-// OAuth 
-// ==============================
+/* ==============================
+===== OAuth Handler ============
+============================== */
 async function handleOAuthCallback() {
-  // Handle only when URL hash has the token
   const params = new URLSearchParams(window.location.hash.substring(1));
   const accessToken = params.get("access_token");
   if (!accessToken) return;
@@ -96,26 +121,56 @@ async function handleOAuthCallback() {
   showHeaderAuthSpinner();
 
   try {
+    console.log("🔑 OAuth callback triggered — access token received.");
     localStorage.setItem("access_token", accessToken);
 
+    // Fetch user info
     const userResponse = await fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!userResponse.ok) throw new Error("Failed to fetch user info");
-
     const userData = await userResponse.json();
-    localStorage.setItem("discordUser", JSON.stringify(userData));
+    console.log("👤 User info:", userData);
 
-    // Warm the GAS
-    if (userData.id) {
-      fetch(`${GAS_ENDPOINT}?id=${encodeURIComponent(userData.id)}&username=${encodeURIComponent(userData.username || "")}`)
-        .then(res => res.json())
-        .then(gasData => localStorage.setItem("userData", JSON.stringify(gasData)))
-        .catch(() => {});
+    // Fetch guild member info (for roles)
+    const memberURL = `https://discord.com/api/users/@me/guilds/${GUILD_ID}/member`;
+    console.log("🌐 Fetching guild member data:", memberURL);
+
+    const memberResponse = await fetch(memberURL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    let roles = [];
+    if (memberResponse.ok) {
+      const memberData = await memberResponse.json();
+      roles = memberData.roles || [];
+      console.log("✅ Roles fetched:", roles);
+    } else {
+      const errText = await memberResponse.text();
+      console.warn(`⚠️ Failed to fetch guild member data (${memberResponse.status})`, errText);
     }
 
-    // If not on /user.html, go there; otherwise clean hash + update UI
+    // Attach roles to user data
+    userData.roles = roles;
+    localStorage.setItem("discordUser", JSON.stringify(userData));
+
+    // Send to Google Apps Script backend
+    if (userData.id) {
+      fetch(
+        `${GAS_ENDPOINT}?id=${encodeURIComponent(userData.id)}&username=${encodeURIComponent(
+          userData.username || ""
+        )}`
+      )
+        .then((res) => res.json())
+        .then((gasData) => {
+          localStorage.setItem("userData", JSON.stringify(gasData));
+        })
+        .catch((err) => console.warn("⚠️ GAS sync failed:", err));
+    }
+
+    // Redirect or update navbar
     if (!window.location.pathname.endsWith("/user.html")) {
+      console.log("➡️ Redirecting to user.html...");
       window.location.replace("/user.html");
       return;
     } else {
@@ -123,13 +178,67 @@ async function handleOAuthCallback() {
       updateNavbarUI();
       hideHeaderAuthSpinner();
     }
+
   } catch (err) {
-    console.error("OAuth handling error:", err);
+    console.error("❌ OAuth processing error:", err);
     history.replaceState(null, "", window.location.pathname);
     hideHeaderAuthSpinner();
   }
 }
 
+/* ==============================
+===== Local Dev Bypass ==========
+============================== */
+const DEV_MODE =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+if (DEV_MODE) {
+  console.warn("⚙️ Running in DEV_MODE — using mock Discord user.");
+
+  // Simulated Discord user (replace with your actual info)
+  const mockUser = {
+    id: "220002294941351947",
+    username: "chuwigirls",
+    roles: ["735289897656516698"], // ✅ give yourself a staff role if needed
+  };
+
+  localStorage.setItem("discordUser", JSON.stringify(mockUser));
+  localStorage.setItem(
+    "userData",
+    JSON.stringify({
+      id: mockUser.id,
+      username: mockUser.username,
+      crystals: 9999, // optional mock data
+    })
+  );
+
+  // Update UI as if logged in
+  document.addEventListener("DOMContentLoaded", () => {
+    updateNavbarUI?.(); // safely call if defined
+    hideHeaderAuthSpinner?.();
+  });
+}
+
+/* ==============================
+===== Staff Check Helper =======
+============================== */
+function isStaffUser() {
+  const DEV_MODE =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  if (DEV_MODE) return true; // Dev always counts as staff
+
+  const user = JSON.parse(localStorage.getItem("discordUser") || "{}");
+  const roles = user.roles || [];
+  return roles.some((r) => STAFF_ROLE_IDS.includes(r));
+}
+
+
+/* ==============================
+===== Logout ===================
+============================== */
 function setupLogoutButton() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (!logoutBtn) return;
@@ -144,30 +253,9 @@ function setupLogoutButton() {
   });
 }
 
-// ==============================
-// ===== Sidebar, Header ========
-// ==============================
-function updateHeaderHeightCSSVar() {
-  const header = document.getElementById('siteHeader');
-  if (header) {
-    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
-  }
-}
-
-function toggleSidebar() {
-  document.body.classList.toggle("sidebar-open");
-}
-
-function handleSidebarDisplay() {
-  if (window.innerWidth >= 1275) {
-    if (!document.body.classList.contains("sidebar-closed")) {
-      document.body.classList.add("sidebar-open");
-    }
-  } else {
-    document.body.classList.remove("sidebar-open");
-  }
-}
-
+/* ==============================
+===== Header / Sidebar =========
+============================== */
 function updateHeaderHeightCSSVar() {
   const header = document.getElementById('siteHeader');
   if (header) {
@@ -241,6 +329,18 @@ function initNavbarToggler() {
 
 window.addEventListener('load', updateHeaderHeightCSSVar);
 window.addEventListener('resize', updateHeaderHeightCSSVar);
+
+/* ==============================
+===== Helpers ==================
+============================== */
+async function fetchUserProfile() {
+  try {
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    return userData;
+  } catch {
+    return {};
+  }
+}
 
 // ==============================
 // ===== Load Includes & Initialize Page ====
@@ -958,7 +1058,10 @@ function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefa
   const categories = [
     { field: "Inventory", containerId: "detail-inventory", map: artifactIconMap, emptyId: "no-inventory" },
     { field: "Palcharms", containerId: "detail-palcharms", map: palcharmIconMap, emptyId: "no-palcharms" },
-    { field: "Emblems", containerId: "detail-emblems", map: emblemIconMap, emptyId: "no-emblems" }
+    { field: "Emblems", containerId: "detail-emblems", map: emblemIconMap, emptyId: "no-emblems" },
+    { field: "Physiognomy", containerId: "detail-physiognomy", emptyId: "no-physiognomy", type: "text" },
+    { field: "Aesthetics", containerId: "detail-aesthetics", emptyId: "no-aesthetics", type: "text" },
+    { field: "Fundamental", containerId: "detail-fundamental", emptyId: "no-fundamental", type: "text" }
   ];
 
   categories.forEach(cat => {
@@ -967,6 +1070,20 @@ function renderDetail(row, config, regionMap, listEl, detailEl, pageEl, pageDefa
     if (!container) return;
 
     container.innerHTML = "";
+
+    // === SIMPLE TEXT FIELD (Physiognomy) ===
+    if (cat.type === "text") {
+      const value = row[cat.field]?.trim();
+
+      if (!value) {
+        if (emptyMsg) emptyMsg.style.display = "block";
+        return;
+      }
+
+      container.innerHTML = `<p><strong>${cat.field}:</strong> ${value}</p>`;
+      if (emptyMsg) emptyMsg.style.display = "none";
+      return;
+    }
 
     if (!row[cat.field]) {
       if (emptyMsg) emptyMsg.style.display = "block";
@@ -1060,7 +1177,7 @@ async function loadCiviliansGrid() {
         Status: row?.Status || "",
         Rarity: row?.Rarity || "",
         Titles: row?.Titles || "",
-        URL: row?.URL || "",        // if you have a representative image
+        URL: row?.URL || "",
         Build: row?.Build || "",
         Inventory: row?.Inventory || "",
         Palcharms: row?.Palcharms || ""
